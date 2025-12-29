@@ -1,0 +1,14 @@
+{
+  "dataset_info": {
+    "name": "QuickSplit Receipt Dataset",
+    "version": "1.0",
+    "description": "Dataset for training OCR models on receipt images",
+    "created_at": "2024-01-01T00:00:00Z"
+  },
+  "statistics": {
+    "total_images": 0,
+    "total_annotations": 0,
+    "average_items_per_receipt": 0
+  }
+}
+

@@ -1,0 +1,11 @@
+{
+  "labels": [],
+  "categories": [
+    "item_name",
+    "item_price",
+    "total_amount",
+    "date",
+    "merchant_name"
+  ]
+}
+

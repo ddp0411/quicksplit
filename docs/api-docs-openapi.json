@@ -1,0 +1,56 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "QuickSplit API",
+    "version": "1.0.0",
+    "description": "API documentation for QuickSplit bill splitting application"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {"type": "string"},
+                  "password": {"type": "string"},
+                  "name": {"type": "string"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/ocr/upload": {
+      "post": {
+        "summary": "Upload receipt image",
+        "tags": ["ocr"]
+      }
+    },
+    "/api/v1/split/create": {
+      "post": {
+        "summary": "Create a new split",
+        "tags": ["split"]
+      }
+    }
+  }
+}
+
