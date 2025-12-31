@@ -1,42 +1,70 @@
-// Login page
-import { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { loginSchema } from '@/utils/formValidators';
+import { z } from 'zod';
 
-export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, isLoading } = useAuth();
+type LoginFormData = z.infer<typeof loginSchema>;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    login({ email, password });
+export const Login: React.FC = () => {
+  const { login, isLoggingIn, loginError } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginFormData) => {
+    login(data);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+    <div className="max-w-md mx-auto mt-16">
+      <Card>
         <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
-        <Input
-          type="email"
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <Input
-          type="password"
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </Button>
-      </form>
+        
+        {loginError && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4">
+            Invalid credentials. Please try again.
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <Input
+            label="Email"
+            type="email"
+            {...register('email')}
+            error={errors.email?.message}
+            placeholder="your@email.com"
+          />
+
+          <Input
+            label="Password"
+            type="password"
+            {...register('password')}
+            error={errors.password?.message}
+            placeholder="••••••••"
+          />
+
+          <Button type="submit" loading={isLoggingIn} className="w-full">
+            Login
+          </Button>
+        </form>
+
+        <p className="text-center mt-6 text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-primary-600 hover:underline">
+            Register
+          </Link>
+        </p>
+      </Card>
     </div>
   );
 };
-

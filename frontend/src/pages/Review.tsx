@@ -1,24 +1,45 @@
-// Review page
-import { useOCRStore } from '../state/ocrStore';
-import { Button } from '../components/ui/Button';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { Card } from '@/components/ui/Card';
+import { QRGenerator } from '@/components/payments/QRGenerator';
+import { useSplit } from '@/hooks/useSplit';
 
-export const Review = () => {
-  const { ocrResult } = useOCRStore();
+export const Review: React.FC = () => {
+  const { splitId } = useParams<{ splitId: string }>();
+  const { useGetSplit } = useSplit();
+  const { data: split, isLoading } = useGetSplit(splitId!);
+
+  if (isLoading) {
+    return <div className="text-center">Loading...</div>;
+  }
+
+  if (!split) {
+    return <div className="text-center">Split not found</div>;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Review Receipt</h1>
-      {ocrResult ? (
-        <div>
-          <pre className="bg-gray-100 p-4 rounded-lg mb-4">
-            {JSON.stringify(ocrResult, null, 2)}
-          </pre>
-          <Button>Confirm & Split</Button>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold text-center">Payment Collection</h1>
+
+      <Card>
+        <div className="text-center mb-6">
+          <div className="text-sm text-gray-600 mb-2">Total Amount</div>
+          <div className="text-4xl font-bold text-primary-600">
+            ₹{split.total_amount.toFixed(2)}
+          </div>
         </div>
-      ) : (
-        <p>No receipt data found. Please scan a receipt first.</p>
-      )}
+      </Card>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {split.participants.map((participant) => (
+          <QRGenerator
+            key={participant.id}
+            upiLink={participant.upi_link}
+            amount={participant.amount}
+            participantName={participant.name}
+          />
+        ))}
+      </div>
     </div>
   );
 };
-

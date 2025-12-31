@@ -33,11 +33,19 @@ async def register(
 
 @router.post("/login", response_model=Dict)
 async def login(
-    email: str,
-    password: str,
+    credentials: dict,
     db: AsyncSession = Depends(get_db),
 ):
     """Login user."""
+    email = credentials.get("email")
+    password = credentials.get("password")
+    
+    if not email or not password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email and password are required",
+        )
+    
     user = await get_user_by_email(db, email)
     if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(

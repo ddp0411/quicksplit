@@ -1,22 +1,24 @@
 {
-  "name": "QuickSplit",
   "short_name": "QuickSplit",
-  "description": "Split bills easily with OCR",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "name": "QuickSplit - Bill Splitting App",
+  "description": "AI-powered bill scanning and instant expense splitting with UPI payments",
   "icons": [
     {
       "src": "/icons/icon-192.png",
+      "type": "image/png",
       "sizes": "192x192",
-      "type": "image/png"
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512.png",
+      "type": "image/png",
       "sizes": "512x512",
-      "type": "image/png"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0ea5e9",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
 }
-

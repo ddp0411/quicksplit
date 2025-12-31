@@ -1,35 +1,40 @@
-// Authentication hook
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { authAPI } from '../services/api/authAPI';
-import { useUserStore } from '../state/userStore';
+import { authAPI, LoginRequest, RegisterRequest } from '@/services/api/authAPI';
+import { useUserStore } from '@/state/userStore';
+import { useNavigate } from 'react-router-dom';
 
 export const useAuth = () => {
-  const { user, setUser, clearUser } = useUserStore();
+  const { setUser, logout: logoutStore } = useUserStore();
+  const navigate = useNavigate();
 
   const loginMutation = useMutation({
-    mutationFn: authAPI.login,
+    mutationFn: (data: LoginRequest) => authAPI.login(data),
     onSuccess: (data) => {
-      setUser(data.user);
+      setUser(data.user, data.access_token);
+      navigate('/scan');
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: authAPI.register,
+    mutationFn: (data: RegisterRequest) => authAPI.register(data),
     onSuccess: (data) => {
-      setUser(data.user);
+      setUser(data.user, data.access_token);
+      navigate('/scan');
     },
   });
 
   const logout = () => {
-    clearUser();
+    logoutStore();
+    navigate('/login');
   };
 
   return {
-    user,
     login: loginMutation.mutate,
     register: registerMutation.mutate,
     logout,
-    isLoading: loginMutation.isPending || registerMutation.isPending,
+    isLoggingIn: loginMutation.isPending,
+    isRegistering: registerMutation.isPending,
+    loginError: loginMutation.error,
+    registerError: registerMutation.error,
   };
 };
-

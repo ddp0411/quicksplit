@@ -1,22 +1,28 @@
-// OCR store
 import { create } from 'zustand';
 
 interface OCRResult {
   text: string;
-  items: Array<{ name: string; price: number }>;
-  total: number;
-  date?: string;
+  confidence: number;
+  detectedTotal: number | null;
+  processedImage: string | null;
 }
 
-interface OCRStore {
-  ocrResult: OCRResult | null;
-  setOCRResult: (result: OCRResult) => void;
-  clearOCRResult: () => void;
+interface OCRState {
+  isProcessing: boolean;
+  result: OCRResult | null;
+  error: string | null;
+  setProcessing: (isProcessing: boolean) => void;
+  setResult: (result: OCRResult) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
 }
 
-export const useOCRStore = create<OCRStore>((set) => ({
-  ocrResult: null,
-  setOCRResult: (result) => set({ ocrResult: result }),
-  clearOCRResult: () => set({ ocrResult: null }),
+export const useOCRStore = create<OCRState>((set) => ({
+  isProcessing: false,
+  result: null,
+  error: null,
+  setProcessing: (isProcessing) => set({ isProcessing }),
+  setResult: (result) => set({ result, error: null, isProcessing: false }),
+  setError: (error) => set({ error, isProcessing: false }),
+  reset: () => set({ isProcessing: false, result: null, error: null }),
 }));
-

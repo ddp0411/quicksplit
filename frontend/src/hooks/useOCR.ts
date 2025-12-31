@@ -1,29 +1,19 @@
-// OCR hook
 import { useMutation } from '@tanstack/react-query';
-import { ocrAPI } from '../services/api/ocrAPI';
-import { useOCRStore } from '../state/ocrStore';
+import { ocrAPI, OCRUploadRequest } from '@/services/api/ocrAPI';
 
 export const useOCR = () => {
-  const { setOCRResult } = useOCRStore();
-
-  const scanMutation = useMutation({
-    mutationFn: ocrAPI.scanReceipt,
-    onSuccess: (data) => {
-      setOCRResult(data);
-    },
+  const uploadMutation = useMutation({
+    mutationFn: (data: OCRUploadRequest) => ocrAPI.uploadAndProcess(data),
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: ocrAPI.uploadReceipt,
-    onSuccess: (data) => {
-      setOCRResult(data);
-    },
+  const validateMutation = useMutation({
+    mutationFn: ocrAPI.validateOCR,
   });
 
   return {
-    scanReceipt: scanMutation.mutate,
-    uploadReceipt: uploadMutation.mutate,
-    isLoading: scanMutation.isPending || uploadMutation.isPending,
+    uploadAndProcess: uploadMutation.mutate,
+    validate: validateMutation.mutate,
+    isUploading: uploadMutation.isPending,
+    uploadError: uploadMutation.error,
   };
 };
-
