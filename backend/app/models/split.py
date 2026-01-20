@@ -1,22 +1,51 @@
-# Split model
-from sqlalchemy import Column, String, Numeric, DateTime, ForeignKey, JSON
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Integer, Enum
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+from datetime import datetime
 import uuid
+import enum
 from app.core.database import Base
+
+
+class SplitType(str, enum.Enum):
+    EQUAL = "equal"
+    CUSTOM = "custom"
+    PERCENTAGE = "percentage"
+
+
+class PaymentStatus(str, enum.Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    FAILED = "failed"
 
 
 class Split(Base):
     __tablename__ = "splits"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    title = Column(String, nullable=False)
-    total_amount = Column(Numeric(10, 2), nullable=False)
-    participants = Column(JSON, nullable=False)  # List of participant data
-    items = Column(JSON, nullable=False)  # List of items with prices
-    status = Column(String, default="pending")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    total_amount = Column(Float, nullable=False)
+    split_type = Column(Enum(SplitType), default=SplitType.EQUAL)
+    metadata = Column(JSONB, default={})
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # Relationships
+    user = relationship("User", back_populates="splits")
+    participants = relationship("Participant", back_populates="split", cascade="all, delete-orphan")
+
+
+class Participant(Base):
+    __tablename__ = "participants"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    split_id = Column(UUID(as_uuid=True), ForeignKey("splits.id"), nullable=False)
+    name = Column(String, nullable=False)
+    upi_id = Column(String, nullable=True)
+    amount = Column(Float, nullable=False)
+    payment_status = Column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
+    paid_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    split = relationship("Split", back_populates="participants")

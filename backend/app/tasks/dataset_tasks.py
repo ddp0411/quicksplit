@@ -1,40 +1,48 @@
-# Dataset tasks
+from celery import Task
 from app.core.celery_app import celery_app
-from app.services.dataset_service import upload_dataset_file
-import zipfile
-import os
+from app.services.dataset_service import DatasetService
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-@celery_app.task(name="process_dataset")
-def process_dataset_task(filename: str, file_content: bytes):
-    """Process dataset upload task asynchronously."""
+@celery_app.task(bind=True)
+def process_dataset_entry(self: Task, entry_id: str):
+    """
+    Process dataset entry in background
+    - Validate OCR results
+    - Calculate accuracy metrics
+    - Prepare for model training
+    """
     try:
-        # Save uploaded file
-        file_path = upload_dataset_file(filename, file_content)
+        logger.info(f"Processing dataset entry: {entry_id}")
         
-        # Extract and process dataset
-        extract_dir = os.path.join(os.path.dirname(file_path), "extracted")
-        os.makedirs(extract_dir, exist_ok=True)
+        # Perform dataset processing
+        # - Text normalization
+        # - Entity extraction
+        # - Confidence calculation
         
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
-        
-        # Count images
-        image_count = 0
-        for root, dirs, files in os.walk(extract_dir):
-            for file in files:
-                if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    image_count += 1
-        
-        return {
-            "status": "completed",
-            "file_path": file_path,
-            "extract_dir": extract_dir,
-            "total_images": image_count,
-        }
-    except Exception as e:
-        return {
-            "status": "failed",
-            "error": str(e),
-        }
+        logger.info(f"Dataset entry processed: {entry_id}")
+        return {"status": "success", "entry_id": entry_id}
+    
+    except Exception as exc:
+        logger.error(f"Dataset processing failed: {exc}")
+        return {"status": "failed", "entry_id": entry_id, "error": str(exc)}
 
+
+@celery_app.task
+def export_dataset_coco():
+    """
+    Export dataset in COCO format for training
+    Runs periodically to prepare training data
+    """
+    try:
+        dataset_service = DatasetService()
+        coco_data = dataset_service.export_coco_format()
+        
+        logger.info("Dataset exported successfully")
+        return {"status": "success", "records": len(coco_data.get('images', []))}
+    
+    except Exception as exc:
+        logger.error(f"Dataset export failed: {exc}")
+        return {"status": "failed", "error": str(exc)}

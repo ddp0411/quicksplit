@@ -1,77 +1,107 @@
-# Split service
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List, Optional
-from uuid import UUID
-from app.models.split import Split
-from app.schemas.split import SplitCreate, SplitUpdate
+from typing import List
+import math
 
 
-async def create_split(
-    db: AsyncSession,
-    split_data: SplitCreate,
-    user_id: UUID,
-) -> Split:
-    """Create a new split."""
-    split = Split(
-        user_id=user_id,
-        title=split_data.title,
-        total_amount=split_data.total_amount,
-        participants=[p.dict() for p in split_data.participants],
-        items=[i.dict() for i in split_data.items],
-    )
-    db.add(split)
-    await db.commit()
-    await db.refresh(split)
-    return split
-
-
-async def get_split_by_id(db: AsyncSession, split_id: str) -> Optional[Split]:
-    """Get split by ID."""
-    result = await db.execute(select(Split).where(Split.id == split_id))
-    return result.scalar_one_or_none()
-
-
-async def get_user_splits(db: AsyncSession, user_id: UUID) -> List[Split]:
-    """Get all splits for a user."""
-    result = await db.execute(select(Split).where(Split.user_id == user_id))
-    return list(result.scalars().all())
-
-
-async def update_split(
-    db: AsyncSession,
-    split_id: str,
-    split_data: SplitUpdate,
-    user_id: UUID,
-) -> Optional[Split]:
-    """Update a split."""
-    split = await get_split_by_id(db, split_id)
-    if not split or split.user_id != user_id:
-        return None
+class SplitService:
+    """
+    Service for calculating bill splits
+    Implements paisa-accurate splitting with deterministic rounding
+    """
     
-    update_data = split_data.dict(exclude_unset=True)
-    for field, value in update_data.items():
-        if field in ["participants", "items"]:
-            setattr(split, field, [p.dict() if hasattr(p, "dict") else p for p in value])
-        else:
-            setattr(split, field, value)
+    def calculate_equal_split(self, total_amount: float, num_participants: int) -> List[float]:
+        """
+        Calculate equal split with proper paisa distribution
+        
+        Algorithm:
+        1. Calculate base amount (floor division)
+        2. Calculate remainder in paisa
+        3. Distribute remainder to first N participants
+        
+        Example:
+        Total: 100, Participants: 3
+        Base: 33.33 each
+        Result: [33.34, 33.33, 33.33] (total = 100.00)
+        """
+        if num_participants <= 0:
+            raise ValueError("Number of participants must be positive")
+        
+        if total_amount <= 0:
+            raise ValueError("Total amount must be positive")
+        
+        # Convert to paisa for accurate calculation
+        total_paisa = round(total_amount * 100)
+        
+        # Calculate base amount per person in paisa
+        base_paisa = total_paisa // num_participants
+        
+        # Calculate remainder in paisa
+        remainder_paisa = total_paisa - (base_paisa * num_participants)
+        
+        # Distribute amounts
+        amounts = []
+        for i in range(num_participants):
+            # First 'remainder' participants get 1 extra paisa
+            if i < remainder_paisa:
+                amount_paisa = base_paisa + 1
+            else:
+                amount_paisa = base_paisa
+            
+            # Convert back to rupees
+            amounts.append(amount_paisa / 100)
+        
+        return amounts
     
-    await db.commit()
-    await db.refresh(split)
-    return split
-
-
-async def delete_split(
-    db: AsyncSession,
-    split_id: str,
-    user_id: UUID,
-) -> bool:
-    """Delete a split."""
-    split = await get_split_by_id(db, split_id)
-    if not split or split.user_id != user_id:
-        return False
+    def calculate_custom_split(
+        self, 
+        total_amount: float, 
+        participant_amounts: List[float]
+    ) -> List[float]:
+        """
+        Validate and adjust custom split amounts
+        Ensures sum equals total with paisa accuracy
+        """
+        if not participant_amounts:
+            raise ValueError("Participant amounts list is empty")
+        
+        sum_amounts = sum(participant_amounts)
+        
+        # Check if sum matches total (within 1 paisa tolerance)
+        diff = abs(sum_amounts - total_amount)
+        if diff > 0.01:
+            raise ValueError(
+                f"Sum of amounts ({sum_amounts}) doesn't match total ({total_amount})"
+            )
+        
+        # Adjust last amount if there's a small difference
+        if diff > 0:
+            participant_amounts[-1] += (total_amount - sum_amounts)
+        
+        return participant_amounts
     
-    await db.delete(split)
-    await db.commit()
-    return True
-
+    def calculate_percentage_split(
+        self,
+        total_amount: float,
+        percentages: List[float]
+    ) -> List[float]:
+        """
+        Calculate split based on percentages
+        """
+        if not percentages:
+            raise ValueError("Percentages list is empty")
+        
+        if abs(sum(percentages) - 100.0) > 0.01:
+            raise ValueError("Percentages must sum to 100")
+        
+        # Calculate amounts
+        amounts = [total_amount * (p / 100) for p in percentages]
+        
+        # Adjust for rounding errors
+        total_calculated = sum(amounts)
+        diff = total_amount - total_calculated
+        if abs(diff) > 0.01:
+            amounts[-1] += diff
+        
+        # Round to 2 decimal places
+        amounts = [round(amt, 2) for amt in amounts]
+        
+        return amounts

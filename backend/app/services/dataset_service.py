@@ -1,69 +1,79 @@
-# Dataset service
-from sqlalchemy.ext.asyncio import AsyncSession
+from pathlib import Path
 from typing import Optional
-from uuid import UUID
-from app.models.dataset import Dataset
-from app.schemas.dataset import DatasetCreate
+import json
+from datetime import datetime
+from app.core.config import settings
 
 
-async def create_dataset(
-    db: AsyncSession,
-    dataset_data: DatasetCreate,
-    user_id: UUID,
-) -> Dataset:
-    """Create a new dataset record."""
-    dataset = Dataset(
-        user_id=user_id,
-        name=dataset_data.name,
-        file_path=dataset_data.file_path,
-    )
-    db.add(dataset)
-    await db.commit()
-    await db.refresh(dataset)
-    return dataset
-
-
-async def get_dataset_by_id(
-    db: AsyncSession,
-    dataset_id: str,
-) -> Optional[Dataset]:
-    """Get dataset by ID."""
-    from sqlalchemy import select
-    result = await db.execute(select(Dataset).where(Dataset.id == dataset_id))
-    return result.scalar_one_or_none()
-
-
-async def update_dataset_status(
-    db: AsyncSession,
-    dataset_id: str,
-    status: str,
-    processed_images: int = 0,
-    total_images: int = 0,
-) -> Optional[Dataset]:
-    """Update dataset processing status."""
-    dataset = await get_dataset_by_id(db, dataset_id)
-    if not dataset:
-        return None
+class DatasetService:
+    """
+    Service for managing AI training dataset
+    Organizes receipts, OCR results, and annotations
+    """
     
-    dataset.status = status
-    dataset.processed_images = processed_images
-    dataset.total_images = total_images
-    await db.commit()
-    await db.refresh(dataset)
-    return dataset
-
-
-async def upload_dataset_file(file_path: str, file_content: bytes) -> str:
-    """Save uploaded dataset file."""
-    import os
-    from app.core.config import settings
+    def __init__(self):
+        self.dataset_dir = Path(settings.DATASET_DIR)
+        self.raw_dir = self.dataset_dir / 'raw' / 'images'
+        self.processed_dir = self.dataset_dir / 'processed'
+        self.annotations_dir = self.dataset_dir / 'annotations'
+        
+        # Create directories
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
+        self.processed_dir.mkdir(parents=True, exist_ok=True)
+        self.annotations_dir.mkdir(parents=True, exist_ok=True)
     
-    upload_dir = settings.UPLOAD_DIR
-    os.makedirs(upload_dir, exist_ok=True)
+    async def save_dataset_image(self, content: bytes, image_hash: str) -> str:
+        """
+        Save image to dataset directory
+        Organizes by date for easy management
+        """
+        # Create date-based subdirectory
+        date_dir = self.raw_dir / datetime.now().strftime('%Y-%m-%d')
+        date_dir.mkdir(exist_ok=True)
+        
+        # Save image
+        image_path = date_dir / f"{image_hash}.png"
+        with open(image_path, 'wb') as f:
+            f.write(content)
+        
+        return str(image_path)
     
-    full_path = os.path.join(upload_dir, file_path)
-    with open(full_path, "wb") as f:
-        f.write(file_content)
+    def save_annotation(
+        self,
+        image_hash: str,
+        ocr_text: str,
+        detected_total: Optional[float],
+        actual_total: float,
+        metadata: dict
+    ) -> str:
+        """
+        Save annotation data for training
+        """
+        annotation = {
+            'image_hash': image_hash,
+            'ocr_text': ocr_text,
+            'detected_total': detected_total,
+            'actual_total': actual_total,
+            'metadata': metadata,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        annotation_path = self.annotations_dir / f"{image_hash}.json"
+        with open(annotation_path, 'w') as f:
+            json.dump(annotation, f, indent=2)
+        
+        return str(annotation_path)
     
-    return full_path
-
+    def export_coco_format(self) -> dict:
+        """
+        Export dataset in COCO format for model training
+        """
+        # Implementation for COCO format export
+        # Used for training object detection/OCR models
+        return {
+            'info': {},
+            'licenses': [],
+            'images': [],
+            'annotations': [],
+            'categories': []
+        }

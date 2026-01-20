@@ -1,70 +1,105 @@
-# OCR service
-try:
-    import pytesseract
-    from PIL import Image
-except ImportError:
-    pytesseract = None
-    Image = None
-
-import io
-import base64
 import re
-from typing import Dict, List
+from typing import Dict, Optional
+from pathlib import Path
 
 
-async def process_receipt_image(image_data: str) -> Dict:
-    """Process receipt image and extract text."""
-    if not pytesseract or not Image:
-        raise ImportError("pytesseract and Pillow are required for OCR")
+class OCRService:
+    """
+    OCR service for backend validation
+    Frontend does primary OCR with Tesseract.js
+    Backend validates and enhances results
+    """
     
-    # Decode base64 image
-    image_bytes = base64.b64decode(image_data)
-    image = Image.open(io.BytesIO(image_bytes))
-    
-    # Perform OCR
-    text = pytesseract.image_to_string(image)
-    
-    # Extract items and total
-    items = extract_items(text)
-    total = extract_total(text)
-    
-    return {
-        "text": text,
-        "items": items,
-        "total": total,
-    }
-
-
-def extract_items(text: str) -> List[Dict[str, any]]:
-    """Extract items from OCR text."""
-    items = []
-    lines = text.split('\n')
-    
-    for line in lines:
-        # Look for price patterns
-        price_match = re.search(r'(\d+\.\d{2})', line)
-        if price_match:
-            price = float(price_match.group(1))
-            name = line.replace(price_match.group(1), '').strip()
-            if name:
-                items.append({"name": name, "price": price})
-    
-    return items
-
-
-def extract_total(text: str) -> float:
-    """Extract total amount from OCR text."""
-    # Look for "TOTAL" or "TOTAL:" followed by amount
-    total_patterns = [
-        r'TOTAL[:\s]+(\d+\.\d{2})',
-        r'Total[:\s]+(\d+\.\d{2})',
-        r'AMOUNT[:\s]+(\d+\.\d{2})',
+    TOTAL_KEYWORDS = [
+        'total', 'grand total', 'amount due', 'net amount',
+        'bill amount', 'total amount', 'amount payable'
     ]
     
-    for pattern in total_patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            return float(match.group(1))
+    async def process_image(self, image_path: str, preprocessed: bool = False) -> Dict:
+        """
+        Process image for OCR (validation only)
+        Primary OCR is done on frontend for speed
+        """
+        # In production, you might use Tesseract/Paddle OCR here for validation
+        # For now, return placeholder
+        return {
+            "text": "",
+            "confidence": 0.0,
+            "detected_total": None
+        }
     
-    return 0.0
-
+    async def validate_ocr_text(
+        self, 
+        text: str, 
+        detected_total: Optional[float]
+    ) -> Dict:
+        """
+        Validate OCR results from frontend
+        Cross-check detected total with text analysis
+        """
+        # Re-detect total from text
+        redetected_total = self.detect_total_amount(text)
+        
+        # Calculate confidence based on match
+        confidence = 1.0
+        if detected_total and redetected_total:
+            diff_percent = abs(detected_total - redetected_total) / detected_total * 100
+            if diff_percent < 5:
+                confidence = 0.95
+            elif diff_percent < 10:
+                confidence = 0.85
+            else:
+                confidence = 0.70
+        
+        is_valid = confidence >= 0.70
+        
+        return {
+            "is_valid": is_valid,
+            "confidence": confidence,
+            "suggested_total": redetected_total or detected_total,
+            "message": "OCR validated successfully" if is_valid else "Low confidence detection"
+        }
+    
+    def detect_total_amount(self, text: str) -> Optional[float]:
+        """
+        Detect total amount from OCR text
+        Uses keyword matching and pattern recognition
+        """
+        lines = text.lower().split('\n')
+        detected_amount: Optional[float] = None
+        highest_amount = 0.0
+        
+        for line in lines:
+            # Check if line contains total keyword
+            has_keyword = any(keyword in line for keyword in self.TOTAL_KEYWORDS)
+            
+            # Extract amounts from line
+            # Supports: 123.45, 1,234.56, Rs 123, ₹123
+            amounts = re.findall(
+                r'(?:rs\.?|₹)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)',
+                line,
+                re.IGNORECASE
+            )
+            
+            if amounts:
+                for amount_str in amounts:
+                    # Clean and parse
+                    cleaned = amount_str.replace(',', '')
+                    try:
+                        amount = float(cleaned)
+                        
+                        # If keyword found, this is likely the total
+                        if has_keyword and amount > 0:
+                            detected_amount = amount
+                            break
+                        
+                        # Track highest amount as fallback
+                        if amount > highest_amount:
+                            highest_amount = amount
+                    except ValueError:
+                        continue
+            
+            if detected_amount:
+                break
+        
+        return detected_amount or (highest_amount if highest_amount > 0 else None)

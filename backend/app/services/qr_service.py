@@ -1,30 +1,97 @@
-# QR service
-try:
-    import qrcode
-except ImportError:
-    qrcode = None
-
-import io
+import qrcode
+from io import BytesIO
 import base64
 from typing import Optional
-from app.services.upi_service import generate_upi_link
 
 
-def generate_qr_code(upi_id: str, amount: float, note: Optional[str] = None) -> str:
-    """Generate QR code as base64 string."""
-    if not qrcode:
-        raise ImportError("qrcode is required for QR code generation")
+class QRService:
+    """
+    QR Code generation service for UPI payments
+    Generates QR codes that can be scanned by any UPI app
+    """
     
-    upi_link = generate_upi_link(upi_id, amount, note)
+    def generate_qr_base64(
+        self,
+        data: str,
+        size: int = 300,
+        error_correction: str = 'H'
+    ) -> str:
+        """
+        Generate QR code as base64 string
+        
+        Args:
+            data: Data to encode (usually UPI link)
+            size: QR code size in pixels
+            error_correction: Error correction level (L, M, Q, H)
+        
+        Returns:
+            Base64 encoded PNG image string with data URI prefix
+        """
+        # Map error correction level
+        error_levels = {
+            'L': qrcode.constants.ERROR_CORRECT_L,
+            'M': qrcode.constants.ERROR_CORRECT_M,
+            'Q': qrcode.constants.ERROR_CORRECT_Q,
+            'H': qrcode.constants.ERROR_CORRECT_H,
+        }
+        
+        # Create QR code instance
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=error_levels.get(error_correction, qrcode.constants.ERROR_CORRECT_H),
+            box_size=10,
+            border=4,
+        )
+        
+        # Add data
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        # Create image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Resize if needed
+        if size:
+            img = img.resize((size, size))
+        
+        # Convert to base64
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        
+        return f"data:image/png;base64,{img_str}"
     
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(upi_link)
-    qr.make(fit=True)
-    
-    img = qr.make_image(fill_color="black", back_color="white")
-    buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
-    img_str = base64.b64encode(buffer.getvalue()).decode()
-    
-    return f"data:image/png;base64,{img_str}"
-
+    def save_qr_image(
+        self,
+        data: str,
+        file_path: str,
+        size: int = 300
+    ) -> str:
+        """
+        Save QR code as image file
+        
+        Args:
+            data: Data to encode
+            file_path: Path to save image
+            size: Image size
+        
+        Returns:
+            File path where image was saved
+        """
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=10,
+            border=4,
+        )
+        
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        if size:
+            img = img.resize((size, size))
+        
+        img.save(file_path)
+        return file_path

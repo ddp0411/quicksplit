@@ -1,79 +1,247 @@
-# Split routes
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+from uuid import UUID
 from typing import List
+
 from app.core.database import get_db
-from app.api.deps import get_current_user
 from app.models.user import User
-from app.schemas.split import SplitCreate, SplitResponse, SplitUpdate
-from app.services.split_service import (
-    create_split,
-    get_split_by_id,
-    get_user_splits,
-    update_split,
-    delete_split,
+from app.models.split import Split, Participant, PaymentStatus
+from app.schemas.split import (
+    SplitCreate, 
+    SplitResponse, 
+    SplitListItem,
+    ParticipantResponse,
+    MarkPaidRequest
 )
+from app.services.split_service import SplitService
+from app.services.upi_service import UPIService
+from app.services.qr_service import QRService
+from app.api.deps import get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/splits", tags=["Splits"])
 
 
-@router.post("/create", response_model=SplitResponse)
-async def create_split_bill(
+@router.post("/create", response_model=SplitResponse, status_code=status.HTTP_201_CREATED)
+async def create_split(
     split_data: SplitCreate,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db)
 ):
-    """Create a new split bill."""
-    split = await create_split(db, split_data, current_user.id)
-    return split
+    """
+    Create a new bill split
+    - Calculates split amounts
+    - Generates UPI links and QR codes
+    - Stores in database
+    """
+    # Create split record
+    new_split = Split(
+        user_id=current_user.id,
+        total_amount=split_data.total_amount,
+        split_type=split_data.split_type,
+        metadata=split_data.metadata
+    )
+    
+    db.add(new_split)
+    await db.flush()
+    
+    # Calculate split amounts
+    split_service = SplitService()
+    amounts = split_service.calculate_equal_split(
+        split_data.total_amount,
+        len(split_data.participants)
+    )
+    
+    # Create participants with payment details
+    upi_service = UPIService()
+    qr_service = QRService()
+    
+    participant_responses = []
+    
+    for idx, participant_data in enumerate(split_data.participants):
+        amount = amounts[idx]
+        
+        # Generate UPI link
+        upi_link = upi_service.generate_upi_link(
+            upi_id=participant_data.upi_id or "merchant@upi",
+            name=participant_data.name,
+            amount=amount,
+            note=f"QuickSplit - {current_user.name}"
+        )
+        
+        # Generate QR code
+        qr_code = qr_service.generate_qr_base64(upi_link)
+        
+        # Create participant record
+        participant = Participant(
+            split_id=new_split.id,
+            name=participant_data.name,
+            upi_id=participant_data.upi_id,
+            amount=amount
+        )
+        
+        db.add(participant)
+        
+        participant_responses.append(
+            ParticipantResponse(
+                id=participant.id,
+                name=participant.name,
+                upi_id=participant.upi_id,
+                amount=participant.amount,
+                upi_link=upi_link,
+                qr_code=qr_code,
+                payment_status=PaymentStatus.PENDING.value
+            )
+        )
+    
+    await db.commit()
+    await db.refresh(new_split)
+    
+    return SplitResponse(
+        split_id=new_split.id,
+        total_amount=new_split.total_amount,
+        split_type=new_split.split_type,
+        participants=participant_responses,
+        created_at=new_split.created_at
+    )
 
 
 @router.get("/{split_id}", response_model=SplitResponse)
 async def get_split(
-    split_id: str,
+    split_id: UUID,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db)
 ):
-    """Get a split bill by ID."""
-    split = await get_split_by_id(db, split_id)
+    """Get split details by ID"""
+    result = await db.execute(
+        select(Split).where(
+            Split.id == split_id,
+            Split.user_id == current_user.id
+        )
+    )
+    split = result.scalar_one_or_none()
+    
     if not split:
-        raise HTTPException(status_code=404, detail="Split not found")
-    return split
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Split not found"
+        )
+    
+    # Get participants
+    participants_result = await db.execute(
+        select(Participant).where(Participant.split_id == split_id)
+    )
+    participants = participants_result.scalars().all()
+    
+    # Generate UPI links and QR codes
+    upi_service = UPIService()
+    qr_service = QRService()
+    
+    participant_responses = []
+    for p in participants:
+        upi_link = upi_service.generate_upi_link(
+            upi_id=p.upi_id or "merchant@upi",
+            name=p.name,
+            amount=p.amount
+        )
+        qr_code = qr_service.generate_qr_base64(upi_link)
+        
+        participant_responses.append(
+            ParticipantResponse(
+                id=p.id,
+                name=p.name,
+                upi_id=p.upi_id,
+                amount=p.amount,
+                upi_link=upi_link,
+                qr_code=qr_code,
+                payment_status=p.payment_status.value
+            )
+        )
+    
+    return SplitResponse(
+        split_id=split.id,
+        total_amount=split.total_amount,
+        split_type=split.split_type,
+        participants=participant_responses,
+        created_at=split.created_at
+    )
 
 
-@router.get("/all", response_model=List[SplitResponse])
-async def get_all_splits(
+@router.get("/history", response_model=List[SplitListItem])
+async def get_user_splits(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    limit: int = 50,
+    offset: int = 0
 ):
-    """Get all splits for current user."""
-    splits = await get_user_splits(db, current_user.id)
-    return splits
+    """Get user's split history"""
+    result = await db.execute(
+        select(
+            Split.id,
+            Split.total_amount,
+            Split.created_at,
+            func.count(Participant.id).label('participant_count')
+        )
+        .join(Participant, Split.id == Participant.split_id)
+        .where(Split.user_id == current_user.id)
+        .group_by(Split.id)
+        .order_by(Split.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    
+    splits = result.all()
+    
+    return [
+        SplitListItem(
+            split_id=s.id,
+            total_amount=s.total_amount,
+            participant_count=s.participant_count,
+            created_at=s.created_at
+        )
+        for s in splits
+    ]
 
 
-@router.put("/{split_id}", response_model=SplitResponse)
-async def update_split_bill(
-    split_id: str,
-    split_data: SplitUpdate,
+@router.post("/{split_id}/participants/{participant_id}/paid")
+async def mark_as_paid(
+    split_id: UUID,
+    participant_id: UUID,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db)
 ):
-    """Update a split bill."""
-    split = await update_split(db, split_id, split_data, current_user.id)
+    """Mark participant payment as completed"""
+    # Verify split belongs to user
+    split_result = await db.execute(
+        select(Split).where(
+            Split.id == split_id,
+            Split.user_id == current_user.id
+        )
+    )
+    split = split_result.scalar_one_or_none()
+    
     if not split:
-        raise HTTPException(status_code=404, detail="Split not found")
-    return split
-
-
-@router.delete("/{split_id}")
-async def delete_split_bill(
-    split_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Delete a split bill."""
-    success = await delete_split(db, split_id, current_user.id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Split not found")
-    return {"message": "Split deleted successfully"}
-
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Split not found"
+        )
+    
+    # Update participant status
+    participant_result = await db.execute(
+        select(Participant).where(
+            Participant.id == participant_id,
+            Participant.split_id == split_id
+        )
+    )
+    participant = participant_result.scalar_one_or_none()
+    
+    if not participant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Participant not found"
+        )
+    
+    participant.payment_status = PaymentStatus.PAID
+    await db.commit()
+    
+    return {"message": "Payment marked as completed"}

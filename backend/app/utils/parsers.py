@@ -1,37 +1,50 @@
-# Parsers utilities
 import re
-from typing import List, Dict
+from typing import Optional, List, Dict
 
 
-def parse_receipt_text(text: str) -> Dict:
-    """Parse receipt text to extract structured data."""
-    items = []
-    total = 0.0
+class TextParser:
+    """Utility class for parsing OCR text"""
     
-    lines = text.split('\n')
-    for line in lines:
-        # Look for item-price patterns
-        price_match = re.search(r'(\d+\.\d{2})', line)
-        if price_match:
-            price = float(price_match.group(1))
-            name = line.replace(price_match.group(1), '').strip()
-            if name:
-                items.append({"name": name, "price": price})
+    @staticmethod
+    def extract_amounts(text: str) -> List[float]:
+        """
+        Extract all amounts from text
+        Supports formats: 123.45, 1,234.56, Rs 123, ₹123
+        """
+        pattern = r'(?:rs\.?|₹)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)'
+        matches = re.findall(pattern, text, re.IGNORECASE)
+        
+        amounts = []
+        for match in matches:
+            cleaned = match.replace(',', '')
+            try:
+                amounts.append(float(cleaned))
+            except ValueError:
+                continue
+        
+        return amounts
     
-    # Extract total
-    total_patterns = [
-        r'TOTAL[:\s]+(\d+\.\d{2})',
-        r'Total[:\s]+(\d+\.\d{2})',
-    ]
-    for pattern in total_patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            total = float(match.group(1))
-            break
+    @staticmethod
+    def extract_date(text: str) -> Optional[str]:
+        """Extract date from text"""
+        # Common date patterns
+        patterns = [
+            r'\d{2}[/-]\d{2}[/-]\d{4}',  # DD/MM/YYYY or DD-MM-YYYY
+            r'\d{4}[/-]\d{2}[/-]\d{2}',  # YYYY/MM/DD or YYYY-MM-DD
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text)
+            if match:
+                return match.group(0)
+        
+        return None
     
-    return {
-        "items": items,
-        "total": total,
-        "raw_text": text,
-    }
-
+    @staticmethod
+    def clean_text(text: str) -> str:
+        """Clean and normalize OCR text"""
+        # Remove extra whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Remove special characters
+        text = re.sub(r'[^\w\s.,@₹-]', '', text)
+        return text.strip()

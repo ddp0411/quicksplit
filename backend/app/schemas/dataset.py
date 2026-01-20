@@ -1,28 +1,45 @@
-# Dataset schemas
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from uuid import UUID
+from typing import Optional
 
 
-class DatasetBase(BaseModel):
-    name: str
+class DatasetSubmit(BaseModel):
+    ocr_text: str = Field(..., min_length=1)
+    actual_total: float = Field(..., gt=0)
+    metadata: dict = Field(default_factory=dict)
 
 
-class DatasetCreate(DatasetBase):
-    file_path: str
-
-
-class DatasetResponse(DatasetBase):
+class DatasetResponse(BaseModel):
     id: UUID
-    user_id: UUID
-    file_path: str
-    status: str
-    total_images: int
-    processed_images: int
+    image_hash: str
+    ocr_text: str
+    detected_total: Optional[float]
+    actual_total: float
+    confidence: Optional[float]
+    is_verified: int
     created_at: datetime
-    updated_at: Optional[datetime]
+    
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
 
+class DatasetStats(BaseModel):
+    total_entries: int
+    verified_entries: int
+    unverified_entries: int
+    rejected_entries: int
+    average_confidence: float
+    total_images_size_mb: float
+
+
+class OCRResult(BaseModel):
+    text: str
+    confidence: float
+    detected_total: Optional[float]
+    processing_time: float
+
+
+class OCRValidation(BaseModel):
+    text: str
+    detected_total: Optional[float]
+    image_hash: str
