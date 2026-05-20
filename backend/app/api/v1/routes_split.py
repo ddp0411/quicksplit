@@ -17,6 +17,7 @@ from app.schemas.split import (
 from app.services.split_service import SplitService
 from app.services.upi_service import UPIService
 from app.services.qr_service import QRService
+from app.services.cache_service import cache_service
 from app.api.deps import get_current_user
 
 router = APIRouter(prefix="/splits", tags=["Splits"])
@@ -39,7 +40,7 @@ async def create_split(
         user_id=current_user.id,
         total_amount=split_data.total_amount,
         split_type=split_data.split_type,
-        metadata=split_data.metadata
+        meta=split_data.metadata
     )
     
     db.add(new_split)
@@ -47,16 +48,22 @@ async def create_split(
     
     # Calculate split amounts
     split_service = SplitService()
-    amounts = split_service.calculate_equal_split(
-        split_data.total_amount,
-        len(split_data.participants)
-    )
+    split_cache_key = f"split:equal:{split_data.total_amount:.2f}:{len(split_data.participants)}"
+    cached_amounts = await cache_service.get_json(split_cache_key)
+    if cached_amounts:
+        amounts = [float(amount) for amount in cached_amounts]
+    else:
+        amounts = split_service.calculate_equal_split(
+            split_data.total_amount,
+            len(split_data.participants)
+        )
+        await cache_service.set_json(split_cache_key, amounts, ttl_seconds=60 * 60)
     
     # Create participants with payment details
     upi_service = UPIService()
     qr_service = QRService()
     
-    participant_responses = []
+    participants = []
     
     for idx, participant_data in enumerate(split_data.participants):
         amount = amounts[idx]
@@ -81,6 +88,17 @@ async def create_split(
         )
         
         db.add(participant)
+        participants.append((participant, upi_link, qr_code))
+
+    await db.flush()
+
+    participant_responses = []
+    for participant, upi_link, qr_code in participants:
+        payment_status = (
+            participant.payment_status.value
+            if hasattr(participant.payment_status, "value")
+            else participant.payment_status
+        )
         
         participant_responses.append(
             ParticipantResponse(
@@ -90,7 +108,7 @@ async def create_split(
                 amount=participant.amount,
                 upi_link=upi_link,
                 qr_code=qr_code,
-                payment_status=PaymentStatus.PENDING.value
+                payment_status=payment_status
             )
         )
     
@@ -100,10 +118,46 @@ async def create_split(
     return SplitResponse(
         split_id=new_split.id,
         total_amount=new_split.total_amount,
-        split_type=new_split.split_type,
+        split_type=new_split.split_type.value if hasattr(new_split.split_type, "value") else new_split.split_type,
         participants=participant_responses,
         created_at=new_split.created_at
     )
+
+
+@router.get("/history", response_model=List[SplitListItem])
+async def get_user_splits(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = 50,
+    offset: int = 0
+):
+    """Get user's split history"""
+    result = await db.execute(
+        select(
+            Split.id,
+            Split.total_amount,
+            Split.created_at,
+            func.count(Participant.id).label('participant_count')
+        )
+        .join(Participant, Split.id == Participant.split_id)
+        .where(Split.user_id == current_user.id)
+        .group_by(Split.id)
+        .order_by(Split.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+
+    splits = result.all()
+
+    return [
+        SplitListItem(
+            split_id=s.id,
+            total_amount=s.total_amount,
+            participant_count=s.participant_count,
+            created_at=s.created_at
+        )
+        for s in splits
+    ]
 
 
 @router.get("/{split_id}", response_model=SplitResponse)
@@ -120,13 +174,13 @@ async def get_split(
         )
     )
     split = result.scalar_one_or_none()
-    
+
     if not split:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Split not found"
         )
-    
+
     # Get participants
     participants_result = await db.execute(
         select(Participant).where(Participant.split_id == split_id)
@@ -154,53 +208,17 @@ async def get_split(
                 amount=p.amount,
                 upi_link=upi_link,
                 qr_code=qr_code,
-                payment_status=p.payment_status.value
+                payment_status=p.payment_status.value if hasattr(p.payment_status, "value") else p.payment_status
             )
         )
     
     return SplitResponse(
         split_id=split.id,
         total_amount=split.total_amount,
-        split_type=split.split_type,
+        split_type=split.split_type.value if hasattr(split.split_type, "value") else split.split_type,
         participants=participant_responses,
         created_at=split.created_at
     )
-
-
-@router.get("/history", response_model=List[SplitListItem])
-async def get_user_splits(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-    limit: int = 50,
-    offset: int = 0
-):
-    """Get user's split history"""
-    result = await db.execute(
-        select(
-            Split.id,
-            Split.total_amount,
-            Split.created_at,
-            func.count(Participant.id).label('participant_count')
-        )
-        .join(Participant, Split.id == Participant.split_id)
-        .where(Split.user_id == current_user.id)
-        .group_by(Split.id)
-        .order_by(Split.created_at.desc())
-        .limit(limit)
-        .offset(offset)
-    )
-    
-    splits = result.all()
-    
-    return [
-        SplitListItem(
-            split_id=s.id,
-            total_amount=s.total_amount,
-            participant_count=s.participant_count,
-            created_at=s.created_at
-        )
-        for s in splits
-    ]
 
 
 @router.post("/{split_id}/participants/{participant_id}/paid")

@@ -8,6 +8,7 @@ from uuid import UUID
 from app.core.database import get_db
 from app.core.security import decode_access_token
 from app.models.user import User
+from app.services.cache_service import cache_service
 
 security = HTTPBearer()
 
@@ -22,8 +23,11 @@ async def get_current_user(
     """
     token = credentials.credentials
     payload = decode_access_token(token)
-    
-    user_id: Optional[UUID] = payload.get("sub")
+
+    cached_session = await cache_service.get_json(f"session:{token}")
+    user_id: Optional[str] = (
+        cached_session.get("user_id") if isinstance(cached_session, dict) else payload.get("sub")
+    )
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

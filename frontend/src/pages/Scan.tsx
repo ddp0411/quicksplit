@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import clsx from 'clsx';
@@ -93,6 +93,12 @@ export const Scan: React.FC = () => {
               <div className="text-lg">
                 {result.confidence.toFixed(1)}%
               </div>
+              {result.validationMessage && (
+                <div className="text-sm text-gray-500 mt-1">
+                  {result.validationMessage}
+                  {result.detectionStrategy ? ` (${result.detectionStrategy})` : ''}
+                </div>
+              )}
             </div>
 
             <div>

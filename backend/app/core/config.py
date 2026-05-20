@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -32,10 +33,25 @@ class Settings(BaseSettings):
     
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:5173"]
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, value):
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"1", "true", "yes", "on", "debug", "development", "dev"}:
+                return True
+            if normalized in {"0", "false", "no", "off", "release", "production", "prod"}:
+                return False
+        return value
 
 
 @lru_cache()

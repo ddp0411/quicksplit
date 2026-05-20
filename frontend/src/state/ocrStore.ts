@@ -5,6 +5,9 @@ interface OCRResult {
   confidence: number;
   detectedTotal: number | null;
   processedImage: string | null;
+  imageHash?: string;
+  validationMessage?: string;
+  detectionStrategy?: string;
 }
 
 interface OCRState {

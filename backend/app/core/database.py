@@ -3,15 +3,17 @@ from sqlalchemy.orm import declarative_base
 from typing import AsyncGenerator
 from .config import settings
 
+engine_kwargs = {
+    "echo": settings.DEBUG,
+    "future": True,
+    "pool_pre_ping": True,
+}
+
+if not settings.DATABASE_URL.startswith("sqlite"):
+    engine_kwargs.update({"pool_size": 10, "max_overflow": 20})
+
 # Create async engine
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    future=True,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-)
+engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 
 # Create async session factory
 AsyncSessionLocal = async_sessionmaker(
@@ -44,5 +46,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     """Initialize database tables"""
+    # Import models before create_all so SQLAlchemy metadata is populated.
+    from app.models import dataset, split, user  # noqa: F401
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

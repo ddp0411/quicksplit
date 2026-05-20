@@ -1,116 +1,102 @@
 # QuickSplit
 
-A modern bill splitting application that uses OCR technology to extract receipt information and split costs among participants.
+QuickSplit scans receipts, detects the bill total, splits the amount with paisa-accurate rounding, and generates UPI payment links plus QR codes for each participant.
 
 ## Features
 
-- 📸 **OCR Receipt Scanning** - Upload or scan receipts to extract items and totals
-- 💰 **Bill Splitting** - Split bills among multiple participants
-- 📱 **UPI Integration** - Generate UPI payment links and QR codes
-- 📊 **Dataset Management** - Upload and process training datasets
-- 🔐 **Authentication** - Secure user authentication with JWT
+- Frontend OCR with Tesseract.js and Canvas preprocessing
+- Camera capture and receipt image upload
+- Backend OCR validation with keyword total detection and largest-number fallback
+- Equal split calculations with deterministic paisa remainder distribution
+- UPI deep links and QR codes for Indian UPI apps
+- JWT authentication with passlib password hashing
+- Dataset collection for raw images, OCR text, normalized totals, metadata, and annotations
+- Celery tasks for OCR post-processing, dataset normalization, export, and cleanup
+- Redis-backed caching for OCR validation, split calculations, and sessions
+- PWA manifest for installable mobile use on Android and iOS browsers
 
 ## Tech Stack
 
-### Frontend
-- React 18 + TypeScript
-- Vite
-- Zustand (State Management)
-- React Query (Data Fetching)
-- Tailwind CSS + HeadlessUI
-- React Router
+Frontend:
+- React 18, TypeScript, Vite
+- Zustand, React Query, React Router
+- Tailwind CSS, Headless UI
+- Tesseract.js, qrcode.react
 
-### Backend
-- FastAPI
-- PostgreSQL (async)
-- Celery + Redis
-- Tesseract OCR
-- JWT Authentication
+Backend:
+- FastAPI, Pydantic v2
+- Async SQLAlchemy with PostgreSQL
+- Redis, Celery
+- JWT, passlib bcrypt
+- Pytest and httpx
 
-## Getting Started
+## Local Setup
 
-### Prerequisites
-- Node.js 18+
-- Python 3.11+
-- PostgreSQL
-- Redis
-- Docker & Docker Compose (optional)
+Backend:
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd quicksplit
-```
-
-2. Backend Setup:
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
-```
-
-3. Frontend Setup:
-```bash
-cd frontend
-npm install
-```
-
-4. Environment Variables:
-Create `.env` files in both `backend/` and `frontend/` directories with required configuration.
-
-### Running the Application
-
-#### Using Docker Compose (Recommended)
-```bash
-docker-compose up
-```
-
-#### Manual Setup
-
-1. Start PostgreSQL and Redis
-2. Run database migrations:
-```bash
-cd backend
-alembic upgrade head
-```
-
-3. Start backend:
-```bash
-cd backend
 uvicorn app.main:app --reload
 ```
 
-4. Start Celery worker:
-```bash
-cd backend
-celery -A app.core.celery_app worker --loglevel=info
-```
+Frontend:
 
-5. Start frontend:
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-## Project Structure
+Full stack with Docker:
 
-```
-quicksplit/
-├── frontend/          # React frontend application
-├── backend/           # FastAPI backend application
-├── dataset/           # AI training dataset
-├── docs/              # Documentation
-└── docker-compose.yml # Docker configuration
+```bash
+docker-compose up --build
 ```
 
-## API Documentation
+The API runs at `http://localhost:8000`, and the frontend runs at `http://localhost:3000`.
 
-API documentation is available at `/docs` when the backend is running (Swagger UI).
+## Environment
 
-## License
+Backend defaults are in `backend/app/core/config.py`. Override them with a backend `.env` file:
 
-MIT
+```env
+SECRET_KEY=change-this-in-production
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/quicksplit
+REDIS_URL=redis://localhost:6379/0
+CELERY_BROKER_URL=redis://localhost:6379/1
+CELERY_RESULT_BACKEND=redis://localhost:6379/2
+UPLOAD_DIR=./uploads
+DATASET_DIR=./dataset
+```
 
+Frontend:
+
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+```
+
+## Verification
+
+```bash
+./backend/venv/bin/python -m pytest backend/tests -q
+npm --prefix frontend run build
+```
+
+## Main API Routes
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
+- `POST /api/v1/ocr/upload`
+- `POST /api/v1/ocr/validate`
+- `POST /api/v1/splits/create`
+- `GET /api/v1/splits/history`
+- `GET /api/v1/splits/{split_id}`
+- `POST /api/v1/splits/{split_id}/participants/{participant_id}/paid`
+- `POST /api/v1/dataset/submit`
+- `GET /api/v1/dataset/stats`
+
+Swagger UI is available at `http://localhost:8000/docs` when the backend is running.

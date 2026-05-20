@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from typing import Optional
 import json
+from pathlib import Path
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.models.user import User
 from app.models.dataset import DatasetEntry
 from app.schemas.dataset import DatasetResponse, DatasetStats
@@ -64,7 +66,13 @@ async def submit_to_dataset(
     image_path = await dataset_service.save_dataset_image(content, image_hash)
     
     # Parse metadata
-    metadata_dict = json.loads(metadata) if metadata else {}
+    try:
+        metadata_dict = json.loads(metadata) if metadata else {}
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid metadata JSON: {exc.msg}"
+        ) from exc
     
     # Create dataset entry
     entry = DatasetEntry(
@@ -73,15 +81,18 @@ async def submit_to_dataset(
         image_hash=image_hash,
         ocr_text=ocr_text,
         actual_total=actual_total,
-        metadata=metadata_dict
+        meta=metadata_dict
     )
     
     db.add(entry)
     await db.commit()
     await db.refresh(entry)
     
-    # Queue background processing
-    process_dataset_entry.delay(str(entry.id))
+    # Queue background processing when workers are available.
+    try:
+        process_dataset_entry.delay(str(entry.id))
+    except Exception:
+        pass
     
     return DatasetResponse.model_validate(entry)
 
@@ -120,11 +131,16 @@ async def get_dataset_stats(
     )
     avg_confidence = avg_confidence_result.scalar() or 0.0
     
+    total_size_bytes = 0
+    for image_path in (Path(settings.DATASET_DIR) / "raw" / "images").rglob("*"):
+        if image_path.is_file():
+            total_size_bytes += image_path.stat().st_size
+
     return DatasetStats(
         total_entries=total,
         verified_entries=verified,
         unverified_entries=unverified,
         rejected_entries=rejected,
         average_confidence=float(avg_confidence),
-        total_images_size_mb=0.0  # Calculate from file system
+        total_images_size_mb=round(total_size_bytes / (1024 * 1024), 2)
     )

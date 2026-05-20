@@ -1,111 +1,89 @@
 # QuickSplit System Design
 
 ## Overview
-QuickSplit is a bill splitting application that uses OCR technology to extract receipt information and split costs among participants.
+
+QuickSplit is a receipt OCR and UPI collection app for India. The frontend performs fast OCR in the browser, the backend validates the extracted text and total, and split/payment records are stored for authenticated users.
 
 ## Architecture
 
-### Frontend
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **State Management**: Zustand
-- **Data Fetching**: React Query
-- **UI Components**: Tailwind CSS + HeadlessUI
-- **Routing**: React Router
+Frontend:
+- React 18, TypeScript, Vite
+- Tesseract.js OCR in the client
+- Canvas-based image resize, binarization, and SHA-256 hashing
+- Zustand stores for user, OCR, and split state
+- React Query for API mutations and cached reads
+- PWA manifest for installable Android/iOS browser use
 
-### Backend
-- **Framework**: FastAPI
-- **Database**: PostgreSQL (async with SQLAlchemy)
-- **Task Queue**: Celery with Redis
-- **OCR**: Tesseract OCR
-- **Authentication**: JWT tokens
+Backend:
+- FastAPI with dependency-injected auth and async DB sessions
+- Async SQLAlchemy against PostgreSQL
+- JWT access tokens and passlib bcrypt password hashes
+- Redis caching for OCR validation, split calculations, and session lookups
+- Celery workers for OCR post-processing, dataset normalization/export, and cleanup
+- Dataset storage under `dataset/raw`, `dataset/processed`, and `dataset/annotations`
 
-## Key Features
+## OCR Flow
 
-1. **OCR Receipt Scanning**
-   - Upload receipt images
-   - Extract items and totals using OCR
-   - Process asynchronously with Celery
+1. User uploads a receipt or captures it with the camera.
+2. Frontend resizes and preprocesses the image with Canvas.
+3. Tesseract.js extracts OCR text and confidence.
+4. Frontend detects a bill total using total keywords such as `Grand Total`, `Amount Due`, and `Total Amount`.
+5. If no strong keyword match is found, frontend falls back to the largest detected amount.
+6. Frontend sends OCR text, detected total, and image hash to `POST /api/v1/ocr/validate`.
+7. Backend repeats detection, scores confidence, caches the validation result, and returns the suggested total.
 
-2. **Bill Splitting**
-   - Create splits with multiple participants
-   - Assign items to participants
-   - Calculate individual amounts
+## Split Flow
 
-3. **Payment Integration**
-   - Generate UPI payment links
-   - Create QR codes for payments
+1. User confirms the detected total.
+2. User adds participants and optional UPI IDs.
+3. Frontend and backend both use paisa-based integer math.
+4. Base paisa amount is assigned to everyone.
+5. Remaining paisa are distributed to the first participants deterministically.
+6. Backend creates participant records, UPI links, and QR code data URIs.
 
-4. **Dataset Management**
-   - Upload training datasets
-   - Process and annotate images
-   - Export in various formats
+## Data Model
 
-## Database Schema
+Users:
+- `id`, `email`, `name`, `hashed_password`, `is_active`, timestamps
 
-### Users
-- id (UUID)
-- email (String)
-- hashed_password (String)
-- name (String)
-- is_active (Boolean)
-- created_at (DateTime)
+Splits:
+- `id`, `user_id`, `total_amount`, `split_type`, `metadata`, timestamps
 
-### Splits
-- id (UUID)
-- user_id (UUID, FK)
-- title (String)
-- total_amount (Decimal)
-- participants (JSON)
-- items (JSON)
-- status (String)
-- created_at (DateTime)
+Participants:
+- `id`, `split_id`, `name`, `upi_id`, `amount`, `payment_status`, timestamps
 
-### Datasets
-- id (UUID)
-- user_id (UUID, FK)
-- name (String)
-- file_path (String)
-- status (String)
-- total_images (Integer)
-- processed_images (Integer)
+Dataset entries:
+- `id`, `user_id`, `image_path`, `image_hash`, `ocr_text`, `detected_total`, `actual_total`, `confidence`, `metadata`, `annotations`, verification status
 
 ## API Endpoints
 
-### Authentication
-- POST `/api/v1/auth/register` - Register new user
-- POST `/api/v1/auth/login` - Login user
-- GET `/api/v1/auth/me` - Get current user
+Authentication:
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
 
-### OCR
-- POST `/api/v1/ocr/upload` - Upload receipt image
-- POST `/api/v1/ocr/scan` - Scan receipt from base64
-- GET `/api/v1/ocr/result/{task_id}` - Get OCR result
+OCR:
+- `POST /api/v1/ocr/upload`
+- `POST /api/v1/ocr/validate`
 
-### Split
-- POST `/api/v1/split/create` - Create split
-- GET `/api/v1/split/{split_id}` - Get split
-- GET `/api/v1/split/all` - Get all splits
-- PUT `/api/v1/split/{split_id}` - Update split
-- DELETE `/api/v1/split/{split_id}` - Delete split
+Splits:
+- `POST /api/v1/splits/create`
+- `GET /api/v1/splits/history`
+- `GET /api/v1/splits/{split_id}`
+- `POST /api/v1/splits/{split_id}/participants/{participant_id}/paid`
 
-### Dataset
-- POST `/api/v1/dataset/upload` - Upload dataset
-- GET `/api/v1/dataset/status/{dataset_id}` - Get dataset status
+Dataset:
+- `POST /api/v1/dataset/submit`
+- `GET /api/v1/dataset/stats`
+
+## Background Jobs
+
+- `process_ocr_background`: placeholder hook for enhanced OCR post-processing
+- `process_dataset_entry`: normalize OCR text and prepare labels
+- `export_dataset_coco`: export dataset annotations to COCO-style JSON
+- `cleanup_old_uploads`: remove stale uploaded files
+- `cleanup_temp_files`: remove temporary processing files
 
 ## Deployment
 
-### Docker Compose
-The application can be deployed using Docker Compose with:
-- Frontend container
-- Backend container
-- PostgreSQL database
-- Redis for Celery
-- Celery worker
-
-### Environment Variables
-- Database connection strings
-- JWT secret keys
-- CORS origins
-- File upload directories
-
+`docker-compose.yml` starts PostgreSQL, Redis, FastAPI, Celery worker, Celery beat, and the frontend dev server. Production deployments should replace the default secret key, mount durable upload/dataset storage, and serve the frontend build through a static server or CDN.

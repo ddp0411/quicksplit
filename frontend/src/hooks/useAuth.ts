@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { authAPI, LoginRequest, RegisterRequest } from '@/services/api/authAPI';
 import { useUserStore } from '@/state/userStore';
 import { useNavigate } from 'react-router-dom';

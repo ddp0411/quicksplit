@@ -5,7 +5,8 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useOCRStore } from '@/state/ocrStore';
 import { ImageProcessor } from './ImageProcessor';
-import { CameraIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ocrAPI } from '@/services/api/ocrAPI';
+import { CameraIcon } from '@heroicons/react/24/outline';
 
 export const OCRScanner: React.FC = () => {
   const webcamRef = useRef<Webcam>(null);
@@ -31,63 +32,48 @@ export const OCRScanner: React.FC = () => {
 
       // Preprocess image
       const processedImage = await ImageProcessor.preprocessImage(file);
+      const imageHash = await ImageProcessor.calculateHash(file);
 
       // Initialize Tesseract worker
       const worker = await createWorker('eng');
 
       // Perform OCR
       const { data } = await worker.recognize(processedImage);
-      
-      // Detect total amount from text
-      const detectedTotal = detectTotalAmount(data.text);
+      await worker.terminate();
+
+      const detection = ImageProcessor.detectBillTotal(data.text);
+      let detectedTotal = detection.amount;
+      let confidence = Math.max(data.confidence, detection.confidence);
+      let validationMessage = 'Validated locally';
+      let detectionStrategy: string = detection.strategy;
+
+      try {
+        const validation = await ocrAPI.validateOCR({
+          text: data.text,
+          detected_total: detection.amount,
+          image_hash: imageHash,
+        });
+        detectedTotal = validation.suggested_total ?? detection.amount;
+        confidence = Math.round(((data.confidence * 0.55) + (validation.confidence * 0.45)) * 10) / 10;
+        validationMessage = validation.message;
+        detectionStrategy = validation.strategy;
+      } catch {
+        validationMessage = 'Backend validation unavailable; using local OCR result';
+      }
 
       setResult({
         text: data.text,
-        confidence: data.confidence,
+        confidence,
         detectedTotal,
         processedImage,
+        imageHash,
+        validationMessage,
+        detectionStrategy,
       });
-
-      await worker.terminate();
     } catch (error) {
       console.error('OCR Error:', error);
       setError('Failed to process image. Please try again.');
     }
-  };
-
-  const detectTotalAmount = (text: string): number | null => {
-    // Keywords that typically appear near total amounts
-    const totalKeywords = ['total', 'grand total', 'amount due', 'net amount', 'bill amount'];
-    
-    const lines = text.toLowerCase().split('\n');
-    let detectedAmount: number | null = null;
-    let highestAmount = 0;
-
-    for (const line of lines) {
-      // Check if line contains total keyword
-      const hasKeyword = totalKeywords.some(keyword => line.includes(keyword));
-      
-      // Extract numbers (supports formats like 123.45, 1,234.56, Rs 123, ₹123)
-      const amounts = line.match(/(?:rs\.?|₹)?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/gi);
-      
-      if (amounts) {
-        amounts.forEach(amountStr => {
-          const cleaned = amountStr.replace(/[^\d.]/g, '');
-          const amount = parseFloat(cleaned);
-          
-          if (hasKeyword && !isNaN(amount)) {
-            detectedAmount = amount;
-          }
-          
-          // Fallback: track highest amount
-          if (amount > highestAmount) {
-            highestAmount = amount;
-          }
-        });
-      }
-    }
-
-    return detectedAmount || (highestAmount > 0 ? highestAmount : null);
   };
 
   return (

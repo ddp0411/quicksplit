@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
 import { useSplit } from '@/hooks/useSplit';
 import { formatDate } from '@/utils/helpers';
+import type { SplitHistoryItem } from '@/services/api/splitAPI';
 
 export const History: React.FC = () => {
   const { useHistory } = useSplit();
@@ -18,7 +19,7 @@ export const History: React.FC = () => {
 
       {splits && splits.length > 0 ? (
         <div className="space-y-4">
-          {splits.map((split: any) => (
+          {splits.map((split: SplitHistoryItem) => (
             <Link key={split.split_id} to={`/review/${split.split_id}`}>
               <Card hover>
                 <div className="flex justify-between items-center">
@@ -27,7 +28,7 @@ export const History: React.FC = () => {
                       ₹{split.total_amount.toFixed(2)}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {split.participants.length} participants
+                      {split.participant_count} participants
                     </div>
                     <div className="text-xs text-gray-400 mt-1">
                       {formatDate(split.created_at)}

@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.core.database import init_db
 from app.api.v1 import routes_auth, routes_ocr, routes_split, routes_dataset
+from app.services.cache_service import cache_service
 from app.utils.logger import setup_logger
 
 logger = setup_logger()
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
+    await cache_service.close()
     logger.info("Shutting down QuickSplit API...")
 
 

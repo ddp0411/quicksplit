@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.user import User
 from app.schemas.user import UserCreate
-from app.core.security import get_password_hash
+from app.core.security import hash_password
 
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
@@ -20,7 +20,7 @@ async def get_user_by_id(db: AsyncSession, user_id: str) -> User | None:
 
 async def create_user(db: AsyncSession, user_data: UserCreate) -> User:
     """Create a new user."""
-    hashed_password = get_password_hash(user_data.password)
+    hashed_password = hash_password(user_data.password)
     user = User(
         email=user_data.email,
         name=user_data.name,
@@ -30,4 +30,3 @@ async def create_user(db: AsyncSession, user_data: UserCreate) -> User:
     await db.commit()
     await db.refresh(user)
     return user
-

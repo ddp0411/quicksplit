@@ -52,14 +52,15 @@ export const useSplitStore = create<SplitState>((set, get) => ({
   calculateSplit: () => {
     const { billTotal, participants } = get();
     if (participants.length === 0) return;
-    
-    const baseAmount = Math.floor(billTotal / participants.length);
-    const remainder = billTotal - baseAmount * participants.length;
-    
+
+    const totalPaisa = Math.round(billTotal * 100);
+    const basePaisa = Math.floor(totalPaisa / participants.length);
+    const remainderPaisa = totalPaisa - basePaisa * participants.length;
+
     set({
       participants: participants.map((p, index) => ({
         ...p,
-        amount: baseAmount + (index < remainder ? 1 : 0),
+        amount: (basePaisa + (index < remainderPaisa ? 1 : 0)) / 100,
       })),
     });
   },

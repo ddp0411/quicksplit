@@ -24,6 +24,13 @@ export interface SplitResponse {
   created_at: string;
 }
 
+export interface SplitHistoryItem {
+  split_id: string;
+  total_amount: number;
+  participant_count: number;
+  created_at: string;
+}
+
 export const splitAPI = {
   createSplit: async (data: SplitRequest): Promise<SplitResponse> => {
     const response = await axiosClient.post<SplitResponse>('/splits/create', data);
@@ -35,8 +42,8 @@ export const splitAPI = {
     return response.data;
   },
 
-  getUserSplits: async () => {
-    const response = await axiosClient.get('/splits/history');
+  getUserSplits: async (): Promise<SplitHistoryItem[]> => {
+    const response = await axiosClient.get<SplitHistoryItem[]>('/splits/history');
     return response.data;
   },
 

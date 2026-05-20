@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse, Token, UserLogin
 from app.api.deps import get_current_user
+from app.services.cache_service import cache_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -47,6 +48,11 @@ async def register(
     access_token = create_access_token(
         data={"sub": str(new_user.id)},
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    await cache_service.set_json(
+        f"session:{access_token}",
+        {"user_id": str(new_user.id), "email": new_user.email},
+        ttl_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
     
     return Token(
@@ -86,6 +92,11 @@ async def login(
     access_token = create_access_token(
         data={"sub": str(user.id)},
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    await cache_service.set_json(
+        f"session:{access_token}",
+        {"user_id": str(user.id), "email": user.email},
+        ttl_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
     
     return Token(

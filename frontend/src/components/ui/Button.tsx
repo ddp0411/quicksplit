@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,9 +24,7 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <motion.button
-      whileHover={{ scale: disabled || loading ? 1 : 1.02 }}
-      whileTap={{ scale: disabled || loading ? 1 : 0.98 }}
+    <button
       className={clsx(baseStyles, variantStyles[variant], className)}
       disabled={disabled || loading}
       {...props}
@@ -59,6 +56,6 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         children
       )}
-    </motion.button>
+    </button>
   );
 };

@@ -18,6 +18,14 @@ export interface OCRValidationRequest {
   image_hash: string;
 }
 
+export interface OCRValidationResponse {
+  is_valid: boolean;
+  confidence: number;
+  suggested_total: number | null;
+  strategy: string;
+  message: string;
+}
+
 export const ocrAPI = {
   uploadAndProcess: async (data: OCRUploadRequest): Promise<OCRResult> => {
     const formData = new FormData();
@@ -34,8 +42,8 @@ export const ocrAPI = {
     return response.data;
   },
 
-  validateOCR: async (data: OCRValidationRequest) => {
-    const response = await axiosClient.post('/ocr/validate', data);
+  validateOCR: async (data: OCRValidationRequest): Promise<OCRValidationResponse> => {
+    const response = await axiosClient.post<OCRValidationResponse>('/ocr/validate', data);
     return response.data;
   },
 

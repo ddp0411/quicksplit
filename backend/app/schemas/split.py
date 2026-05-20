@@ -8,6 +8,13 @@ class ParticipantBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
     upi_id: Optional[str] = Field(None, pattern=r'^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$')
 
+    @field_validator("upi_id", mode="before")
+    @classmethod
+    def empty_upi_to_none(cls, value):
+        if value == "":
+            return None
+        return value
+
 
 class ParticipantCreate(ParticipantBase):
     pass

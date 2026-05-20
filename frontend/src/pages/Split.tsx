@@ -8,15 +8,20 @@ import { useSplitStore } from '@/state/splitStore';
 import { useSplit } from '@/hooks/useSplit';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 
+interface ParticipantFormData {
+  name: string;
+  upiId?: string;
+}
+
 export const Split: React.FC = () => {
   const navigate = useNavigate();
   const { billTotal, participants, addParticipant, removeParticipant, calculateSplit } = useSplitStore();
   const { createSplit, isCreating } = useSplit();
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<ParticipantFormData>();
   const [hasCalculated, setHasCalculated] = useState(false);
 
-  const onAddParticipant = (data: { name: string; upiId?: string }) => {
-    addParticipant(data.name, data.upiId);
+  const onAddParticipant = (data: ParticipantFormData) => {
+    addParticipant(data.name, data.upiId || undefined);
     reset();
   };
 
@@ -31,7 +36,7 @@ export const Split: React.FC = () => {
         total_amount: billTotal,
         participants: participants.map(p => ({
           name: p.name,
-          upi_id: p.upiId,
+          upi_id: p.upiId || undefined,
         })),
         split_type: 'equal',
       },
