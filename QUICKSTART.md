@@ -27,12 +27,12 @@ Make sure you have:
 
 Terminal 1 - Backend:
 ```bash
-cd backend && source venv/bin/activate && uvicorn app.main:app --reload
+cd backend && source venv/bin/activate && python manage.py migrate && python manage.py runserver 127.0.0.1:8000
 ```
 
 Terminal 2 - Celery:
 ```bash
-cd backend && source venv/bin/activate && celery -A app.core.celery_app worker --loglevel=info
+cd backend && source venv/bin/activate && celery -A quicksplit worker --loglevel=info
 ```
 
 Terminal 3 - Frontend:
@@ -71,4 +71,3 @@ cd frontend && npm run dev
 - Or: `sudo apt-get install tesseract-ocr` (Linux)
 
 For more details, see [SETUP.md](./SETUP.md)
-

@@ -59,7 +59,7 @@ createdb quicksplit
 Create `.env` file in `backend/` directory:
 
 ```env
-DATABASE_URL=postgresql+asyncpg://your_user:your_password@localhost/quicksplit
+DATABASE_URL=postgresql://your_user:your_password@localhost/quicksplit
 SECRET_KEY=your-secret-key-here
 CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
 CELERY_BROKER_URL=redis://localhost:6379/0
@@ -77,14 +77,14 @@ VITE_API_BASE_URL=http://localhost:8000
 ```bash
 cd backend
 source venv/bin/activate
-alembic upgrade head
+python manage.py migrate
 ```
 
-If migrations don't exist yet, create initial migration:
+If migrations don't exist yet, create initial migrations:
 
 ```bash
-alembic revision --autogenerate -m "Initial migration"
-alembic upgrade head
+python manage.py makemigrations
+python manage.py migrate
 ```
 
 ## Running the Application
@@ -115,14 +115,15 @@ redis-server
 ```bash
 cd backend
 source venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
 ```
 
 #### Terminal 4: Start Celery Worker
 ```bash
 cd backend
 source venv/bin/activate
-celery -A app.core.celery_app worker --loglevel=info
+celery -A quicksplit worker --loglevel=info
 ```
 
 #### Terminal 5: Start Frontend
@@ -175,8 +176,7 @@ This will start all services including PostgreSQL and Redis.
 
 ## Development Tips
 
-- Backend auto-reloads on file changes (thanks to `--reload` flag)
+- Django development server auto-reloads on file changes
 - Frontend hot-reloads automatically
 - Check backend logs for API requests
 - Use `/docs` endpoint for interactive API testing
-

@@ -34,17 +34,30 @@ if [ ! -d "venv" ]; then
 else
     source venv/bin/activate
 fi
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+
+: "${DATABASE_URL:=sqlite:////tmp/quicksplit-local.db}"
+: "${UPLOAD_DIR:=/tmp/quicksplit-uploads}"
+: "${DATASET_DIR:=/tmp/quicksplit-dataset}"
+: "${REDIS_URL:=redis://localhost:6379/0}"
+export DATABASE_URL UPLOAD_DIR DATASET_DIR REDIS_URL
+
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000 &
 BACKEND_PID=$!
 cd ..
 
 # Start Celery worker
-echo "⚙️  Starting Celery worker..."
-cd backend
-source venv/bin/activate
-celery -A app.core.celery_app worker --loglevel=info &
-CELERY_PID=$!
-cd ..
+CELERY_PID=""
+if command -v redis-cli &> /dev/null && redis-cli -u "$REDIS_URL" ping &> /dev/null; then
+    echo "⚙️  Starting Celery worker..."
+    cd backend
+    source venv/bin/activate
+    celery -A quicksplit worker --loglevel=info &
+    CELERY_PID=$!
+    cd ..
+else
+    echo "⚠️  Redis unavailable. Skipping Celery worker; API will still run."
+fi
 
 # Start frontend
 echo "🎨 Starting frontend server..."
@@ -53,6 +66,7 @@ if [ ! -d "node_modules" ]; then
     echo "❌ Node modules not found. Installing..."
     npm install
 fi
+export VITE_API_URL="${VITE_API_URL:-http://localhost:8000/api/v1}"
 npm run dev &
 FRONTEND_PID=$!
 cd ..
@@ -66,6 +80,5 @@ echo ""
 echo "Press Ctrl+C to stop all services"
 
 # Wait for interrupt
-trap "kill $BACKEND_PID $CELERY_PID $FRONTEND_PID; exit" INT
+trap "kill $BACKEND_PID $FRONTEND_PID; if [ -n \"$CELERY_PID\" ]; then kill $CELERY_PID; fi; exit" INT
 wait
-

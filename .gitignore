@@ -36,6 +36,7 @@ build/
 # Database
 *.db
 *.sqlite
+*.sqlite3
 
 # Uploads
 uploads/
@@ -50,4 +51,3 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
-

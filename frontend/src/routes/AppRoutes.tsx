@@ -7,6 +7,7 @@ import { Scan } from '@/pages/Scan';
 import { Split } from '@/pages/Split';
 import { Review } from '@/pages/Review';
 import { History } from '@/pages/History';
+import { Profile } from '@/pages/Profile';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useUserStore();
@@ -49,6 +50,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <History />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         }
       />

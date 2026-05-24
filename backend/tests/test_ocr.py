@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.ocr_service import OCRService
+from api.services import OCRService
 
 
 def test_total_detection_prefers_total_keywords():
@@ -27,20 +27,19 @@ def test_total_detection_falls_back_to_largest_number():
     assert detection["strategy"] == "largest_number_fallback"
 
 
-@pytest.mark.asyncio
-async def test_validate_ocr_result(auth_headers, client):
-    response = await client.post(
+@pytest.mark.django_db
+def test_validate_ocr_result(auth_client):
+    response = auth_client.post(
         "/api/v1/ocr/validate",
-        headers=auth_headers,
-        json={
+        {
             "text": "Subtotal 500.00\nAmount Due 546.00",
             "detected_total": 546.0,
             "image_hash": "receipt-hash",
         },
+        format="json",
     )
 
     assert response.status_code == 200
-    body = response.json()
-    assert body["is_valid"] is True
-    assert body["suggested_total"] == 546.0
-    assert body["confidence"] >= 90
+    assert response.data["is_valid"] is True
+    assert response.data["suggested_total"] == 546.0
+    assert response.data["confidence"] >= 90

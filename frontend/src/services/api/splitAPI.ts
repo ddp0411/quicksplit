@@ -14,12 +14,15 @@ export interface SplitRequest {
 export interface SplitResponse {
   split_id: string;
   total_amount: number;
+  split_type: string;
   participants: Array<{
     id: string;
     name: string;
+    upi_id?: string | null;
     amount: number;
     upi_link: string;
     qr_code: string;
+    payment_status: 'pending' | 'paid' | 'failed';
   }>;
   created_at: string;
 }
@@ -47,8 +50,8 @@ export const splitAPI = {
     return response.data;
   },
 
-  markAsPaid: async (splitId: string, participantId: string) => {
-    const response = await axiosClient.post(`/splits/${splitId}/participants/${participantId}/paid`);
+  markAsPaid: async (splitId: string, participantId: string): Promise<{ message: string }> => {
+    const response = await axiosClient.post<{ message: string }>(`/splits/${splitId}/participants/${participantId}/paid`);
     return response.data;
   },
 };

@@ -1,56 +1,957 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "QuickSplit API",
-    "version": "1.0.0",
-    "description": "API documentation for QuickSplit bill splitting application"
-  },
-  "servers": [
-    {
-      "url": "http://localhost:8000",
-      "description": "Development server"
-    }
-  ],
-  "paths": {
-    "/api/v1/auth/register": {
-      "post": {
-        "summary": "Register a new user",
-        "tags": ["auth"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
+    "openapi": "3.0.3",
+    "info": {
+        "title": "QuickSplit API",
+        "version": "1.0.0",
+        "description": "Django REST API for bill OCR validation, split tracking, and UPI collection."
+    },
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "operationId": "api_v1_auth_login_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Login"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Login"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Login"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "operationId": "api_v1_auth_me_retrieve",
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "operationId": "api_v1_auth_register_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Register"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Register"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Register"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/dataset/stats": {
+            "get": {
+                "operationId": "api_v1_dataset_stats_retrieve",
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatasetStats"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/dataset/submit": {
+            "post": {
+                "operationId": "api_v1_dataset_submit_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DatasetSubmit"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DatasetSubmit"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatasetResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/ocr/upload": {
+            "post": {
+                "operationId": "api_v1_ocr_upload_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OCRUpload"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OCRUpload"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OCRResult"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/ocr/validate": {
+            "post": {
+                "operationId": "api_v1_ocr_validate_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OCRValidation"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OCRValidation"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OCRValidation"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OCRValidationResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/splits/{split_id}": {
+            "get": {
+                "operationId": "api_v1_splits_retrieve",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "split_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SplitResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/splits/{split_id}/participants/{participant_id}/paid": {
+            "post": {
+                "operationId": "api_v1_splits_participants_paid_create",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "participant_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "split_id",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipantPaymentResponse"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipantPaymentResponse"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipantPaymentResponse"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ParticipantPaymentResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/splits/create": {
+            "post": {
+                "operationId": "api_v1_splits_create_create",
+                "tags": [
+                    "api"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SplitCreate"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SplitCreate"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SplitCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SplitResponse"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/splits/history": {
+            "get": {
+                "operationId": "api_v1_splits_history_list",
+                "tags": [
+                    "api"
+                ],
+                "security": [
+                    {
+                        "jwtAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SplitHistoryItem"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DatasetResponse": {
                 "type": "object",
                 "properties": {
-                  "email": {"type": "string"},
-                  "password": {"type": "string"},
-                  "name": {"type": "string"}
-                }
-              }
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "image_hash": {
+                        "type": "string",
+                        "maxLength": 128
+                    },
+                    "ocr_text": {
+                        "type": "string"
+                    },
+                    "detected_total": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 10000000000,
+                        "minimum": -10000000000,
+                        "exclusiveMaximum": true,
+                        "exclusiveMinimum": true,
+                        "nullable": true
+                    },
+                    "actual_total": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 10000000000,
+                        "minimum": -10000000000,
+                        "exclusiveMaximum": true,
+                        "exclusiveMinimum": true
+                    },
+                    "confidence": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "is_verified": {
+                        "type": "integer",
+                        "maximum": 9223372036854775807,
+                        "minimum": -9223372036854775808,
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "actual_total",
+                    "created_at",
+                    "id",
+                    "image_hash",
+                    "ocr_text"
+                ]
+            },
+            "DatasetStats": {
+                "type": "object",
+                "properties": {
+                    "total_entries": {
+                        "type": "integer"
+                    },
+                    "verified_entries": {
+                        "type": "integer"
+                    },
+                    "unverified_entries": {
+                        "type": "integer"
+                    },
+                    "rejected_entries": {
+                        "type": "integer"
+                    },
+                    "average_confidence": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "total_images_size_mb": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "required": [
+                    "average_confidence",
+                    "rejected_entries",
+                    "total_entries",
+                    "total_images_size_mb",
+                    "unverified_entries",
+                    "verified_entries"
+                ]
+            },
+            "DatasetSubmit": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "ocr_text": {
+                        "type": "string"
+                    },
+                    "actual_total": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 10000000000,
+                        "minimum": -10000000000,
+                        "exclusiveMaximum": true,
+                        "exclusiveMinimum": true
+                    },
+                    "detected_total": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 10000000000,
+                        "minimum": -10000000000,
+                        "exclusiveMaximum": true,
+                        "exclusiveMinimum": true,
+                        "nullable": true
+                    },
+                    "confidence": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "metadata": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "actual_total",
+                    "file",
+                    "ocr_text"
+                ]
+            },
+            "Login": {
+                "type": "object",
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true
+                    }
+                },
+                "required": [
+                    "password",
+                    "username"
+                ]
+            },
+            "OCRResult": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "confidence": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "detected_total": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "processing_time": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "required": [
+                    "confidence",
+                    "detected_total",
+                    "processing_time",
+                    "text"
+                ]
+            },
+            "OCRUpload": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "preprocessed": {
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "required": [
+                    "file"
+                ]
+            },
+            "OCRValidation": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    },
+                    "detected_total": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "image_hash": {
+                        "type": "string",
+                        "maxLength": 128
+                    }
+                },
+                "required": [
+                    "image_hash",
+                    "text"
+                ]
+            },
+            "OCRValidationResponse": {
+                "type": "object",
+                "properties": {
+                    "is_valid": {
+                        "type": "boolean"
+                    },
+                    "confidence": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "suggested_total": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "strategy": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "confidence",
+                    "is_valid",
+                    "message",
+                    "strategy",
+                    "suggested_total"
+                ]
+            },
+            "ParticipantCreate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 2
+                    },
+                    "upi_id": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 100
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "ParticipantPayload": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "upi_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "upi_link": {
+                        "type": "string"
+                    },
+                    "qr_code": {
+                        "type": "string"
+                    },
+                    "payment_status": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "amount",
+                    "id",
+                    "name",
+                    "payment_status",
+                    "qr_code",
+                    "upi_link"
+                ]
+            },
+            "ParticipantPaymentResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "participant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "message",
+                    "participant_id"
+                ]
+            },
+            "Register": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 2
+                    },
+                    "password": {
+                        "type": "string",
+                        "writeOnly": true,
+                        "maxLength": 100,
+                        "minLength": 6
+                    }
+                },
+                "required": [
+                    "email",
+                    "name",
+                    "password"
+                ]
+            },
+            "SplitCreate": {
+                "type": "object",
+                "properties": {
+                    "total_amount": {
+                        "type": "number",
+                        "format": "double",
+                        "maximum": 10000000000,
+                        "minimum": 0.01,
+                        "exclusiveMaximum": true
+                    },
+                    "participants": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ParticipantCreate"
+                        }
+                    },
+                    "split_type": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SplitTypeEnum"
+                            }
+                        ],
+                        "default": "equal"
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                },
+                "required": [
+                    "participants",
+                    "total_amount"
+                ]
+            },
+            "SplitHistoryItem": {
+                "type": "object",
+                "properties": {
+                    "split_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "participant_count": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "participant_count",
+                    "split_id",
+                    "total_amount"
+                ]
+            },
+            "SplitResponse": {
+                "type": "object",
+                "properties": {
+                    "split_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "total_amount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "split_type": {
+                        "type": "string"
+                    },
+                    "participants": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ParticipantPayload"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "participants",
+                    "split_id",
+                    "split_type",
+                    "total_amount"
+                ]
+            },
+            "SplitTypeEnum": {
+                "enum": [
+                    "equal",
+                    "custom",
+                    "percentage"
+                ],
+                "type": "string",
+                "description": "* `equal` - Equal\n* `custom` - Custom\n* `percentage` - Percentage"
+            },
+            "TokenResponse": {
+                "type": "object",
+                "properties": {
+                    "access_token": {
+                        "type": "string"
+                    },
+                    "token_type": {
+                        "type": "string"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    }
+                },
+                "required": [
+                    "access_token",
+                    "token_type",
+                    "user"
+                ]
+            },
+            "UserResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 254
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "title": "Active",
+                        "description": "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "email",
+                    "id",
+                    "name"
+                ]
             }
-          }
+        },
+        "securitySchemes": {
+            "jwtAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
         }
-      }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "summary": "Login user",
-        "tags": ["auth"]
-      }
-    },
-    "/api/v1/ocr/upload": {
-      "post": {
-        "summary": "Upload receipt image",
-        "tags": ["ocr"]
-      }
-    },
-    "/api/v1/split/create": {
-      "post": {
-        "summary": "Create a new split",
-        "tags": ["split"]
-      }
     }
-  }
 }
-

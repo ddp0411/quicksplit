@@ -1,7 +1,14 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/state/userStore';
 import { Button } from '../ui/Button';
+import {
+  ArrowRightOnRectangleIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  QrCodeIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
 
 export const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useUserStore();
@@ -12,38 +19,55 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    [
+      'hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition md:inline-flex',
+      isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+    ].join(' ');
+
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <svg className="w-8 h-8 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-            </svg>
-            <span className="text-2xl font-bold text-gradient">QuickSplit</span>
+    <nav className="sticky top-0 z-40 border-b border-white/70 bg-white/80 backdrop-blur-xl">
+      <div className="app-container">
+        <div className="flex h-16 items-center justify-between gap-4">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-sky-500 text-xl font-black text-white shadow-button">
+              ₹
+            </span>
+            <span className="truncate font-display text-2xl font-extrabold tracking-normal text-ink">
+              QuickSplit
+            </span>
           </Link>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
-                <Link to="/scan" className="text-gray-700 hover:text-primary-600">
-                  Scan Bill
-                </Link>
-                <Link to="/history" className="text-gray-700 hover:text-primary-600">
+                <NavLink to="/scan" className={navLinkClass}>
+                  <DocumentTextIcon className="h-4 w-4" />
+                  Scan
+                </NavLink>
+                <NavLink to="/split" className={navLinkClass}>
+                  <QrCodeIcon className="h-4 w-4" />
+                  Split
+                </NavLink>
+                <NavLink to="/history" className={navLinkClass}>
+                  <ClockIcon className="h-4 w-4" />
                   History
-                </Link>
-                <span className="text-gray-600">Hi, {user?.name}</span>
-                <Button variant="secondary" onClick={handleLogout}>
-                  Logout
+                </NavLink>
+                <span className="hidden items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 lg:inline-flex">
+                  <UserCircleIcon className="h-4 w-4" />
+                  {user?.name}
+                </span>
+                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Logout">
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
                 </Button>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="secondary">Login</Button>
+                  <Button variant="ghost" size="sm">Login</Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="primary">Register</Button>
+                  <Button size="sm">Register</Button>
                 </Link>
               </>
             )}

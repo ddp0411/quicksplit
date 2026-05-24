@@ -15,9 +15,9 @@ Frontend:
 - PWA manifest for installable Android/iOS browser use
 
 Backend:
-- FastAPI with dependency-injected auth and async DB sessions
-- Async SQLAlchemy against PostgreSQL
-- JWT access tokens and passlib bcrypt password hashes
+- Django 5 with Django REST Framework
+- Django ORM against PostgreSQL/Supabase or local SQLite
+- JWT access tokens via SimpleJWT and Django password hashing
 - Redis caching for OCR validation, split calculations, and session lookups
 - Celery workers for OCR post-processing, dataset normalization/export, and cleanup
 - Dataset storage under `dataset/raw`, `dataset/processed`, and `dataset/annotations`
@@ -86,4 +86,4 @@ Dataset:
 
 ## Deployment
 
-`docker-compose.yml` starts PostgreSQL, Redis, FastAPI, Celery worker, Celery beat, and the frontend dev server. Production deployments should replace the default secret key, mount durable upload/dataset storage, and serve the frontend build through a static server or CDN.
+`docker-compose.yml` starts PostgreSQL, Redis, the Django API, Celery worker, Celery beat, and the frontend dev server. Production deployments should replace the default secret key, mount durable upload/dataset storage, and serve the frontend build through a static server or CDN.

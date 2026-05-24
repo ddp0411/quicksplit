@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY ./app ./app
+COPY . .
 
 # Create necessary directories
 RUN mkdir -p /app/uploads /app/dataset /app/logs
@@ -24,4 +24,4 @@ RUN mkdir -p /app/uploads /app/dataset /app/logs
 EXPOSE 8000
 
 # Run application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]

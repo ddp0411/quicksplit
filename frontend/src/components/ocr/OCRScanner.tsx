@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Webcam from 'react-webcam';
 import { createWorker } from 'tesseract.js';
-import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useOCRStore } from '@/state/ocrStore';
 import { ImageProcessor } from './ImageProcessor';
@@ -77,23 +76,23 @@ export const OCRScanner: React.FC = () => {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Scan Receipt</h2>
+    <div>
+      <h2 className="mb-4 text-lg font-bold text-slate-900">Scan receipt</h2>
       
       {isCameraActive ? (
         <div className="space-y-4">
           <Webcam
             ref={webcamRef}
             screenshotFormat="image/jpeg"
-            className="w-full rounded-lg"
+            className="aspect-[3/4] w-full rounded-lg bg-slate-950 object-cover"
             videoConstraints={{
               facingMode: 'environment',
             }}
           />
-          <div className="flex space-x-4">
+          <div className="flex gap-3">
             <Button onClick={captureAndProcess} className="flex-1">
-              <CameraIcon className="h-5 w-5 mr-2 inline" />
-              Capture & Process
+              <CameraIcon className="mr-2 h-5 w-5" />
+              Capture
             </Button>
             <Button variant="secondary" onClick={() => setIsCameraActive(false)}>
               Cancel
@@ -102,10 +101,10 @@ export const OCRScanner: React.FC = () => {
         </div>
       ) : (
         <Button onClick={() => setIsCameraActive(true)} className="w-full">
-          <CameraIcon className="h-5 w-5 mr-2 inline" />
+          <CameraIcon className="mr-2 h-5 w-5" />
           Open Camera
         </Button>
       )}
-    </Card>
+    </div>
   );
 };

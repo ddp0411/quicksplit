@@ -25,10 +25,21 @@ export const useSplit = () => {
     });
   };
 
+  const markPaidMutation = useMutation({
+    mutationFn: ({ splitId, participantId }: { splitId: string; participantId: string }) =>
+      splitAPI.markAsPaid(splitId, participantId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['split', variables.splitId] });
+      queryClient.invalidateQueries({ queryKey: ['splits'] });
+    },
+  });
+
   return {
     createSplit: createMutation.mutate,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
+    markAsPaid: markPaidMutation.mutate,
+    isMarkingPaid: markPaidMutation.isPending,
     useGetSplit,
     useHistory,
   };

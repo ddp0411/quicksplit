@@ -2,37 +2,47 @@ import React from 'react';
 import clsx from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg' | 'icon';
   loading?: boolean;
   children: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
+  size = 'md',
   loading = false,
   children,
   className,
   disabled,
   ...props
 }) => {
-  const baseStyles = 'px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center rounded-lg font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
   
   const variantStyles = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary: 'bg-primary-600 text-white shadow-button hover:bg-primary-700 active:translate-y-px',
+    secondary: 'border border-primary-200 bg-white text-primary-700 hover:bg-primary-50',
+    ghost: 'text-slate-700 hover:bg-slate-100',
+    danger: 'bg-rose-600 text-white shadow-button hover:bg-rose-700 active:translate-y-px',
+  };
+
+  const sizeStyles = {
+    sm: 'h-9 px-3 text-sm',
+    md: 'h-11 px-5 text-sm',
+    lg: 'h-12 px-6 text-base',
+    icon: 'h-10 w-10 p-0',
   };
 
   return (
     <button
-      className={clsx(baseStyles, variantStyles[variant], className)}
+      className={clsx(baseStyles, variantStyles[variant], sizeStyles[size], className)}
       disabled={disabled || loading}
       {...props}
     >
       {loading ? (
-        <div className="flex items-center justify-center">
+        <span className="flex items-center justify-center">
           <svg
-            className="animate-spin h-5 w-5 mr-2"
+            className="mr-2 h-4 w-4 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -52,7 +62,7 @@ export const Button: React.FC<ButtonProps> = ({
             />
           </svg>
           Processing...
-        </div>
+        </span>
       ) : (
         children
       )}

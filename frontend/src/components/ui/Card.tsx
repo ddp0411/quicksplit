@@ -9,12 +9,12 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ children, className, hover = false }) => {
-  const baseStyles = 'bg-white rounded-xl shadow-lg p-6';
+  const baseStyles = 'rounded-lg border border-slate-200/80 bg-white p-5 shadow-soft';
 
   if (hover) {
     return (
       <motion.div
-        whileHover={{ scale: 1.02, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
+        whileHover={{ y: -2, boxShadow: '0 18px 45px rgba(36, 31, 78, 0.12)' }}
         className={clsx(baseStyles, className)}
       >
         {children}

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { createWorker } from 'tesseract.js';
-import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useOCRStore } from '@/state/ocrStore';
 import { ImageProcessor } from './ImageProcessor';
@@ -83,11 +82,11 @@ export const OCRUpload: React.FC = () => {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Upload Receipt</h2>
+    <div>
+      <h2 className="mb-4 text-lg font-bold text-slate-900">Upload receipt</h2>
       
       <div className="space-y-4">
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+        <div className="rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center transition-colors hover:border-primary-400 hover:bg-primary-50/40">
           <input
             type="file"
             accept="image/*"
@@ -96,15 +95,15 @@ export const OCRUpload: React.FC = () => {
             id="file-upload"
           />
           <label htmlFor="file-upload" className="cursor-pointer">
-            <ArrowUpTrayIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-            <p className="text-gray-600">Click to upload or drag and drop</p>
-            <p className="text-sm text-gray-400 mt-1">PNG, JPG up to 10MB</p>
+            <ArrowUpTrayIcon className="mx-auto mb-2 h-10 w-10 text-primary-500" />
+            <p className="font-bold text-slate-700">Click to upload receipt</p>
+            <p className="mt-1 text-sm font-medium text-slate-400">PNG or JPG up to 10MB</p>
           </label>
         </div>
 
         {preview && (
           <div>
-            <img src={preview} alt="Preview" className="w-full rounded-lg" />
+            <img src={preview} alt="Receipt preview" className="max-h-72 w-full rounded-lg object-contain" />
             <Button
               onClick={processImage}
               loading={isProcessing}
@@ -115,6 +114,6 @@ export const OCRUpload: React.FC = () => {
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
