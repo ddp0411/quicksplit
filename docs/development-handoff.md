@@ -99,7 +99,7 @@ VITE_API_URL=http://localhost:8000/api/v1 npm run dev -- --host 127.0.0.1 --port
 
 Open:
 - Frontend: `http://127.0.0.1:3000`
-- Backend docs: `http://127.0.0.1:8000/docs`
+- Backend docs: `http://D127.0.0.1:8000/docs`
 
 ## How To Stop Running Servers
 

@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import re
+from collections import defaultdict
 from decimal import Decimal, ROUND_HALF_UP
 from io import BytesIO
 from pathlib import Path
@@ -205,3 +206,200 @@ class QRService:
         image.save(buffer, format="PNG")
         encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
         return f"data:image/png;base64,{encoded}"
+
+
+# ─── Splitwise-style balance and share calculation ────────────────────────────
+
+class ShareCalculationService:
+    """Calculates per-user share amounts for all split types."""
+
+    def calculate_shares(
+        self,
+        total_amount: Decimal,
+        split_type: str,
+        participant_ids: list,
+        shares_input: list[dict],
+    ) -> dict[str, Decimal]:
+        """
+        Returns {user_id_str: amount_owed}.
+
+        shares_input items: {"user_id": str, "value": Decimal}
+        For equal:      values ignored, IDs from participant_ids
+        For exact:      value = exact rupee amount each person owes
+        For percentage: value = % (must sum to 100)
+        For shares:     value = # of shares (proportional)
+        """
+        result: dict[str, Decimal] = {}
+
+        if split_type == "equal":
+            count = len(participant_ids)
+            if count == 0:
+                raise ValueError("At least one participant required.")
+            total_paisa = int(to_decimal(total_amount) * 100)
+            base_paisa = total_paisa // count
+            rem = total_paisa - base_paisa * count
+            for i, uid in enumerate(participant_ids):
+                result[str(uid)] = Decimal(base_paisa + (1 if i < rem else 0)) / 100
+
+        elif split_type == "exact":
+            total_check = sum(Decimal(str(s["value"])) for s in shares_input)
+            if abs(total_check - to_decimal(total_amount)) > Decimal("0.02"):
+                raise ValueError("Exact amounts must sum to the total.")
+            for s in shares_input:
+                result[str(s["user_id"])] = to_decimal(s["value"])
+
+        elif split_type == "percentage":
+            pct_sum = sum(Decimal(str(s["value"])) for s in shares_input)
+            if abs(pct_sum - 100) > Decimal("0.01"):
+                raise ValueError("Percentages must sum to 100.")
+            for s in shares_input:
+                result[str(s["user_id"])] = to_decimal(
+                    to_decimal(total_amount) * Decimal(str(s["value"])) / 100
+                )
+
+        elif split_type == "shares":
+            total_shares = sum(Decimal(str(s["value"])) for s in shares_input)
+            if total_shares == 0:
+                raise ValueError("Total shares cannot be zero.")
+            for s in shares_input:
+                result[str(s["user_id"])] = to_decimal(
+                    to_decimal(total_amount) * Decimal(str(s["value"])) / total_shares
+                )
+
+        else:
+            raise ValueError(f"Unknown split type: {split_type}")
+
+        return result
+
+
+class BalanceService:
+    """
+    Computes net balances between users from Expense + Settlement records.
+
+    Convention:
+      balance[uid] = net amount *owed to* the current user by uid
+      positive → uid owes current user
+      negative → current user owes uid
+    """
+
+    def get_user_balances(self, user) -> dict:
+        """
+        Overall balance: aggregate across all expenses and settlements
+        involving the user.
+        Returns list of {user, balance} dicts (serializer-ready).
+        """
+        from api.models import Expense, ExpenseShare, Settlement, User as UserModel
+
+        # net[other_user_id] = amount other user owes current user (signed)
+        net: dict[str, Decimal] = defaultdict(Decimal)
+
+        # Expenses paid by current user
+        for expense in Expense.objects.filter(paid_by=user).prefetch_related("shares"):
+            for share in expense.shares.all():
+                if share.user_id != user.pk and not share.is_settled:
+                    net[str(share.user_id)] += share.amount_owed
+
+        # Expenses involving current user as a debtor
+        for share in (
+            ExpenseShare.objects
+            .filter(user=user, is_settled=False)
+            .select_related("expense__paid_by")
+        ):
+            paid_by_id = str(share.expense.paid_by_id)
+            if paid_by_id != str(user.pk):
+                net[paid_by_id] -= share.amount_owed
+
+        # Settlements FROM current user (current user paid someone)
+        for s in Settlement.objects.filter(from_user=user):
+            net[str(s.to_user_id)] -= s.amount
+
+        # Settlements TO current user (someone paid current user)
+        for s in Settlement.objects.filter(to_user=user):
+            net[str(s.from_user_id)] += s.amount
+
+        # Build response
+        user_ids = [uid for uid, bal in net.items() if abs(bal) >= Decimal("0.01")]
+        users = {str(u.pk): u for u in UserModel.objects.filter(pk__in=user_ids)}
+
+        result = []
+        for uid, balance in net.items():
+            if abs(balance) < Decimal("0.01"):
+                continue
+            if uid in users:
+                result.append({"user": users[uid], "balance": float(balance)})
+
+        result.sort(key=lambda x: abs(x["balance"]), reverse=True)
+        return result
+
+    def get_group_balances(self, group) -> dict:
+        """
+        Balances within a single group.
+        Returns member_balances (raw per-member net), simplified_debts, total_expenses.
+        """
+        from api.models import Expense, ExpenseShare, Settlement, User as UserModel
+
+        net: dict[str, Decimal] = defaultdict(Decimal)
+        total_expenses = Decimal("0")
+
+        # Credit the payer, debit each share holder
+        for expense in group.expenses.all().prefetch_related("shares"):
+            total_expenses += expense.amount
+            net[str(expense.paid_by_id)] += expense.amount
+            for share in expense.shares.all():
+                net[str(share.user_id)] -= share.amount_owed
+
+        # Apply group settlements
+        for s in group.settlements.all():
+            net[str(s.from_user_id)] += s.amount
+            net[str(s.to_user_id)] -= s.amount
+
+        member_ids = list({str(m.user_id) for m in group.members.all()})
+        users = {str(u.pk): u for u in UserModel.objects.filter(pk__in=member_ids)}
+
+        member_balances = [
+            {"user": users[uid], "balance": float(net.get(uid, Decimal("0")))}
+            for uid in member_ids
+            if uid in users
+        ]
+
+        simplified = self._simplify_debts(net, users)
+
+        return {
+            "member_balances": member_balances,
+            "simplified_debts": simplified,
+            "total_expenses": float(total_expenses),
+        }
+
+    def _simplify_debts(self, net: dict, users: dict) -> list:
+        """Greedy debt simplification — minimises transaction count."""
+        creditors = sorted(
+            [[uid, float(bal)] for uid, bal in net.items() if bal > Decimal("0.005") and uid in users],
+            key=lambda x: -x[1],
+        )
+        debtors = sorted(
+            [[uid, float(-bal)] for uid, bal in net.items() if bal < Decimal("-0.005") and uid in users],
+            key=lambda x: -x[1],
+        )
+
+        transactions = []
+        i = j = 0
+        while i < len(creditors) and j < len(debtors):
+            cred_uid, cred_amt = creditors[i]
+            debt_uid, debt_amt = debtors[j]
+            settle = round(min(cred_amt, debt_amt), 2)
+
+            transactions.append({
+                "from_user": users[debt_uid],
+                "to_user": users[cred_uid],
+                "amount": settle,
+            })
+
+            creditors[i][1] = round(cred_amt - settle, 2)
+            debtors[j][1] = round(debt_amt - settle, 2)
+
+            if creditors[i][1] < 0.005:
+                i += 1
+            if debtors[j][1] < 0.005:
+                j += 1
+
+        return transactions

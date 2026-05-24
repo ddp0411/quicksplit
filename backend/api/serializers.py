@@ -1,19 +1,29 @@
 import re
 from decimal import Decimal
-
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from api.models import DatasetEntry, Participant, Split, User
+from api.models import (
+    Comment, DatasetEntry, Expense, ExpenseShare, Friendship,
+    GroupMember, Participant, Settlement, Split, SplitGroup, User,
+)
 
 
 UPI_RE = re.compile(r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$")
 
 
+# ─── Auth ─────────────────────────────────────────────────────────────────────
+
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "name", "is_active", "created_at"]
+        fields = ["id", "email", "name", "is_active", "avatar_color", "upi_id", "created_at"]
+
+
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "email", "name", "avatar_color", "upi_id"]
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -61,6 +71,8 @@ class TokenResponseSerializer(serializers.Serializer):
     user = UserResponseSerializer()
 
 
+# ─── OCR ──────────────────────────────────────────────────────────────────────
+
 class OCRUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
     preprocessed = serializers.BooleanField(required=False, default=False)
@@ -86,6 +98,8 @@ class OCRValidationResponseSerializer(serializers.Serializer):
     strategy = serializers.CharField()
     message = serializers.CharField()
 
+
+# ─── Original Split / Participant ─────────────────────────────────────────────
 
 class ParticipantCreateSerializer(serializers.Serializer):
     name = serializers.CharField(min_length=2, max_length=100)
@@ -136,6 +150,8 @@ class SplitHistoryItemSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
 
 
+# ─── Dataset ──────────────────────────────────────────────────────────────────
+
 class DatasetSubmitSerializer(serializers.Serializer):
     file = serializers.FileField()
     ocr_text = serializers.CharField()
@@ -149,14 +165,8 @@ class DatasetResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = DatasetEntry
         fields = [
-            "id",
-            "image_hash",
-            "ocr_text",
-            "detected_total",
-            "actual_total",
-            "confidence",
-            "is_verified",
-            "created_at",
+            "id", "image_hash", "ocr_text", "detected_total",
+            "actual_total", "confidence", "is_verified", "created_at",
         ]
 
 
@@ -173,3 +183,213 @@ class DatasetStatsSerializer(serializers.Serializer):
     rejected_entries = serializers.IntegerField()
     average_confidence = serializers.FloatField()
     total_images_size_mb = serializers.FloatField()
+
+
+# ─── Friends ──────────────────────────────────────────────────────────────────
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    requester = UserMiniSerializer(read_only=True)
+    addressee = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = Friendship
+        fields = ["id", "requester", "addressee", "status", "created_at"]
+
+
+class FriendSerializer(serializers.Serializer):
+    """Flattened friend view — whichever side is not the current user."""
+    id = serializers.IntegerField()
+    friendship_id = serializers.IntegerField()
+    user = UserMiniSerializer()
+    balance = serializers.FloatField()
+    status = serializers.CharField()
+
+
+class AddFriendSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+# ─── Groups ───────────────────────────────────────────────────────────────────
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+    user = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = GroupMember
+        fields = ["id", "user", "role", "joined_at"]
+
+
+class SplitGroupSerializer(serializers.ModelSerializer):
+    created_by = UserMiniSerializer(read_only=True)
+    member_count = serializers.SerializerMethodField()
+    your_balance = serializers.FloatField(default=0.0)
+
+    class Meta:
+        model = SplitGroup
+        fields = [
+            "id", "name", "description", "category", "created_by",
+            "is_active", "member_count", "your_balance", "created_at",
+        ]
+
+    def get_member_count(self, obj):
+        return obj.members.count()
+
+
+class SplitGroupDetailSerializer(serializers.ModelSerializer):
+    created_by = UserMiniSerializer(read_only=True)
+    members = GroupMemberSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SplitGroup
+        fields = [
+            "id", "name", "description", "category", "created_by",
+            "is_active", "members", "created_at", "updated_at",
+        ]
+
+
+class CreateGroupSerializer(serializers.Serializer):
+    name = serializers.CharField(min_length=2, max_length=100)
+    description = serializers.CharField(required=False, allow_blank=True)
+    category = serializers.ChoiceField(choices=SplitGroup.GroupCategory.choices, default="other")
+    member_emails = serializers.ListField(
+        child=serializers.EmailField(), required=False, default=list
+    )
+
+    def validate_member_emails(self, emails):
+        return [e.lower().strip() for e in emails]
+
+
+class AddGroupMemberSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+# ─── Expenses ─────────────────────────────────────────────────────────────────
+
+class ExpenseShareInputSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    value = serializers.DecimalField(
+        max_digits=12, decimal_places=4,
+        help_text="Amount for exact, percentage for %, shares count for shares split"
+    )
+
+
+class CreateExpenseSerializer(serializers.Serializer):
+    group_id = serializers.UUIDField(required=False, allow_null=True)
+    description = serializers.CharField(min_length=1, max_length=200)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal("0.01"))
+    currency = serializers.CharField(max_length=3, default="INR")
+    category = serializers.ChoiceField(choices=Expense.Category.choices, default="other")
+    paid_by_user_id = serializers.UUIDField()
+    split_type = serializers.ChoiceField(choices=Expense.SplitType.choices, default="equal")
+    date = serializers.DateField()
+    notes = serializers.CharField(required=False, allow_blank=True)
+    is_recurring = serializers.BooleanField(default=False)
+    recurring_frequency = serializers.ChoiceField(
+        choices=Expense.RecurringFrequency.choices, required=False, allow_blank=True
+    )
+    # For non-equal splits: list of {user_id, value}
+    shares = ExpenseShareInputSerializer(many=True, required=False, default=list)
+    # For equal split: just list of user UUIDs
+    participant_ids = serializers.ListField(
+        child=serializers.UUIDField(), required=False, default=list
+    )
+
+
+class ExpenseShareSerializer(serializers.ModelSerializer):
+    user = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = ExpenseShare
+        fields = ["id", "user", "amount_owed", "is_settled", "settled_at"]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ["id", "user", "content", "created_at", "updated_at"]
+
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    paid_by = UserMiniSerializer(read_only=True)
+    created_by = UserMiniSerializer(read_only=True)
+    shares = ExpenseShareSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
+    group_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Expense
+        fields = [
+            "id", "group", "group_name", "description", "amount", "currency",
+            "category", "paid_by", "split_type", "date", "notes",
+            "is_recurring", "recurring_frequency", "created_by",
+            "shares", "comments", "created_at", "updated_at",
+        ]
+
+    def get_group_name(self, obj):
+        return obj.group.name if obj.group else None
+
+
+class ExpenseListSerializer(serializers.ModelSerializer):
+    paid_by = UserMiniSerializer(read_only=True)
+    your_share = serializers.FloatField(default=0.0)
+    group_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Expense
+        fields = [
+            "id", "group", "group_name", "description", "amount", "currency",
+            "category", "paid_by", "split_type", "date", "your_share", "created_at",
+        ]
+
+    def get_group_name(self, obj):
+        return obj.group.name if obj.group else None
+
+
+# ─── Settlements ──────────────────────────────────────────────────────────────
+
+class CreateSettlementSerializer(serializers.Serializer):
+    to_user_id = serializers.UUIDField()
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal("0.01"))
+    group_id = serializers.UUIDField(required=False, allow_null=True)
+    notes = serializers.CharField(required=False, allow_blank=True)
+    upi_transaction_id = serializers.CharField(required=False, allow_blank=True)
+
+
+class SettlementSerializer(serializers.ModelSerializer):
+    from_user = UserMiniSerializer(read_only=True)
+    to_user = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = Settlement
+        fields = [
+            "id", "group", "from_user", "to_user", "amount",
+            "currency", "notes", "upi_transaction_id", "created_at",
+        ]
+
+
+# ─── Balances ─────────────────────────────────────────────────────────────────
+
+class BalanceWithUserSerializer(serializers.Serializer):
+    user = UserMiniSerializer()
+    balance = serializers.FloatField()  # positive = they owe you, negative = you owe them
+
+
+class SimplifiedDebtSerializer(serializers.Serializer):
+    from_user = UserMiniSerializer()
+    to_user = UserMiniSerializer()
+    amount = serializers.FloatField()
+
+
+class GroupBalanceSerializer(serializers.Serializer):
+    member_balances = BalanceWithUserSerializer(many=True)
+    simplified_debts = SimplifiedDebtSerializer(many=True)
+    total_expenses = serializers.FloatField()
+
+
+class OverallBalanceSerializer(serializers.Serializer):
+    total_owed_to_you = serializers.FloatField()
+    total_you_owe = serializers.FloatField()
+    net_balance = serializers.FloatField()
+    balances = BalanceWithUserSerializer(many=True)
