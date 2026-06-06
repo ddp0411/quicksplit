@@ -1,18 +1,18 @@
 # QuickSplit — Complete Feature Checklist
 
-> Cross-reference against: `Quicksplit UI and features guide.md`
-> Last updated: 2026-06-06 (Session 3)
+> Cross-reference against: `Quicksplit UI and features guide.md` + Moodboard v1 (Social Casual Dining)
+> Last updated: 2026-06-06 (Session 4 — moodboard integrated)
 
 ---
 
-## ✅ Complete Features (46 items)
+## ✅ Complete Features (47 items)
 
 ### Auth & Onboarding
-- ✅ Splash Screen — animated teal logo, auto-redirect (authed → /friends, unauthed → /onboarding)
+- ✅ Splash Screen — animated teal logo, auto-redirect (authed → /home dashboard, unauthed → /onboarding)
 - ✅ Onboarding Carousel — 5 slides (Shared Expenses, Scan Bills, AI Insights, Smart Budgets, Recurring), progress dots, Skip, localStorage `qs_onboarded` flag
-- ✅ Login — Google/Apple UI buttons, email + password, show/hide password toggle, teal CTA
-- ✅ Register — name, email, password, confirm password, terms checkbox, Google signup UI
-- ✅ Permission Setup — Contacts / Notifications / Camera step cards, skip each, navigates to /friends on finish
+- ✅ Login — Google/Apple UI buttons, email + password, show/hide password toggle, teal CTA → redirects to /home
+- ✅ Register — name, email, password, confirm password, terms checkbox, Google signup UI → redirects to /home
+- ✅ Permission Setup — Contacts / Notifications / Camera step cards, skip each, navigates to /home on finish
 
 ### Navigation
 - ✅ 5-tab Bottom Nav — Friends | Groups | +FAB | Personal | Account
@@ -63,13 +63,23 @@
 - ✅ Import from Splitwise — standalone page at /account/import (Option 1: direct instructions, Option 2: CSV file upload)
 - ✅ QR Code page — /account/qr with "My Code" tab (qrcode.react, teal SVG, Copy/Share) + "Scan" tab (animated viewfinder, fallback CTA)
 
+### Home Dashboard
+- ✅ Home page — /home, default post-login destination (replaces /friends as landing)
+- ✅ Hero greeting card — time-based greeting + daily rotating finance/travel quote (20 quotes, teal gradient)
+- ✅ Balance summary strip — Net / Owed to you / You owe (3-column card with skeleton loading)
+- ✅ Quick actions row — ➕ Add / 📷 Scan / 💸 Settle / 👤 Friend (4 coloured pill buttons)
+- ✅ Active groups strip — horizontal scroll, up to 4 groups sorted by outstanding balance
+- ✅ Who owes you / You owe — compact friend rows with Remind 🔔 / Settle → inline actions
+- ✅ Recent activity feed — last 5 items from activityAPI with category emoji and stagger animation
+- ✅ AI insight card — rotating daily insight + "Chat with AI →" link
+
 ### System & OCR Flow
 - ✅ OCR Scan Flow — Scan → Split → Review → History pages (full existing flow kept)
-- ✅ Skeleton Loading — SkeletonCard + SkeletonRow used on Friends, Groups, GroupDetail, GroupInsights
-- ✅ Teal Design System — #0F9D94 brand, Urbanist font, 24px radius cards, all screens consistent
+- ✅ Skeleton Loading — SkeletonCard + SkeletonRow used on Friends, Groups, GroupDetail, GroupInsights, Home
+- ✅ Teal Design System — #0F9D94 brand (moodboard target: #1B4332 primary + #FF6B35 accent — see V2)
 - ✅ Balances page — existing page kept, accessible from Friends/Groups balance chips
 - ✅ Activity page — themed with CSS variables (dark mode), enhanced empty state, date-grouped feed
-- ✅ Page transition animations — AnimatePresence keyed by location.pathname, fade + y-slide on every route change
+- ✅ Page transition animations — enter-only fade + y-slide via PageTransition component (no blank flash)
 - ✅ Pull-to-refresh — touch gesture (≥65px drag from top) on Friends, Groups, Activity → triggers query refetch with spinner indicator
 - ✅ usePullToRefresh hook — reusable touch handler (touchstart/touchmove/touchend), works across all list pages
 
@@ -93,10 +103,28 @@
 All Phase 9 items are complete. ✅
 
 ### V2 / Post-launch
+
+#### 🎨 Design Rebrand (from Moodboard v1)
+| Feature | Notes |
+|---------|-------|
+| Primary color rebrand | Migrate #0F9D94 (teal) → #1B4332 (forest green) + #FF6B35 (orange) accent across all Tailwind tokens |
+| Typography rebrand | Swap Urbanist → Playfair Display (headings) + Inter (body) |
+| Illustrated empty states | Replace icon-only empty states with warm lifestyle illustrations |
+| Overlapping member avatars | Group cards show stacked avatar circles (up to 4 + "+N more") |
+| Badge system | Unsettled / Settled / You paid / Owes you / **Overdue** status badges on expense rows |
+| Expense table view | Optional table layout showing: icon / name / paid by / total / you owe / status / date / actions |
+| Per-person amount on cards | "₹310.00 each" shown prominently on expense cards |
+| Alert / notification toasts | Dismissible in-app alerts: success (green) / warning (amber) / error (red) / info (green) |
+| Analytics tab | Dedicated analytics route with charts (replacing or supplementing Personal tab) |
+| Wallet section | Wallet tab in nav for UPI balance / payment history |
+| Balance hero card redesign | Dark #1B4332 bg card: "You are owed ₹2,450.75" + "Settle up now →" in orange |
+| Sparkline trend charts | Inline SVG sparklines on balance/summary cards (+12.5% vs last month) |
+
+#### 🚀 New Features
 | Feature | Notes |
 |---------|-------|
 | Guest mode | Use app without login |
-| Phone OTP login | SMS verification |
+| Phone OTP login | SMS verification for Indian users |
 | Real AI (Claude API) in chat | /personal/ai-chat currently uses mock keyword replies |
 | Voice AI assistant | "Split ₹1200 dinner with Rahul and Nehal" voice input |
 | Multi-currency with live exchange rates | Currency field exists; no exchange rate API |
@@ -113,7 +141,7 @@ All Phase 9 items are complete. ✅
 | Travel mode | Trip budget tracking, expense itinerary, shared docs |
 | Bank SMS detection | Auto-parse SMS for expense amounts |
 | Spending heatmap | Day-of-week / time-of-day heat map chart |
-| Advanced batch settlement | Full minimize-transactions algorithm (currently shows simplified debts from backend) |
+| Advanced batch settlement | Full minimize-transactions algorithm |
 | Multi-device session management | Security → "active sessions" list with revoke |
 | Email parsing | Parse Gmail/Outlook for expense detection |
 
@@ -123,8 +151,9 @@ All Phase 9 items are complete. ✅
 
 | Status | Count |
 |--------|-------|
-| ✅ Complete | 46 |
+| ✅ Complete | 55 |
 | 🟡 Partial | 5 |
 | ❌ Phase 9 remaining | 0 |
-| ❌ Missing (V2+) | 20 |
-| **Total tracked** | **71** |
+| ❌ Missing (V2 design rebrand) | 12 |
+| ❌ Missing (V2 new features) | 21 |
+| **Total tracked** | **93** |
