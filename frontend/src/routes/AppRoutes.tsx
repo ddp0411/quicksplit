@@ -26,6 +26,7 @@ import { Groups } from '@/pages/Groups';
 import { GroupDetail } from '@/pages/GroupDetail';
 import { CreateGroup } from '@/pages/CreateGroup';
 import { GroupInsights } from '@/pages/GroupInsights';
+import { ImportGroup } from '@/pages/ImportGroup';
 
 // Expenses
 import { AddExpense } from '@/pages/AddExpense';
@@ -81,6 +82,7 @@ const AppRoutes: React.FC = () => (
     {/* Groups */}
     <Route path="/groups" element={<P><Groups /></P>} />
     <Route path="/groups/new" element={<P><CreateGroup /></P>} />
+    <Route path="/groups/import" element={<P><ImportGroup /></P>} />
     <Route path="/groups/:groupId" element={<P><GroupDetail /></P>} />
     <Route path="/groups/:groupId/insights" element={<P><GroupInsights /></P>} />
 

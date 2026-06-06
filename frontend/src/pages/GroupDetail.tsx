@@ -43,6 +43,7 @@ export const GroupDetail: React.FC = () => {
   const [addMemberEmail, setAddMemberEmail] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const { data: group, isLoading: groupLoading } = useQuery({
     queryKey: ['group', groupId],
@@ -80,6 +81,17 @@ export const GroupDetail: React.FC = () => {
     mutationFn: () => groupsAPI.deleteGroup(groupId!),
     onSuccess: () => navigate('/groups'),
   });
+
+  const handleInvite = () => {
+    const inviteLink = `${window.location.origin}/join/${groupId}`;
+    if (navigator.share) {
+      navigator.share({ title: `Join ${group?.name ?? 'our group'} on QuickSplit`, url: inviteLink }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(inviteLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
+  };
 
   if (groupLoading) {
     return (
@@ -169,16 +181,17 @@ export const GroupDetail: React.FC = () => {
       </div>
 
       {/* Quick actions row */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {[
-          { label: 'Add expense', emoji: '➕', to: `/expenses/new?group=${groupId}` },
-          { label: 'Scan receipt', emoji: '📷', to: `/scan` },
-          { label: 'Settle up', emoji: '💸', to: `/settle-up?group=${groupId}` },
-          { label: 'Insights', emoji: '📊', to: `/groups/${groupId}/insights` },
+          { label: 'Add', emoji: '➕', action: () => navigate(`/expenses/new?group=${groupId}`) },
+          { label: 'Scan', emoji: '📷', action: () => navigate('/scan') },
+          { label: 'Settle', emoji: '💸', action: () => navigate(`/settle-up?group=${groupId}`) },
+          { label: 'Insights', emoji: '📊', action: () => navigate(`/groups/${groupId}/insights`) },
+          { label: linkCopied ? 'Copied!' : 'Invite', emoji: linkCopied ? '✓' : '🔗', action: handleInvite },
         ].map(action => (
           <button
             key={action.label}
-            onClick={() => navigate(action.to)}
+            onClick={action.action}
             className="flex flex-col items-center gap-1.5 rounded-2xl border py-3 text-center transition hover:border-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/10"
             style={{ borderColor: 'var(--border)', background: 'var(--card)' }}
           >
@@ -187,6 +200,20 @@ export const GroupDetail: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {/* Link copied toast */}
+      <AnimatePresence>
+        {linkCopied && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-2xl bg-slate-800 px-4 py-2 text-sm font-semibold text-white shadow-button"
+          >
+            Invite link copied!
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Analytics mini card */}
       {expenses.length > 0 && (topSpender || topCat) && (

@@ -122,6 +122,13 @@ export const Groups: React.FC = () => {
             />
           </button>
           <button
+            onClick={() => navigate('/groups/import')}
+            className="flex items-center gap-1.5 rounded-2xl border px-3 py-1.5 text-sm font-bold transition hover:border-primary-300 hover:text-primary-600"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+          >
+            Import
+          </button>
+          <button
             onClick={() => navigate('/groups/new')}
             className="flex items-center gap-1.5 rounded-2xl bg-primary-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-primary-700"
           >
