@@ -11,7 +11,7 @@ export const SplashScreen: React.FC = () => {
     const onboarded = localStorage.getItem('qs_onboarded');
     const timer = setTimeout(() => {
       if (isAuthenticated) {
-        navigate('/friends', { replace: true });
+        navigate('/home', { replace: true });
       } else if (onboarded) {
         navigate('/login', { replace: true });
       } else {

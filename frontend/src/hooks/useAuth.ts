@@ -11,7 +11,7 @@ export const useAuth = () => {
     mutationFn: (data: LoginRequest) => authAPI.login(data),
     onSuccess: (data) => {
       setUser(data.user, data.access_token);
-      navigate('/scan');
+      navigate('/home');
     },
   });
 
@@ -19,7 +19,7 @@ export const useAuth = () => {
     mutationFn: (data: RegisterRequest) => authAPI.register(data),
     onSuccess: (data) => {
       setUser(data.user, data.access_token);
-      navigate('/scan');
+      navigate('/home');
     },
   });
 

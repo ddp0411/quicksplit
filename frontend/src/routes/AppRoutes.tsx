@@ -75,6 +75,9 @@ const AppRoutes: React.FC = () => (
     {/* One-time setup */}
     <Route path="/permissions" element={<P><PermissionSetup /></P>} />
 
+    {/* Home dashboard */}
+    <Route path="/home" element={<P><Home /></P>} />
+
     {/* Friends */}
     <Route path="/friends" element={<P><Friends /></P>} />
     <Route path="/friends/add" element={<P><AddFriend /></P>} />
@@ -122,7 +125,6 @@ const AppRoutes: React.FC = () => (
     <Route path="/pro" element={<P><ProUpgrade /></P>} />
 
     {/* Legacy */}
-    <Route path="/home" element={<P><Home /></P>} />
     <Route path="/profile" element={<Navigate to="/account" replace />} />
 
     {/* Fallback */}
