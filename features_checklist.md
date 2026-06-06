@@ -1,11 +1,11 @@
 # QuickSplit — Complete Feature Checklist
 
 > Cross-reference against: `Quicksplit UI and features guide.md`
-> Last updated: 2026-06-06
+> Last updated: 2026-06-06 (Session 3)
 
 ---
 
-## ✅ Complete Features (36 items)
+## ✅ Complete Features (46 items)
 
 ### Auth & Onboarding
 - ✅ Splash Screen — animated teal logo, auto-redirect (authed → /friends, unauthed → /onboarding)
@@ -30,9 +30,11 @@
 ### Groups
 - ✅ Groups Tab — search, FilterSheet, category emoji icons (✈️🏠❤️💼📅📁), balance chips, category quick-filter pill row
 - ✅ Create Group — 3-step wizard: name + 6-type grid → member email chips → split method + currency
-- ✅ Group Detail — gradient hero by category type, 3-stat row, 4-button quick actions, group analytics mini card (top spender + category), collapsible members section
+- ✅ Group Detail — gradient hero by category type, 3-stat row, 5-button quick actions (Add/Scan/Settle/Insights/Invite), group analytics mini card, collapsible members section
 - ✅ Group Insights — per-member horizontal bar chart, SVG donut by category, settlement plan list
 - ✅ Group Types — Trip ✈️ / Home 🏠 / Couple ❤️ / Office 💼 / Event 📅 / Other 📁
+- ✅ Import from Splitwise (create group) — /groups/import, 3-screen flow: CSV upload → setup (identity + type + map friends) → success bottom sheet with invite link
+- ✅ Invite link — GroupDetail quick action uses Web Share API / clipboard copy, animated "Copied!" toast
 
 ### Expense Management
 - ✅ Add Expense — Splitwise-style: "With you and:" chip picker, category emoji + description field, large ₹ amount field, "Paid by / split" expandable panel (Equal/Exact/%/Shares tabs), bottom toolbar (Date/Group/Scan/Notes)
@@ -59,13 +61,17 @@
 - ✅ Pro Upgrade — feature checklist, Yearly/Quarterly/Monthly plan cards (BEST VALUE badge), timeline, "Try It Free" CTA
 - ✅ Referral Page — X/3 referral progress bar, how-it-works accordion, Share link + Copy link
 - ✅ Import from Splitwise — standalone page at /account/import (Option 1: direct instructions, Option 2: CSV file upload)
+- ✅ QR Code page — /account/qr with "My Code" tab (qrcode.react, teal SVG, Copy/Share) + "Scan" tab (animated viewfinder, fallback CTA)
 
 ### System & OCR Flow
 - ✅ OCR Scan Flow — Scan → Split → Review → History pages (full existing flow kept)
 - ✅ Skeleton Loading — SkeletonCard + SkeletonRow used on Friends, Groups, GroupDetail, GroupInsights
 - ✅ Teal Design System — #0F9D94 brand, Urbanist font, 24px radius cards, all screens consistent
 - ✅ Balances page — existing page kept, accessible from Friends/Groups balance chips
-- ✅ Activity page — existing page kept
+- ✅ Activity page — themed with CSS variables (dark mode), enhanced empty state, date-grouped feed
+- ✅ Page transition animations — AnimatePresence keyed by location.pathname, fade + y-slide on every route change
+- ✅ Pull-to-refresh — touch gesture (≥65px drag from top) on Friends, Groups, Activity → triggers query refetch with spinner indicator
+- ✅ usePullToRefresh hook — reusable touch handler (touchstart/touchmove/touchend), works across all list pages
 
 ---
 
@@ -73,9 +79,9 @@
 
 | Feature | Status | What's missing |
 |---------|--------|----------------|
-| Import from Splitwise in Create Group | 🟡 Just added | Expense batch-create is best-effort; paid_by always defaults to current user since CSV names can't be auto-matched to user IDs |
+| Import from Splitwise in Create Group | 🟡 Partial | `paid_by_user_id` always defaults to current user — CSV names can't be auto-matched to user IDs without backend lookup |
 | AI Chat | 🟡 Mock only | Real Claude API integration needed — currently uses keyword pattern matching |
-| QR Code payments | 🟡 UI only | Actual UPI deep-links / QR generation not wired |
+| QR Code payments | 🟡 UI only | QR code page exists and shows real QR; actual UPI deep-links / camera scanning not wired |
 | Scan receipt | 🟡 Partial | OCR flow exists; "Scan receipt" buttons in GroupDetail/AddExpense navigate to /scan |
 | Group Chat | 🟡 Placeholder | Comments on expenses exist; full group thread/pinned messages not built |
 
@@ -83,13 +89,8 @@
 
 ## ❌ Missing Features
 
-### Phase 9 Polish (Next immediate priority)
-| Feature | Notes |
-|---------|-------|
-| QRSheet component | AccountTab "QR Code" row navigates nowhere; needs Scan + My Code bottom sheet |
-| Page transition animations | AnimatePresence on route change — slide/fade between pages |
-| Pull-to-refresh | Friends, Groups, Activity tabs (touch gesture → query refetch) |
-| Enhanced empty states | Illustration + CTA on Friends, Groups, Activity, ExpenseDetail comments |
+### Phase 9 Polish
+All Phase 9 items are complete. ✅
 
 ### V2 / Post-launch
 | Feature | Notes |
@@ -122,8 +123,8 @@
 
 | Status | Count |
 |--------|-------|
-| ✅ Complete | 36 |
+| ✅ Complete | 46 |
 | 🟡 Partial | 5 |
-| ❌ Missing (Phase 9) | 4 |
+| ❌ Phase 9 remaining | 0 |
 | ❌ Missing (V2+) | 20 |
-| **Total tracked** | **65** |
+| **Total tracked** | **71** |

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '@/state/userStore';
 import { Button } from '../ui/Button';
 import {
@@ -19,9 +19,14 @@ const navItems = [
   { to: '/account',  label: 'Account',  icon: UserCircleIcon },
 ];
 
+const FULLSCREEN_ROUTES = ['/', '/onboarding'];
+
 export const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useUserStore();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  if (FULLSCREEN_ROUTES.includes(pathname)) return null;
 
   const handleLogout = () => { logout(); navigate('/login'); };
 

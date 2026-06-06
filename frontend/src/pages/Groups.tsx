@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { groupsAPI, type Group } from '@/services/api/groupsAPI';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PageTransition } from '@/components/layout/PageTransition';
 import { formatCurrency } from '@/utils/upi';
 import { SkeletonRow } from '@/components/ui/SkeletonCard';
 import { FilterSheet } from '@/components/ui/FilterSheet';
@@ -80,10 +82,12 @@ export const Groups: React.FC = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState<BalanceFilter>('None');
 
-  const { data: groups = [], isLoading } = useQuery({
+  const { data: groups = [], isLoading, refetch } = useQuery({
     queryKey: ['groups'],
     queryFn: groupsAPI.getGroups,
   });
+
+  const { indicatorRef } = usePullToRefresh(refetch);
 
   const totalOwed = groups.reduce((s, g) => s + Math.max(0, g.your_balance), 0);
   const totalYouOwe = groups.reduce((s, g) => s + Math.max(0, -g.your_balance), 0);
@@ -101,7 +105,16 @@ export const Groups: React.FC = () => {
   }, [groups, search, filter]);
 
   return (
+    <PageTransition>
     <div className="mx-auto max-w-lg space-y-4 pb-24">
+      {/* Pull-to-refresh indicator */}
+      <div
+        ref={indicatorRef}
+        className="flex justify-center opacity-0 -mt-6 mb-0 transition-all"
+        style={{ transform: 'translateY(0px)' }}
+      >
+        <div className="h-6 w-6 rounded-full border-2 border-primary-600 border-t-transparent animate-spin" />
+      </div>
       {/* Top bar */}
       <div className="flex items-center justify-between pt-1">
         <h1 className="font-display text-2xl font-extrabold" style={{ color: 'var(--text)' }}>Groups</h1>
@@ -261,5 +274,6 @@ export const Groups: React.FC = () => {
         onChange={(v: string) => { setFilter(v as BalanceFilter); }}
       />
     </div>
+    </PageTransition>
   );
 };

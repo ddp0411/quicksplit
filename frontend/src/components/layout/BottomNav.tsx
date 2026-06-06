@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useUserStore } from '@/state/userStore';
 import { ActionSheet } from '@/components/ui/ActionSheet';
 import {
@@ -26,11 +26,14 @@ const tabs = [
   { to: '/account',  label: 'Account',  icon: UserCircleIcon,  iconActive: UserCircleSolid },
 ];
 
+const FULLSCREEN_ROUTES = ['/', '/onboarding'];
+
 export const BottomNav: React.FC = () => {
   const { isAuthenticated } = useUserStore();
+  const { pathname } = useLocation();
   const [showAction, setShowAction] = useState(false);
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated || FULLSCREEN_ROUTES.includes(pathname)) return null;
 
   const half1 = tabs.slice(0, 2);
   const half2 = tabs.slice(2);

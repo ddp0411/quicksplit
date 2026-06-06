@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/Card';
 import { activityAPI, type ActivityItem } from '@/services/api/activityAPI';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PageTransition } from '@/components/layout/PageTransition';
 import { EXPENSE_CATEGORIES } from '@/services/api/expensesAPI';
 import { useUserStore } from '@/state/userStore';
 import { formatCurrency } from '@/utils/upi';
@@ -22,21 +23,22 @@ function ActivityRow({ item, userId }: { item: ActivityItem; userId?: string }) 
     return (
       <Link
         to={`/expenses/${item.id}`}
-        className="flex items-center gap-3 rounded-lg border border-slate-100 p-3 transition hover:border-primary-200 hover:bg-primary-50/40"
+        className="flex items-center gap-3 rounded-2xl border p-3 transition hover:border-primary-300"
+        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-xl">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-900/20 text-xl">
           {cat?.emoji ?? '📦'}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-bold text-slate-900">{item.description}</p>
-          <p className="text-xs text-slate-500">
+          <p className="truncate font-bold text-sm" style={{ color: 'var(--text)' }}>{item.description}</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
             {youPaid ? 'You paid' : `${item.paid_by?.name ?? 'Someone'} paid`}
             {item.group_name && ` · ${item.group_name}`}
             {' · '}{formatDate(item.date)}
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-extrabold text-slate-900">{formatCurrency(item.amount)}</p>
+          <p className="font-extrabold text-sm" style={{ color: 'var(--text)' }}>{formatCurrency(item.amount)}</p>
           {item.your_share > 0 && (
             <p className={`text-xs font-bold ${youPaid ? 'text-emerald-600' : 'text-rose-500'}`}>
               {youPaid
@@ -52,17 +54,17 @@ function ActivityRow({ item, userId }: { item: ActivityItem; userId?: string }) 
   // settlement
   const isOutgoing = item.is_outgoing;
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-emerald-100 bg-emerald-50/50 p-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+    <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 dark:bg-emerald-900/10 dark:border-emerald-800 p-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700">
         <CheckCircleIcon className="h-5 w-5" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-bold text-slate-900">
+        <p className="truncate font-bold text-sm" style={{ color: 'var(--text)' }}>
           {isOutgoing
             ? `You paid ${item.to_user?.name ?? 'someone'}`
             : `${item.from_user?.name ?? 'Someone'} paid you`}
         </p>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
           Settlement{item.group_name && ` · ${item.group_name}`}
           {' · '}{formatDate(item.created_at)}
         </p>
@@ -86,10 +88,12 @@ function groupByDate(items: ActivityItem[]) {
 export const Activity: React.FC = () => {
   const { user } = useUserStore();
 
-  const { data: feed = [], isLoading } = useQuery({
+  const { data: feed = [], isLoading, refetch } = useQuery({
     queryKey: ['activity'],
     queryFn: () => activityAPI.getFeed(50),
   });
+
+  const { indicatorRef } = usePullToRefresh(refetch);
 
   if (isLoading) {
     return (
@@ -104,7 +108,16 @@ export const Activity: React.FC = () => {
   const groups = groupByDate(feed);
 
   return (
+    <PageTransition>
     <div className="mx-auto max-w-2xl space-y-5">
+      {/* Pull-to-refresh indicator */}
+      <div
+        ref={indicatorRef}
+        className="flex justify-center opacity-0 -mt-6 mb-0 transition-all"
+        style={{ transform: 'translateY(0px)' }}
+      >
+        <div className="h-6 w-6 rounded-full border-2 border-primary-600 border-t-transparent animate-spin" />
+      </div>
       {/* Header */}
       <div className="rounded-lg bg-gradient-to-br from-ink to-primary-800 p-5 text-white shadow-button">
         <div className="flex items-center gap-3">
@@ -120,16 +133,23 @@ export const Activity: React.FC = () => {
       </div>
 
       {feed.length === 0 ? (
-        <Card className="py-12 text-center">
-          <BoltIcon className="mx-auto h-10 w-10 text-slate-400" />
-          <p className="mt-3 font-bold text-slate-900">No activity yet</p>
-          <p className="mt-1 text-sm text-slate-500">Add an expense or settle up to see your activity.</p>
-        </Card>
+        <div
+          className="rounded-2xl px-6 py-14 text-center"
+          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+        >
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-primary-50 dark:bg-primary-900/20 text-3xl">
+            ⚡
+          </div>
+          <p className="mt-4 font-bold text-base" style={{ color: 'var(--text)' }}>No activity yet</p>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+            Add an expense or settle up to see your timeline here.
+          </p>
+        </div>
       ) : (
         <div className="space-y-6">
           {groups.map(([dateLabel, items]) => (
             <div key={dateLabel}>
-              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">{dateLabel}</p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{dateLabel}</p>
               <div className="space-y-2">
                 {items.map((item, i) => (
                   <motion.div
@@ -147,5 +167,6 @@ export const Activity: React.FC = () => {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 };

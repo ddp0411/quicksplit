@@ -53,6 +53,7 @@ import { SecuritySettings } from '@/pages/SecuritySettings';
 import { ProUpgrade } from '@/pages/ProUpgrade';
 import { ReferralPage } from '@/pages/ReferralPage';
 import { ImportSplitwise } from '@/pages/ImportSplitwise';
+import { QRCodePage } from '@/pages/QRCode';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useUserStore();
@@ -112,6 +113,7 @@ const AppRoutes: React.FC = () => (
     {/* Account & Settings */}
     <Route path="/account" element={<P><AccountTab /></P>} />
     <Route path="/account/edit" element={<P><EditProfile /></P>} />
+    <Route path="/account/qr" element={<P><QRCodePage /></P>} />
     <Route path="/account/referral" element={<P><ReferralPage /></P>} />
     <Route path="/account/import" element={<P><ImportSplitwise /></P>} />
     <Route path="/settings/appearance" element={<P><AppearanceSettings /></P>} />
