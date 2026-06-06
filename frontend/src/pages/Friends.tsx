@@ -1,64 +1,121 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { friendsAPI, type Friend, type FriendRequest } from '@/services/api/friendsAPI';
-import { getAPIErrorMessage } from '@/services/api/errorMessage';
 import { formatCurrency } from '@/utils/upi';
+import { SkeletonRow } from '@/components/ui/SkeletonCard';
+import { FilterSheet } from '@/components/ui/FilterSheet';
 import {
+  AdjustmentsHorizontalIcon,
   CheckIcon,
   MagnifyingGlassIcon,
-  PlusIcon,
   UserGroupIcon,
-  UserMinusIcon,
   UserPlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+
+type BalanceFilter = 'None' | 'Outstanding' | 'You owe' | 'Owe you';
 
 function avatarInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-function Avatar({ name, color, size = 'md' }: { name: string; color: string; size?: 'sm' | 'md' | 'lg' }) {
-  const sizes = { sm: 'h-8 w-8 text-xs', md: 'h-10 w-10 text-sm', lg: 'h-12 w-12 text-base' };
-  return (
-    <div
-      className={`flex shrink-0 items-center justify-center rounded-full font-extrabold text-white ${sizes[size]}`}
-      style={{ background: color }}
-    >
-      {avatarInitials(name)}
-    </div>
-  );
-}
+function FriendRow({ friend, onSettle, onRemind, onRemove }: {
+  friend: Friend;
+  onSettle: () => void;
+  onRemind: () => void;
+  onRemove: () => void;
+}) {
+  const navigate = useNavigate();
+  const [swiped, setSwiped] = useState(false);
+  const balance = friend.balance;
+  const settled = Math.abs(balance) < 0.01;
 
-function BalanceBadge({ balance }: { balance: number }) {
-  if (Math.abs(balance) < 0.01) {
-    return <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-500">Settled</span>;
-  }
-  if (balance > 0) {
-    return (
-      <div className="text-right">
-        <p className="text-[11px] font-semibold text-emerald-600">owes you</p>
-        <p className="font-extrabold text-emerald-700">{formatCurrency(balance)}</p>
-      </div>
-    );
-  }
   return (
-    <div className="text-right">
-      <p className="text-[11px] font-semibold text-rose-500">you owe</p>
-      <p className="font-extrabold text-rose-600">{formatCurrency(Math.abs(balance))}</p>
+    <div className="relative overflow-hidden rounded-2xl">
+      {/* Action tray (revealed on swipe) */}
+      <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
+        <button
+          onClick={onSettle}
+          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-primary-600 text-[10px] font-bold text-white"
+        >
+          <span className="text-base">💸</span>Settle
+        </button>
+        <button
+          onClick={onRemind}
+          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-warning text-[10px] font-bold text-white"
+        >
+          <span className="text-base">🔔</span>Remind
+        </button>
+        <button
+          onClick={onRemove}
+          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-negative text-[10px] font-bold text-white"
+        >
+          <span className="text-base">🗑</span>Remove
+        </button>
+      </div>
+
+      {/* Main row */}
+      <motion.div
+        animate={{ x: swiped ? -160 : 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        drag="x"
+        dragConstraints={{ left: -160, right: 0 }}
+        dragElastic={0.05}
+        onDragEnd={(_, info) => {
+          if (info.offset.x < -60) setSwiped(true);
+          else setSwiped(false);
+        }}
+        onClick={() => {
+          if (swiped) { setSwiped(false); return; }
+          navigate(`/friends/${friend.user.id}`);
+        }}
+        className="relative flex cursor-pointer items-center gap-3 rounded-2xl border p-3 transition-colors"
+        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+      >
+        {/* Avatar */}
+        <div
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-extrabold text-white"
+          style={{ background: friend.user.avatar_color }}
+        >
+          {avatarInitials(friend.user.name)}
+        </div>
+
+        {/* Info */}
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-bold text-sm" style={{ color: 'var(--text)' }}>{friend.user.name}</p>
+          <p className="truncate text-xs" style={{ color: 'var(--text-muted)' }}>{friend.user.email}</p>
+        </div>
+
+        {/* Balance chip */}
+        {settled ? (
+          <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            Settled
+          </span>
+        ) : balance > 0 ? (
+          <div className="text-right">
+            <p className="text-[10px] font-semibold text-positive">owes you</p>
+            <p className="text-sm font-extrabold text-positive">{formatCurrency(balance)}</p>
+          </div>
+        ) : (
+          <div className="text-right">
+            <p className="text-[10px] font-semibold text-negative">you owe</p>
+            <p className="text-sm font-extrabold text-negative">{formatCurrency(Math.abs(balance))}</p>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }
 
 export const Friends: React.FC = () => {
+  const navigate = useNavigate();
   const qc = useQueryClient();
-  const [addEmail, setAddEmail] = useState('');
-  const [addError, setAddError] = useState('');
-  const [showAdd, setShowAdd] = useState(false);
+  const [search, setSearch] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filter, setFilter] = useState<BalanceFilter>('None');
 
   const { data: friends = [], isLoading } = useQuery({
     queryKey: ['friends'],
@@ -68,18 +125,6 @@ export const Friends: React.FC = () => {
   const { data: requests = [] } = useQuery({
     queryKey: ['friend-requests'],
     queryFn: friendsAPI.getRequests,
-  });
-
-  const addMutation = useMutation({
-    mutationFn: (email: string) => friendsAPI.addFriend(email),
-    onSuccess: () => {
-      setAddEmail('');
-      setShowAdd(false);
-      setAddError('');
-      qc.invalidateQueries({ queryKey: ['friends'] });
-      qc.invalidateQueries({ queryKey: ['friend-requests'] });
-    },
-    onError: (err) => setAddError(getAPIErrorMessage(err, 'Could not add friend.')),
   });
 
   const acceptMutation = useMutation({
@@ -100,191 +145,222 @@ export const Friends: React.FC = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
   });
 
-  const handleAdd = () => {
-    if (!addEmail.trim()) return;
-    setAddError('');
-    addMutation.mutate(addEmail.trim().toLowerCase());
-  };
-
   const totalOwedToYou = friends.reduce((s, f) => s + Math.max(0, f.balance), 0);
   const totalYouOwe = friends.reduce((s, f) => s + Math.max(0, -f.balance), 0);
 
+  const filtered = useMemo(() => {
+    let list = friends;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(f => f.user.name.toLowerCase().includes(q) || f.user.email.toLowerCase().includes(q));
+    }
+    if (filter === 'Outstanding') list = list.filter(f => Math.abs(f.balance) > 0.01);
+    if (filter === 'You owe') list = list.filter(f => f.balance < -0.01);
+    if (filter === 'Owe you') list = list.filter(f => f.balance > 0.01);
+    return list;
+  }, [friends, search, filter]);
+
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col justify-between gap-4 rounded-lg bg-gradient-to-br from-primary-700 to-sky-500 p-5 text-white shadow-button md:flex-row md:items-end">
-        <div>
-          <p className="text-sm font-bold text-white/70">People</p>
-          <h1 className="mt-1 font-display text-4xl font-extrabold tracking-normal">Friends</h1>
-          <p className="mt-2 text-sm font-semibold text-white/70">{friends.length} people</p>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:min-w-72">
-          <div className="rounded-lg bg-white/14 p-3">
-            <p className="text-xs font-semibold text-white/70">Owed to you</p>
-            <p className="mt-1 text-xl font-extrabold text-emerald-200">{formatCurrency(totalOwedToYou)}</p>
-          </div>
-          <div className="rounded-lg bg-white/14 p-3">
-            <p className="text-xs font-semibold text-white/70">You owe</p>
-            <p className="mt-1 text-xl font-extrabold text-rose-200">{formatCurrency(totalYouOwe)}</p>
-          </div>
+    <div className="mx-auto max-w-lg space-y-4 pb-24">
+      {/* Top bar */}
+      <div className="flex items-center justify-between pt-1">
+        <h1 className="font-display text-2xl font-extrabold" style={{ color: 'var(--text)' }}>Friends</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowSearch(v => !v)}
+            className="flex h-9 w-9 items-center justify-center rounded-2xl transition hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            <MagnifyingGlassIcon className="h-5 w-5" style={{ color: 'var(--text-muted)' }} />
+          </button>
+          <button
+            onClick={() => setFilterOpen(true)}
+            className={`flex h-9 w-9 items-center justify-center rounded-2xl transition ${filter !== 'None' ? 'bg-primary-100 dark:bg-primary-900/30' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+          >
+            <AdjustmentsHorizontalIcon className={`h-5 w-5 ${filter !== 'None' ? 'text-primary-600' : ''}`} style={filter === 'None' ? { color: 'var(--text-muted)' } : undefined} />
+          </button>
+          <button
+            onClick={() => navigate('/friends/add')}
+            className="flex items-center gap-1.5 rounded-2xl bg-primary-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-primary-700"
+          >
+            <UserPlusIcon className="h-4 w-4" />
+            Add
+          </button>
         </div>
       </div>
 
-      {/* Pending requests */}
+      {/* Search bar */}
       <AnimatePresence>
-        {requests.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border-amber-200 bg-amber-50">
-              <p className="mb-3 font-bold text-amber-800">Pending requests ({requests.length})</p>
-              <div className="space-y-3">
-                {requests.map((req: FriendRequest) => (
-                  <div key={req.id} className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <Avatar name={req.requester.name} color={req.requester.avatar_color} />
-                      <div>
-                        <p className="font-bold text-slate-900">{req.requester.name}</p>
-                        <p className="text-sm text-slate-500">{req.requester.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => acceptMutation.mutate(req.id)}
-                        loading={acceptMutation.isPending}
-                      >
-                        <CheckIcon className="mr-1 h-4 w-4" />
-                        Accept
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => rejectMutation.mutate(req.id)}
-                        className="text-rose-600 hover:bg-rose-50"
-                      >
-                        <XMarkIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
+        {showSearch && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+              <input
+                autoFocus
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search friends…"
+                className="input-field pl-9 pr-9"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <XMarkIcon className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                </button>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Add friend */}
-      <Card>
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <h2 className="font-display text-xl font-bold text-ink">Your friends</h2>
-          <Button size="sm" onClick={() => setShowAdd(v => !v)}>
-            <PlusIcon className="mr-1.5 h-4 w-4" />
-            Add friend
-          </Button>
-        </div>
-
-        <AnimatePresence>
-          {showAdd && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-4 overflow-hidden"
-            >
-              <div className="flex gap-3 rounded-lg border border-primary-200 bg-primary-50/60 p-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder="friend@email.com"
-                    value={addEmail}
-                    onChange={e => setAddEmail(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleAdd()}
-                    error={addError}
-                  />
-                </div>
-                <div className="flex shrink-0 items-start gap-2">
-                  <Button onClick={handleAdd} loading={addMutation.isPending}>
-                    <UserPlusIcon className="mr-1.5 h-4 w-4" />
-                    Send
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => { setShowAdd(false); setAddError(''); }}>
-                    <XMarkIcon className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
+      {/* Balance summary chips */}
+      {(totalOwedToYou > 0.01 || totalYouOwe > 0.01) && (
+        <div className="flex gap-2">
+          {totalOwedToYou > 0.01 && (
+            <div className="flex items-center gap-1.5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5">
+              <span className="text-xs font-semibold text-positive">Owed to you</span>
+              <span className="text-sm font-extrabold text-positive">{formatCurrency(totalOwedToYou)}</span>
+            </div>
           )}
-        </AnimatePresence>
+          {totalYouOwe > 0.01 && (
+            <div className="flex items-center gap-1.5 rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5">
+              <span className="text-xs font-semibold text-negative">You owe</span>
+              <span className="text-sm font-extrabold text-negative">{formatCurrency(totalYouOwe)}</span>
+            </div>
+          )}
+        </div>
+      )}
 
-        {isLoading ? (
-          <div className="space-y-3">
-            {[0, 1, 2].map(i => <div key={i} className="h-16 animate-pulse rounded-lg bg-slate-100" />)}
-          </div>
-        ) : friends.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center">
-            <UserGroupIcon className="mx-auto h-10 w-10 text-slate-400" />
-            <p className="mt-3 font-bold text-slate-900">No friends yet</p>
-            <p className="mt-1 text-sm text-slate-500">Add friends to start splitting expenses.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {friends.map((f: Friend) => (
-              <motion.div
-                key={f.friendship_id}
-                layout
-                className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 p-3 transition hover:border-primary-200 hover:bg-primary-50/40"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <Avatar name={f.user.name} color={f.user.avatar_color} />
-                  <div className="min-w-0">
-                    <p className="truncate font-bold text-slate-900">{f.user.name}</p>
-                    <p className="truncate text-sm text-slate-500">{f.user.email}</p>
+      {/* Active filter chip */}
+      {filter !== 'None' && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Filter:</span>
+          <button
+            onClick={() => setFilter('None')}
+            className="flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/30 px-3 py-1 text-xs font-bold text-primary-700 dark:text-primary-400"
+          >
+            {filter} <XMarkIcon className="h-3 w-3" />
+          </button>
+        </div>
+      )}
+
+      {/* Pending requests */}
+      <AnimatePresence>
+        {requests.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="card border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800"
+          >
+            <p className="mb-3 font-bold text-amber-800 dark:text-amber-300">
+              Pending requests ({requests.length})
+            </p>
+            <div className="space-y-3">
+              {requests.map((req: FriendRequest) => (
+                <div key={req.id} className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl text-sm font-extrabold text-white"
+                      style={{ background: req.requester.avatar_color }}
+                    >
+                      {avatarInitials(req.requester.name)}
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{req.requester.name}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{req.requester.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => acceptMutation.mutate(req.id)}
+                      disabled={acceptMutation.isPending}
+                      className="flex items-center gap-1 rounded-xl bg-primary-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+                    >
+                      <CheckIcon className="h-3.5 w-3.5" /> Accept
+                    </button>
+                    <button
+                      onClick={() => rejectMutation.mutate(req.id)}
+                      className="flex h-7 w-7 items-center justify-center rounded-xl transition hover:bg-rose-100 dark:hover:bg-rose-900/30"
+                    >
+                      <XMarkIcon className="h-4 w-4 text-negative" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  <BalanceBadge balance={f.balance} />
-                  <Link to={`/settle-up/${f.user.id}`}>
-                    <Button size="sm" variant="secondary">Settle</Button>
-                  </Link>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-slate-400 hover:text-rose-600"
-                    onClick={() => removeMutation.mutate(f.user.id)}
-                    aria-label="Remove friend"
-                  >
-                    <UserMinusIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </motion.div>
         )}
-      </Card>
+      </AnimatePresence>
 
-      {/* Quick actions */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Link to="/expenses/new">
-          <Card hover className="flex cursor-pointer items-center gap-4">
-            <span className="rounded-lg bg-primary-50 p-3 text-primary-700">
-              <PlusIcon className="h-6 w-6" />
-            </span>
-            <div>
-              <p className="font-bold text-slate-900">Add expense</p>
-              <p className="text-sm text-slate-500">Split a bill with friends</p>
-            </div>
-          </Card>
-        </Link>
-        <Link to="/balances">
-          <Card hover className="flex cursor-pointer items-center gap-4">
-            <span className="rounded-lg bg-emerald-50 p-3 text-emerald-700">
-              <MagnifyingGlassIcon className="h-6 w-6" />
-            </span>
-            <div>
-              <p className="font-bold text-slate-900">View balances</p>
-              <p className="text-sm text-slate-500">See all outstanding amounts</p>
-            </div>
-          </Card>
-        </Link>
-      </div>
+      {/* Friends list */}
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3, 4].map(i => <SkeletonRow key={i} />)}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="card py-14 text-center">
+          <UserGroupIcon className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
+          {friends.length === 0 ? (
+            <>
+              <p className="mt-3 font-bold text-base" style={{ color: 'var(--text)' }}>No friends yet</p>
+              <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Add friends to start splitting expenses</p>
+              <button
+                onClick={() => navigate('/friends/add')}
+                className="mx-auto mt-4 flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700"
+              >
+                <UserPlusIcon className="h-4 w-4" /> Add your first friend
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 font-bold text-base" style={{ color: 'var(--text)' }}>No results</p>
+              <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Try a different search or filter</p>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map(f => (
+            <FriendRow
+              key={f.friendship_id}
+              friend={f}
+              onSettle={() => navigate(`/settle-up/${f.user.id}`)}
+              onRemind={() => alert(`Reminder sent to ${f.user.name}`)}
+              onRemove={() => removeMutation.mutate(f.user.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* All settled up banner */}
+      {!isLoading && friends.length > 0 && totalOwedToYou < 0.01 && totalYouOwe < 0.01 && (
+        <div className="card border-positive/30 bg-emerald-50/50 dark:bg-emerald-900/10 py-5 text-center">
+          <p className="text-xl">🎉</p>
+          <p className="mt-1 font-bold text-sm text-positive">You are all settled up!</p>
+        </div>
+      )}
+
+      {/* Filter sheet */}
+      <FilterSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter friends"
+        options={[
+          { value: 'None', label: 'All friends' },
+          { value: 'Outstanding', label: 'Outstanding' },
+          { value: 'You owe', label: 'You owe' },
+          { value: 'Owe you', label: 'Owe you' },
+        ]}
+        value={filter}
+        onChange={(v: string) => { setFilter(v as BalanceFilter); }}
+      />
     </div>
   );
 };

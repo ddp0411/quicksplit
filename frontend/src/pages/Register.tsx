@@ -4,19 +4,30 @@ import { useAuth } from '@/hooks/useAuth';
 import { getAPIErrorMessage } from '@/services/api/errorMessage';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
-export const Login: React.FC = () => {
-  const { login, isLoggingIn, loginError } = useAuth();
+export const Register: React.FC = () => {
+  const { register: registerUser, isRegistering, registerError } = useAuth();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
+  const [agree, setAgree] = useState(false);
+  const [localError, setLocalError] = useState('');
 
-  const authError = getAPIErrorMessage(loginError, 'Invalid credentials. Please try again.');
+  const authError = getAPIErrorMessage(registerError, 'Registration failed. Please try again.');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) return;
-    login({ email: email.trim().toLowerCase(), password });
+    setLocalError('');
+    if (!name.trim()) { setLocalError('Please enter your name'); return; }
+    if (!email.trim().includes('@')) { setLocalError('Enter a valid email'); return; }
+    if (password.length < 6) { setLocalError('Password must be at least 6 characters'); return; }
+    if (password !== confirmPassword) { setLocalError('Passwords do not match'); return; }
+    if (!agree) { setLocalError('Please accept the terms to continue'); return; }
+    registerUser({ name: name.trim(), email: email.trim().toLowerCase(), password });
   };
+
+  const error = localError || (registerError ? authError : '');
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">
@@ -26,15 +37,15 @@ export const Login: React.FC = () => {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-primary-600 shadow-button">
             <span className="font-display text-2xl font-extrabold text-white">Q</span>
           </div>
-          <h1 className="font-display text-3xl font-extrabold" style={{ color: 'var(--text)' }}>Welcome back</h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to your QuickSplit account</p>
+          <h1 className="font-display text-3xl font-extrabold" style={{ color: 'var(--text)' }}>Create account</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Start splitting expenses for free</p>
         </div>
 
-        {/* Social buttons (UI only) */}
+        {/* Social buttons */}
         <div className="space-y-3 mb-5">
           <button
             type="button"
-            onClick={() => alert('Google login coming soon')}
+            onClick={() => alert('Google signup coming soon')}
             className="flex w-full items-center justify-center gap-3 rounded-2xl border py-3 text-sm font-semibold transition hover:bg-slate-50 dark:hover:bg-slate-800"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
           >
@@ -44,18 +55,7 @@ export const Login: React.FC = () => {
               <path d="M24 45c5.5 0 10.5-2.1 14.3-5.4l-6.6-5.6C29.8 35.9 27 37 24 37c-5.8 0-10.7-3.9-12.4-9.3l-7 5.4C8.1 40.9 15.4 45 24 45z" fill="#4CAF50"/>
               <path d="M44.5 20H24v8.5h11.8c-.8 2.4-2.3 4.4-4.3 5.9l6.6 5.6C42.2 36.5 45 31 45 24c0-1.3-.1-2.7-.5-4z" fill="#1976D2"/>
             </svg>
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            onClick={() => alert('Apple login coming soon')}
-            className="flex w-full items-center justify-center gap-3 rounded-2xl border py-3 text-sm font-semibold transition hover:bg-slate-50 dark:hover:bg-slate-800"
-            style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 814 1000" fill="currentColor">
-              <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.4-150.3-109.1c-52.1-75.1-87.2-192.3-87.2-303.1 0-203.8 132.4-312.9 261.1-312.9 70.2 0 128.6 46.2 172.5 46.2 42.2 0 108.6-49 191.4-49 30.8 0 108.2 2.6 163.7 98.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/>
-            </svg>
-            Continue with Apple
+            Sign up with Google
           </button>
         </div>
 
@@ -66,13 +66,24 @@ export const Login: React.FC = () => {
           <div className="flex-1 border-t" style={{ borderColor: 'var(--border)' }} />
         </div>
 
-        {/* Email/password form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {loginError && (
+          {error && (
             <div className="rounded-2xl border border-rose-200 bg-rose-50 dark:bg-rose-900/20 p-3 text-sm font-semibold text-negative">
-              {authError}
+              {error}
             </div>
           )}
+
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Full name</label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="input-field"
+              placeholder="Rohan Mehta"
+              autoComplete="name"
+            />
+          </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Email</label>
@@ -87,20 +98,15 @@ export const Login: React.FC = () => {
           </div>
 
           <div>
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Password</label>
-              <button type="button" className="text-xs font-bold text-primary-600 hover:underline">
-                Forgot password?
-              </button>
-            </div>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Password</label>
             <div className="relative">
               <input
                 type={showPw ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 className="input-field pr-10"
-                placeholder="Your password"
-                autoComplete="current-password"
+                placeholder="At least 6 characters"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -115,19 +121,53 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Confirm password</label>
+            <input
+              type={showPw ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className="input-field"
+              placeholder="Repeat password"
+              autoComplete="new-password"
+            />
+          </div>
+
+          {/* Terms checkbox */}
+          <label className="flex items-start gap-3 cursor-pointer">
+            <div className="relative mt-0.5">
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={e => setAgree(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={`flex h-5 w-5 items-center justify-center rounded-lg border-2 transition ${agree ? 'bg-primary-600 border-primary-600' : ''}`}
+                style={{ borderColor: agree ? undefined : 'var(--border)' }}>
+                {agree && <span className="text-white text-xs font-extrabold">✓</span>}
+              </div>
+            </div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+              I agree to the{' '}
+              <span className="font-bold text-primary-600">Terms of Service</span>{' '}
+              and{' '}
+              <span className="font-bold text-primary-600">Privacy Policy</span>
+            </p>
+          </label>
+
           <button
             type="submit"
-            disabled={isLoggingIn || !email || !password}
+            disabled={isRegistering}
             className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-primary-700 disabled:opacity-60"
           >
-            {isLoggingIn ? 'Signing in…' : 'Sign in'}
+            {isRegistering ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-          Don't have an account?{' '}
-          <Link to="/register" className="font-bold text-primary-600 hover:underline">
-            Sign up free
+          Already have an account?{' '}
+          <Link to="/login" className="font-bold text-primary-600 hover:underline">
+            Sign in
           </Link>
         </p>
       </div>
