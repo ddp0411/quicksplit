@@ -29,4 +29,5 @@ export {
   ScanScreen,
   SplitScreen,
   ReviewScreen,
+  PermissionSetupScreen,
 } from './RemainingScreens';

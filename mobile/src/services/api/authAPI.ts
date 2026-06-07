@@ -21,7 +21,18 @@ export interface AuthResponse {
   };
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  upi_id?: string;
+  avatar_color?: string;
+}
+
 export const authAPI = {
+  updateProfile: async (data: UpdateProfileRequest) => {
+    const response = await axiosClient.patch('/auth/me', data);
+    return response.data;
+  },
+
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     const formData = new FormData();
     formData.append('username', data.email);

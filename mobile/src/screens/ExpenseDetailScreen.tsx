@@ -11,6 +11,9 @@ import { useUserStore } from '../state/userStore';
 import { useToastStore } from '../state/toastStore';
 import { formatCurrency } from '../utils/upi';
 import { formatDate } from '../utils/helpers';
+import { useTheme } from '../theme/useTheme';
+
+type C = ReturnType<typeof useTheme>['colors'];
 
 function avatarInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -23,6 +26,8 @@ export const ExpenseDetailScreen: React.FC = () => {
   const queryClient = useQueryClient();
   const { user } = useUserStore();
   const { toast } = useToastStore();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
 
   const { data: expense, isLoading } = useQuery({
     queryKey: ['expense', expenseId],
@@ -137,34 +142,36 @@ export const ExpenseDetailScreen: React.FC = () => {
   );
 };
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E7E5E4' },
-  backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  backText: { fontSize: 18, color: '#111827' },
-  title: { fontSize: 17, fontWeight: '700', color: '#111827' },
+function createStyles(c: C) {
+  return StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.bg },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
+  backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+  backText: { fontSize: 18, color: c.text },
+  title: { fontSize: 17, fontWeight: '700', color: c.text },
   deleteText: { fontSize: 14, fontWeight: '600', color: '#DC2626' },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { color: '#9CA3AF' },
+  loadingText: { color: c.textMuted },
   scroll: { paddingBottom: 100 },
-  hero: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E7E5E4' },
-  heroIcon: { width: 68, height: 68, borderRadius: 20, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  heroDesc: { fontSize: 20, fontWeight: '800', color: '#111827', textAlign: 'center', fontFamily: 'PlayfairDisplay_700Bold' },
+  hero: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
+  heroIcon: { width: 68, height: 68, borderRadius: 20, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  heroDesc: { fontSize: 20, fontWeight: '800', color: c.text, textAlign: 'center', fontFamily: 'PlayfairDisplay_700Bold' },
   heroAmount: { fontSize: 32, fontWeight: '800', color: '#1B4332', marginTop: 6 },
-  heroMeta: { fontSize: 13, color: '#6B7280', marginTop: 4 },
+  heroMeta: { fontSize: 13, color: c.textSub, marginTop: 4 },
   groupPill: { backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, marginTop: 10, borderWidth: 1, borderColor: '#BBF7D0' },
   groupPillText: { fontSize: 12, color: '#166534', fontWeight: '600' },
   section: { paddingHorizontal: 20, paddingTop: 20 },
-  sectionTitle: { fontSize: 13, fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 },
-  shareRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: '#E7E5E4', padding: 12, marginBottom: 8 },
+  sectionTitle: { fontSize: 13, fontWeight: '700', color: c.textSub, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 },
+  shareRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 12, marginBottom: 8 },
   avatar: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  shareName: { flex: 1, fontSize: 14, fontWeight: '600', color: '#111827' },
-  shareAmount: { fontSize: 14, fontWeight: '700', color: '#111827' },
+  shareName: { flex: 1, fontSize: 14, fontWeight: '600', color: c.text },
+  shareAmount: { fontSize: 14, fontWeight: '700', color: c.text },
   settled: { fontSize: 11, color: '#16A34A', marginTop: 2 },
-  unsettled: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
-  notes: { fontSize: 14, color: '#374151', backgroundColor: '#F9FAFB', borderRadius: 12, padding: 14 },
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6' },
-  metaLabel: { fontSize: 14, color: '#6B7280' },
-  metaValue: { fontSize: 14, fontWeight: '600', color: '#111827', textTransform: 'capitalize' },
-});
+  unsettled: { fontSize: 11, color: c.textMuted, marginTop: 2 },
+  notes: { fontSize: 14, color: c.sectionLabel, backgroundColor: c.pillBg, borderRadius: 12, padding: 14 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.pillBg },
+  metaLabel: { fontSize: 14, color: c.textSub },
+  metaValue: { fontSize: 14, fontWeight: '600', color: c.text, textTransform: 'capitalize' },
+  });
+}

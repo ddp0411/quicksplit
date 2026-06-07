@@ -6,14 +6,40 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { activityAPI, type ActivityItem } from '../services/api/activityAPI';
 import { formatCurrency } from '../utils/upi';
 import { formatDate } from '../utils/helpers';
+import { useTheme } from '../theme/useTheme';
+
+type C = ReturnType<typeof useTheme>['colors'];
 
 const TYPE_ICONS: Record<string, string> = {
   expense: '💸',
   settlement: '✅',
 };
 
+function createStyles(c: C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: c.bg },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
+    backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    backText: { fontSize: 18, color: c.text },
+    title: { fontSize: 17, fontWeight: '700', color: c.text },
+    list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 },
+    row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 12, marginBottom: 8 },
+    iconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    desc: { fontSize: 14, fontWeight: '700', color: c.text },
+    meta: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+    amount: { fontSize: 14, fontWeight: '800', color: c.text },
+    share: { fontSize: 11, color: c.textSub, marginTop: 2 },
+    empty: { alignItems: 'center', paddingTop: 80 },
+    emptyEmoji: { fontSize: 48, marginBottom: 12 },
+    emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
+    emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center' },
+  });
+}
+
 export const ActivityScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
   const { data: feed = [], isLoading, refetch } = useQuery({
     queryKey: ['activity'],
     queryFn: () => activityAPI.getFeed(50),
@@ -70,22 +96,3 @@ export const ActivityScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E7E5E4' },
-  backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  backText: { fontSize: 18, color: '#111827' },
-  title: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 100 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: '#E7E5E4', padding: 12, marginBottom: 8 },
-  iconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  desc: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  meta: { fontSize: 12, color: '#9CA3AF', marginTop: 2 },
-  amount: { fontSize: 14, fontWeight: '800', color: '#111827' },
-  share: { fontSize: 11, color: '#6B7280', marginTop: 2 },
-  empty: { alignItems: 'center', paddingTop: 80 },
-  emptyEmoji: { fontSize: 48, marginBottom: 12 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
-  emptySub: { fontSize: 14, color: '#6B7280', textAlign: 'center' },
-});

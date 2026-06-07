@@ -5,13 +5,47 @@ import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { balancesAPI, type BalanceWithUser } from '../services/api/balancesAPI';
 import { formatCurrency } from '../utils/upi';
+import { useTheme } from '../theme/useTheme';
+
+type C = ReturnType<typeof useTheme>['colors'];
 
 function avatarInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
+function createStyles(c: C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: c.bg },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
+    backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    backText: { fontSize: 18, color: c.text },
+    title: { fontSize: 17, fontWeight: '700', color: c.text },
+    summary: { flexDirection: 'row', backgroundColor: c.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder, paddingVertical: 16 },
+    summaryItem: { flex: 1, alignItems: 'center' },
+    summaryLabel: { fontSize: 11, color: c.textMuted, fontWeight: '600', textTransform: 'uppercase', marginBottom: 4 },
+    summaryAmount: { fontSize: 16, fontWeight: '800' },
+    divider: { width: StyleSheet.hairlineWidth, backgroundColor: c.cardBorder },
+    list: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 100 },
+    sectionTitle: { fontSize: 12, fontWeight: '700', color: c.textSub, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 },
+    row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
+    avatar: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    avatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+    name: { fontSize: 14, fontWeight: '700', color: c.text },
+    label: { fontSize: 12, marginTop: 2 },
+    amount: { fontSize: 16, fontWeight: '800' },
+    settleBtn: { backgroundColor: '#1B4332', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+    settleBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+    empty: { alignItems: 'center', paddingTop: 60 },
+    emptyEmoji: { fontSize: 48, marginBottom: 12 },
+    emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
+    emptySub: { fontSize: 14, color: c.textSub },
+  });
+}
+
 export const BalancesScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['balances'],
     queryFn: balancesAPI.getOverallBalance,
@@ -60,7 +94,6 @@ export const BalancesScreen: React.FC = () => {
         <View style={{ width: 36 }} />
       </View>
 
-      {/* Summary bar */}
       {data && (
         <View style={s.summary}>
           <View style={s.summaryItem}>
@@ -88,9 +121,7 @@ export const BalancesScreen: React.FC = () => {
         contentContainerStyle={s.list}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#1B4332" />}
         ListHeaderComponent={
-          <>
-            {owedToYou.length > 0 && <Text style={s.sectionTitle}>Owed to you ({owedToYou.length})</Text>}
-          </>
+          <>{owedToYou.length > 0 && <Text style={s.sectionTitle}>Owed to you ({owedToYou.length})</Text>}</>
         }
         ListEmptyComponent={
           !isLoading ? (
@@ -114,30 +145,3 @@ export const BalancesScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E7E5E4' },
-  backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  backText: { fontSize: 18, color: '#111827' },
-  title: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  summary: { flexDirection: 'row', backgroundColor: '#FFFFFF', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E7E5E4', paddingVertical: 16 },
-  summaryItem: { flex: 1, alignItems: 'center' },
-  summaryLabel: { fontSize: 11, color: '#9CA3AF', fontWeight: '600', textTransform: 'uppercase', marginBottom: 4 },
-  summaryAmount: { fontSize: 16, fontWeight: '800' },
-  divider: { width: StyleSheet.hairlineWidth, backgroundColor: '#E7E5E4' },
-  list: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 100 },
-  sectionTitle: { fontSize: 12, fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: '#E7E5E4', padding: 14, marginBottom: 8 },
-  avatar: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  name: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  label: { fontSize: 12, marginTop: 2 },
-  amount: { fontSize: 16, fontWeight: '800' },
-  settleBtn: { backgroundColor: '#1B4332', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  settleBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
-  empty: { alignItems: 'center', paddingTop: 60 },
-  emptyEmoji: { fontSize: 48, marginBottom: 12 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
-  emptySub: { fontSize: 14, color: '#6B7280' },
-});

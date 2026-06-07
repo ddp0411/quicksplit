@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../theme/useTheme';
 
 const SLIDES = [
   { emoji: '🍕', title: 'Split bills effortlessly', body: 'Add expenses on the go and split with friends in seconds.' },
@@ -11,10 +12,34 @@ const SLIDES = [
   { emoji: '📸', title: 'Scan any receipt', body: 'Photograph a bill and let QuickSplit split it automatically.' },
 ];
 
-const { width } = Dimensions.get('window');
+type C = ReturnType<typeof useTheme>['colors'];
+
+function createStyles(c: C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: c.bg, paddingHorizontal: 24 },
+    skip: { alignSelf: 'flex-end', paddingTop: 8, paddingBottom: 4 },
+    skipText: { color: c.textSub, fontSize: 14, fontWeight: '600' },
+    content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    emoji: { fontSize: 80, marginBottom: 24 },
+    title: { fontSize: 26, fontWeight: '800', color: c.text, textAlign: 'center', fontFamily: 'PlayfairDisplay_700Bold', marginBottom: 12 },
+    body: { fontSize: 16, color: c.textSub, textAlign: 'center', lineHeight: 24, maxWidth: 300 },
+    dots: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 28 },
+    dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: c.cardBorder },
+    dotActive: { width: 24, backgroundColor: '#FF6B35' },
+    btn: {
+      backgroundColor: '#FF6B35', borderRadius: 16, paddingVertical: 16,
+      alignItems: 'center', marginBottom: 16,
+      shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
+    },
+    btnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  });
+}
 
 export const OnboardingScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
   const [idx, setIdx] = useState(0);
 
   const next = () => {
@@ -37,7 +62,6 @@ export const OnboardingScreen: React.FC = () => {
         <Text style={s.body}>{slide.body}</Text>
       </View>
 
-      {/* Dots */}
       <View style={s.dots}>
         {SLIDES.map((_, i) => (
           <View key={i} style={[s.dot, i === idx && s.dotActive]} />
@@ -52,23 +76,3 @@ export const OnboardingScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9', paddingHorizontal: 24 },
-  skip: { alignSelf: 'flex-end', paddingTop: 8, paddingBottom: 4 },
-  skipText: { color: '#6B7280', fontSize: 14, fontWeight: '600' },
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emoji: { fontSize: 80, marginBottom: 24 },
-  title: { fontSize: 26, fontWeight: '800', color: '#111827', textAlign: 'center', fontFamily: 'PlayfairDisplay_700Bold', marginBottom: 12 },
-  body: { fontSize: 16, color: '#6B7280', textAlign: 'center', lineHeight: 24, maxWidth: 300 },
-  dots: { flexDirection: 'row', gap: 8, justifyContent: 'center', marginBottom: 28 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#E7E5E4' },
-  dotActive: { width: 24, backgroundColor: '#FF6B35' },
-  btn: {
-    backgroundColor: '#FF6B35', borderRadius: 16, paddingVertical: 16,
-    alignItems: 'center', marginBottom: 16,
-    shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
-  },
-  btnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-});

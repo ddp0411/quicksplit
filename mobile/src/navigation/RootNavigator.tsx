@@ -25,6 +25,7 @@ import {
   AIChatScreen, BudgetDashboardScreen, SubscriptionTrackerScreen, SpendingInsightsScreen,
   EditProfileScreen, QRCodeScreen, AppearanceSettingsScreen, NotificationSettingsScreen,
   SecuritySettingsScreen, ProUpgradeScreen, ReferralScreen, ImportSplitwiseScreen,
+  PermissionSetupScreen,
 } from '../screens/stubs';
 
 const Stack = createNativeStackNavigator();
@@ -125,6 +126,7 @@ function AccountStack() {
       <Stack.Screen name="ProUpgrade" component={ProUpgradeScreen} />
       <Stack.Screen name="Referral" component={ReferralScreen} />
       <Stack.Screen name="ImportSplitwise" component={ImportSplitwiseScreen} />
+      <Stack.Screen name="PermissionSetup" component={PermissionSetupScreen} />
     </Stack.Navigator>
   );
 }

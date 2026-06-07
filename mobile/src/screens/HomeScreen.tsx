@@ -1,7 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator,
+  Modal, Animated,
 } from 'react-native';
+import { useTheme } from '../theme/useTheme';
+
+type C = ReturnType<typeof useTheme>['colors'];
 import { useNavigation } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +18,19 @@ import { friendsAPI } from '../services/api/friendsAPI';
 import { activityAPI } from '../services/api/activityAPI';
 import { formatCurrency } from '../utils/upi';
 import { formatDate } from '../utils/helpers';
+
+const AI_INSIGHTS = [
+  'You spent 23% more on food this month compared to last month 🍕',
+  'Your biggest expense category this week is Transport 🚗',
+  'You have 3 unsettled balances. Consider settling up soon! 💸',
+  'Great job! You split 5 bills with friends this week 🎉',
+  'Tip: Adding expenses right away helps keep balances accurate ✅',
+  'Your group "Goa Trip" has outstanding balances — check in! 🏖️',
+  'You owe money to 2 friends. Settle up to keep friendships smooth 😊',
+  'Monthly reminder: Review your budgets to stay on track 📊',
+  'Did you know? You can scan receipts with your camera 📷',
+  'Keep splitting! Every shared expense tracked saves arguments later 🤝',
+];
 
 const QUOTES = [
   { text: "A budget is telling your money where to go instead of wondering where it went.", author: "Dave Ramsey" },
@@ -43,8 +60,22 @@ function getGreeting(name: string) {
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const { user } = useUserStore();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
+  const [showFAB, setShowFAB] = useState(false);
+  const fabAnim = useRef(new Animated.Value(0)).current;
 
+  const todayInsight = useMemo(() => AI_INSIGHTS[new Date().getDate() % AI_INSIGHTS.length], []);
   const todayQuote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
+
+  const openFAB = () => {
+    setShowFAB(true);
+    Animated.spring(fabAnim, { toValue: 1, useNativeDriver: true, damping: 20, stiffness: 200 }).start();
+  };
+
+  const closeFAB = () => {
+    Animated.timing(fabAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => setShowFAB(false));
+  };
 
   const { data: balance, isLoading: balanceLoading } = useQuery({
     queryKey: ['balance-overview'],
@@ -188,6 +219,22 @@ export const HomeScreen: React.FC = () => {
           ))}
         </View>
 
+        {/* AI Insight Card */}
+        <TouchableOpacity
+          style={s.insightCard}
+          onPress={() => navigation.navigate('AIChat')}
+          activeOpacity={0.85}
+        >
+          <View style={s.insightLeft}>
+            <Text style={s.insightEmoji}>🤖</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.insightLabel}>AI INSIGHT</Text>
+              <Text style={s.insightText} numberOfLines={2}>{todayInsight}</Text>
+            </View>
+          </View>
+          <Text style={s.insightCta}>Chat →</Text>
+        </TouchableOpacity>
+
         {/* Your Groups */}
         <View style={s.section}>
           <View style={s.sectionHeader}>
@@ -317,12 +364,52 @@ export const HomeScreen: React.FC = () => {
         )}
 
       </ScrollView>
+
+      {/* Floating Action Button */}
+      <TouchableOpacity style={s.fab} onPress={openFAB} activeOpacity={0.85}>
+        <Text style={s.fabText}>+</Text>
+      </TouchableOpacity>
+
+      {/* FAB Action Sheet */}
+      <Modal visible={showFAB} transparent animationType="none" onRequestClose={closeFAB}>
+        <TouchableOpacity style={s.fabOverlay} onPress={closeFAB} activeOpacity={1}>
+          <Animated.View
+            style={[s.fabSheet, {
+              transform: [{ translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [300, 0] }) }],
+              opacity: fabAnim,
+            }]}
+          >
+            <View style={s.fabHandle} />
+            {[
+              { emoji: '➕', label: 'Add Expense', sub: 'Split a bill or expense', screen: 'AddExpense', color: '#FF6B35' },
+              { emoji: '📷', label: 'Scan Bill', sub: 'Scan receipt with camera', screen: 'Scan', color: '#F59E0B' },
+              { emoji: '💸', label: 'Settle Up', sub: 'Record a payment', screen: 'SettleUp', color: '#1B4332' },
+            ].map((item) => (
+              <TouchableOpacity
+                key={item.label}
+                style={s.fabRow}
+                onPress={() => { closeFAB(); setTimeout(() => navigation.navigate(item.screen), 250); }}
+              >
+                <View style={[s.fabRowIcon, { backgroundColor: item.color }]}>
+                  <Text style={{ fontSize: 20 }}>{item.emoji}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.fabRowLabel}>{item.label}</Text>
+                  <Text style={s.fabRowSub}>{item.sub}</Text>
+                </View>
+                <Text style={s.fabRowArrow}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </Animated.View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9' },
+function createStyles(c: C) {
+  return StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.bg },
   container: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 100 },
 
   heroCard: { borderRadius: 24, padding: 20, marginBottom: 12, shadowColor: '#1B4332', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 8 },
@@ -353,32 +440,49 @@ const s = StyleSheet.create({
 
   section: { marginBottom: 16 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#111827' },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: c.text },
   seeAll: { fontSize: 12, fontWeight: '700', color: '#1B4332' },
 
-  groupCard: { width: 140, borderWidth: 1.5, borderColor: '#E7E5E4', borderRadius: 16, padding: 12, backgroundColor: '#FFFFFF', gap: 8 },
+  groupCard: { width: 140, borderWidth: 1.5, borderColor: c.cardBorder, borderRadius: 16, padding: 12, backgroundColor: c.card, gap: 8 },
   groupIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  groupName: { fontSize: 12, fontWeight: '700', color: '#111827' },
+  groupName: { fontSize: 12, fontWeight: '700', color: c.text },
   badge: { alignSelf: 'flex-start' },
-  badgeSettled: { fontSize: 10, fontWeight: '700', color: '#6B7280', backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
+  badgeSettled: { fontSize: 10, fontWeight: '700', color: '#6B7280', backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
   badgeOwed: { fontSize: 10, fontWeight: '700', color: '#16A34A', backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
   badgeOwe: { fontSize: 10, fontWeight: '700', color: '#DC2626', backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
 
-  emptyCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E7E5E4' },
-  emptyText: { fontSize: 14, color: '#6B7280' },
+  emptyCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: c.card, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: c.cardBorder },
+  emptyText: { fontSize: 14, color: c.textSub },
 
-  listCard: { backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#E7E5E4', paddingHorizontal: 16 },
+  listCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, paddingHorizontal: 16 },
   listRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 10 },
-  listRowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#E7E5E4' },
+  listRowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
   avatar: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  listName: { flex: 1, fontSize: 14, fontWeight: '600', color: '#111827' },
+  listName: { flex: 1, fontSize: 14, fontWeight: '600', color: c.text },
   positiveAmt: { fontSize: 14, fontWeight: '800', color: '#22C55E' },
   negativeAmt: { fontSize: 14, fontWeight: '800', color: '#EF4444' },
   settleSmallBtn: { backgroundColor: '#FF6B35', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   settleSmallText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
 
-  activityIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  activityTitle: { fontSize: 13, fontWeight: '600', color: '#111827' },
-  activityDate: { fontSize: 11, color: '#9CA3AF', marginTop: 2 },
-});
+  activityIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+  activityTitle: { fontSize: 13, fontWeight: '600', color: c.text },
+  activityDate: { fontSize: 11, color: c.textMuted, marginTop: 2 },
+  insightCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 16 },
+  insightLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  insightEmoji: { fontSize: 24, width: 36, textAlign: 'center' },
+  insightLabel: { fontSize: 10, fontWeight: '800', color: c.textMuted, letterSpacing: 1, marginBottom: 3 },
+  insightText: { fontSize: 13, color: c.sectionLabel, lineHeight: 18 },
+  insightCta: { fontSize: 13, fontWeight: '700', color: '#1B4332', marginLeft: 8 },
+  fab: { position: 'absolute', bottom: 90, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', shadowColor: '#1B4332', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 10 },
+  fabText: { color: '#FFFFFF', fontSize: 28, fontWeight: '300', lineHeight: 32 },
+  fabOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  fabSheet: { backgroundColor: c.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingBottom: 40, paddingTop: 12 },
+  fabHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginBottom: 16 },
+  fabRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
+  fabRowIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  fabRowLabel: { fontSize: 16, fontWeight: '700', color: c.text },
+  fabRowSub: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+  fabRowArrow: { fontSize: 20, color: c.textMuted },
+  });
+}

@@ -7,16 +7,33 @@ import { useNavigation } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { friendsAPI, type Friend } from '../services/api/friendsAPI';
+import { balancesAPI } from '../services/api/balancesAPI';
+import { FilterSheet, type FilterOption } from '../components/FilterSheet';
+import { SkeletonFriendRow } from '../components/SkeletonLoader';
 import { formatCurrency } from '../utils/upi';
+import { useTheme } from '../theme/useTheme';
+
+type C = ReturnType<typeof useTheme>['colors'];
 
 function avatarInitials(name: string) {
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 }
+
+const FILTER_OPTIONS: FilterOption[] = [
+  { label: 'All friends', value: 'all' },
+  { label: 'Outstanding', value: 'outstanding' },
+  { label: 'They owe you', value: 'owe_you' },
+  { label: 'You owe them', value: 'you_owe' },
+];
 
 export const FriendsScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
+  const s = createStyles(colors);
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [showFilter, setShowFilter] = useState(false);
 
   const { data: friends = [], isLoading, refetch } = useQuery({
     queryKey: ['friends'],
@@ -26,6 +43,11 @@ export const FriendsScreen: React.FC = () => {
   const { data: requests = [] } = useQuery({
     queryKey: ['friend-requests'],
     queryFn: friendsAPI.getRequests,
+  });
+
+  const { data: balanceData } = useQuery({
+    queryKey: ['balances'],
+    queryFn: balancesAPI.getOverallBalance,
   });
 
   const acceptMutation = useMutation({
@@ -42,38 +64,60 @@ export const FriendsScreen: React.FC = () => {
   });
 
   const filtered = useMemo(() => {
+    let list = friends as Friend[];
     const q = search.toLowerCase();
-    return (friends as Friend[]).filter(f =>
-      f.user.name.toLowerCase().includes(q) || f.user.email.toLowerCase().includes(q)
-    );
-  }, [friends, search]);
+    if (q) list = list.filter((f) => f.user.name.toLowerCase().includes(q) || f.user.email.toLowerCase().includes(q));
+    if (filter === 'outstanding') list = list.filter((f) => Math.abs(f.balance) > 0.01);
+    else if (filter === 'owe_you') list = list.filter((f) => f.balance > 0.01);
+    else if (filter === 'you_owe') list = list.filter((f) => f.balance < -0.01);
+    return list;
+  }, [friends, search, filter]);
 
   const handleRemove = (f: Friend) => {
-    Alert.alert(
-      'Remove friend',
-      `Remove ${f.user.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: () => removeMutation.mutate(String(f.user.id)),
-        },
-      ]
-    );
+    Alert.alert('Remove friend', `Remove ${f.user.name}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Remove', style: 'destructive', onPress: () => removeMutation.mutate(String(f.user.id)) },
+    ]);
   };
+
+  const totalOwedToYou = (balanceData as any)?.total_owed_to_you ?? 0;
+  const totalYouOwe = (balanceData as any)?.total_you_owe ?? 0;
+  const activeFilter = FILTER_OPTIONS.find((o) => o.value === filter);
 
   return (
     <SafeAreaView style={s.safe}>
-      {/* Header */}
       <View style={s.header}>
         <Text style={s.title}>Friends</Text>
-        <TouchableOpacity style={s.addBtn} onPress={() => navigation.navigate('AddFriend')}>
-          <Text style={s.addBtnText}>+ Add</Text>
-        </TouchableOpacity>
+        <View style={s.headerRight}>
+          <TouchableOpacity style={[s.filterBtn, filter !== 'all' && s.filterBtnActive]} onPress={() => setShowFilter(true)}>
+            <Text style={[s.filterBtnText, filter !== 'all' && s.filterBtnTextActive]}>
+              {filter !== 'all' ? activeFilter?.label : '⚙ Filter'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={s.addBtn} onPress={() => navigation.navigate('AddFriend')}>
+            <Text style={s.addBtnText}>+ Add</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Search */}
+      {/* Balance summary chips */}
+      {(totalOwedToYou > 0.01 || totalYouOwe > 0.01) && (
+        <View style={s.balanceSummary}>
+          {totalOwedToYou > 0.01 && (
+            <View style={s.summaryChip}>
+              <Text style={s.summaryLabel}>You're owed</Text>
+              <Text style={s.summaryValue}>{formatCurrency(totalOwedToYou)}</Text>
+            </View>
+          )}
+          {totalYouOwe > 0.01 && (
+            <View style={[s.summaryChip, s.summaryChipRed]}>
+              <Text style={[s.summaryLabel, { color: '#DC2626' }]}>You owe</Text>
+              <Text style={[s.summaryValue, { color: '#DC2626' }]}>{formatCurrency(totalYouOwe)}</Text>
+            </View>
+          )}
+        </View>
+      )}
+
       <View style={s.searchWrap}>
         <Text style={s.searchIcon}>🔍</Text>
         <TextInput
@@ -85,7 +129,6 @@ export const FriendsScreen: React.FC = () => {
         />
       </View>
 
-      {/* Pending requests */}
       {(requests as any[]).length > 0 && (
         <View style={s.requestsBanner}>
           <Text style={s.requestsLabel}>Pending requests ({(requests as any[]).length})</Text>
@@ -98,10 +141,7 @@ export const FriendsScreen: React.FC = () => {
                 <Text style={s.reqName}>{req.from_user?.name}</Text>
                 <Text style={s.reqEmail}>{req.from_user?.email}</Text>
               </View>
-              <TouchableOpacity
-                style={s.acceptBtn}
-                onPress={() => acceptMutation.mutate(Number(req.id))}
-              >
+              <TouchableOpacity style={s.acceptBtn} onPress={() => acceptMutation.mutate(Number(req.id))}>
                 <Text style={s.acceptBtnText}>Accept</Text>
               </TouchableOpacity>
             </View>
@@ -109,91 +149,129 @@ export const FriendsScreen: React.FC = () => {
         </View>
       )}
 
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => String(item.friendship_id)}
-        contentContainerStyle={s.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#1B4332" />}
-        ListEmptyComponent={
-          <View style={s.empty}>
-            <Text style={s.emptyEmoji}>👥</Text>
-            <Text style={s.emptyTitle}>{search ? 'No results' : 'No friends yet'}</Text>
-            <Text style={s.emptySub}>{search ? 'Try a different name' : 'Add friends to start splitting expenses'}</Text>
-            {!search && (
-              <TouchableOpacity style={s.emptyBtn} onPress={() => navigation.navigate('AddFriend')}>
-                <Text style={s.emptyBtnText}>Add a friend</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        }
-        renderItem={({ item: f }) => {
-          const settled = Math.abs(f.balance) < 0.01;
-          return (
-            <TouchableOpacity
-              style={s.friendRow}
-              onPress={() => navigation.navigate('FriendDetail', { userId: f.user.id })}
-              activeOpacity={0.8}
-            >
-              <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
-                <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.friendName}>{f.user.name}</Text>
-                <Text style={s.friendEmail}>{f.user.email}</Text>
-              </View>
-              {settled ? (
-                <View style={s.settledChip}>
-                  <Text style={s.settledText}>Settled</Text>
-                </View>
-              ) : f.balance > 0 ? (
-                <View style={s.owedChip}>
-                  <Text style={s.owedText}>{formatCurrency(f.balance)}</Text>
-                </View>
-              ) : (
-                <View style={s.oweChip}>
-                  <Text style={s.oweText}>-{formatCurrency(Math.abs(f.balance))}</Text>
-                </View>
+      {isLoading ? (
+        <View style={{ paddingHorizontal: 20, paddingTop: 8 }}>
+          {[1, 2, 3, 4].map((i) => <SkeletonFriendRow key={i} />)}
+        </View>
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => String(item.friendship_id)}
+          contentContainerStyle={s.list}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#1B4332" />}
+          ListEmptyComponent={
+            <View style={s.empty}>
+              <Text style={s.emptyEmoji}>👥</Text>
+              <Text style={s.emptyTitle}>{search || filter !== 'all' ? 'No results' : 'No friends yet'}</Text>
+              <Text style={s.emptySub}>
+                {search ? 'Try a different name' : filter !== 'all' ? 'No friends match this filter' : 'Add friends to start splitting expenses'}
+              </Text>
+              {!search && filter === 'all' && (
+                <TouchableOpacity style={s.emptyBtn} onPress={() => navigation.navigate('AddFriend')}>
+                  <Text style={s.emptyBtnText}>Add a friend</Text>
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
-          );
-        }}
+            </View>
+          }
+          renderItem={({ item: f }) => {
+            const settled = Math.abs(f.balance) < 0.01;
+            return (
+              <TouchableOpacity
+                style={s.friendRow}
+                onPress={() => navigation.navigate('FriendDetail', { userId: f.user.id })}
+                onLongPress={() => handleRemove(f)}
+                activeOpacity={0.8}
+              >
+                <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
+                  <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.friendName}>{f.user.name}</Text>
+                  <Text style={s.friendEmail}>{f.user.email}</Text>
+                </View>
+                {settled ? (
+                  <View style={s.settledChip}><Text style={s.settledText}>Settled</Text></View>
+                ) : f.balance > 0 ? (
+                  <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                    <Text style={s.owedText}>+{formatCurrency(f.balance)}</Text>
+                    <TouchableOpacity style={s.actionChipGreen}
+                      onPress={() => navigation.navigate('SettleUp', { userId: f.user.id, friendName: f.user.name })}>
+                      <Text style={s.actionChipGreenText}>Remind</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                    <Text style={s.oweText}>-{formatCurrency(Math.abs(f.balance))}</Text>
+                    <TouchableOpacity style={s.actionChipRed}
+                      onPress={() => navigation.navigate('SettleUp', { userId: f.user.id, friendName: f.user.name })}>
+                      <Text style={s.actionChipRedText}>Settle</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          }}
+        />
+      )}
+
+      <FilterSheet
+        visible={showFilter}
+        onClose={() => setShowFilter(false)}
+        title="Filter Friends"
+        options={FILTER_OPTIONS}
+        selected={filter}
+        onSelect={setFilter}
       />
     </SafeAreaView>
   );
 };
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFDF9' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
-  title: { fontSize: 24, fontWeight: '800', color: '#111827', fontFamily: 'PlayfairDisplay_700Bold' },
+function createStyles(c: C) {
+  return StyleSheet.create({
+  safe: { flex: 1, backgroundColor: c.bg },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 },
+  title: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
+  headerRight: { flexDirection: 'row', gap: 8 },
+  filterBtn: { backgroundColor: c.pillBg, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
+  filterBtnActive: { backgroundColor: '#F0FDF4', borderWidth: 1, borderColor: '#1B4332' },
+  filterBtnText: { color: c.sectionLabel, fontSize: 12, fontWeight: '600' },
+  filterBtnTextActive: { color: '#1B4332' },
   addBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-  searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 14, borderWidth: 1, borderColor: '#E7E5E4', marginHorizontal: 20, paddingHorizontal: 12, marginBottom: 12 },
+  balanceSummary: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 10 },
+  summaryChip: { flex: 1, backgroundColor: '#F0FDF4', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#BBF7D0' },
+  summaryChipRed: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
+  summaryLabel: { fontSize: 11, fontWeight: '600', color: '#16A34A', marginBottom: 2 },
+  summaryValue: { fontSize: 16, fontWeight: '800', color: '#16A34A' },
+  searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, marginHorizontal: 20, paddingHorizontal: 12, marginBottom: 12 },
   searchIcon: { fontSize: 16, marginRight: 8 },
-  searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: '#111827' },
+  searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   requestsBanner: { marginHorizontal: 20, backgroundColor: '#FFFBEB', borderRadius: 16, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FDE68A' },
   requestsLabel: { fontSize: 12, fontWeight: '700', color: '#92400E', marginBottom: 10 },
   requestRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  reqName: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  reqEmail: { fontSize: 12, color: '#6B7280' },
+  reqName: { fontSize: 14, fontWeight: '600', color: c.text },
+  reqEmail: { fontSize: 12, color: c.textSub },
   acceptBtn: { backgroundColor: '#1B4332', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
   acceptBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
-  friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#E7E5E4', padding: 14, marginBottom: 8 },
+  friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
   avatar: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  friendName: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  friendEmail: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  settledChip: { backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
-  settledText: { fontSize: 11, fontWeight: '700', color: '#6B7280' },
-  owedChip: { backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
-  owedText: { fontSize: 11, fontWeight: '700', color: '#16A34A' },
-  oweChip: { backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
-  oweText: { fontSize: 11, fontWeight: '700', color: '#DC2626' },
+  friendName: { fontSize: 14, fontWeight: '700', color: c.text },
+  friendEmail: { fontSize: 12, color: c.textSub, marginTop: 2 },
+  settledChip: { backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  settledText: { fontSize: 11, fontWeight: '700', color: c.textSub },
+  owedText: { fontSize: 12, fontWeight: '700', color: '#16A34A' },
+  oweText: { fontSize: 12, fontWeight: '700', color: '#DC2626' },
+  actionChipGreen: { backgroundColor: '#F0FDF4', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#BBF7D0' },
+  actionChipGreenText: { fontSize: 10, fontWeight: '700', color: '#16A34A' },
+  actionChipRed: { backgroundColor: '#FEF2F2', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#FECACA' },
+  actionChipRedText: { fontSize: 10, fontWeight: '700', color: '#DC2626' },
   empty: { alignItems: 'center', paddingTop: 60 },
   emptyEmoji: { fontSize: 48, marginBottom: 16 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
-  emptySub: { fontSize: 14, color: '#6B7280', textAlign: 'center', maxWidth: 260, marginBottom: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
+  emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center', maxWidth: 260, marginBottom: 20 },
   emptyBtn: { backgroundColor: '#FF6B35', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
-});
+  });
+}
