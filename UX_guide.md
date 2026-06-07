@@ -198,37 +198,45 @@ Bottom nav icons: Home · Groups · Expenses · Scan · Friends · Analytics · 
 
 | Position | Tab | Route | Icon |
 |----------|-----|-------|------|
-| 1 | Friends | `/friends` | Users icon |
-| 2 | Groups | `/groups` | Group icon |
-| 3 (center) | **+ FAB** | Action sheet | Plus (orange) |
-| 4 | Personal | `/personal` | Sparkles icon |
-| 5 | Account | `/account` | User circle icon |
+| 1 | Home | `/home` | Home icon |
+| 2 | Friends | `/friends` | Users icon |
+| 3 (center) | **+ FAB** | Action sheet | Plus (teal) |
+| 4 | Groups | `/groups` | Group icon |
+| 5 | Personal | `/personal` | Sparkles icon |
+| 6 | Account | `/account` | User circle icon |
 
 **FAB** opens a bottom action sheet: Add Expense / Scan Bill / Settle Up.
 
-### Desktop — Horizontal Navbar (moodboard target)
+**Note:** Activity tab is not in bottom nav — accessible from Home → Recent Activity → "See all →" → `/activity`.
+
+### Desktop — Horizontal Navbar
 
 | Item | Route |
 |------|-------|
-| Dashboard | `/home` |
-| Groups | `/groups` |
-| Expenses | `/expenses/new` |
+| Home | `/home` |
 | Friends | `/friends` |
-| Analytics | `/personal/insights` |
-| **+ Add Expense** (orange CTA) | `/expenses/new` |
+| Groups | `/groups` |
+| Personal | `/personal` |
+| Activity | `/activity` |
+| Account | `/account` |
 | 🔔 Notifications | — |
 | Avatar | `/account` |
+
+**No "Add Expense" button in navbar** — use the bottom nav FAB (mobile) or Personal tab "Add Expense" button (desktop).
 
 ---
 
 ## Key User Flows
 
 ### Adding an Expense
-1. Tap **+** FAB → "Add Expense" → `/expenses/new`
-2. OR tap **Add** in a Group's quick actions → `/expenses/new?group=ID`
-3. Select participants (chip picker), enter description + amount
-4. Optionally adjust split method (Equal / Exact / % / Shares)
-5. Submit → toast confirmation → back to previous screen
+1. Tap **+** FAB (center bottom nav) → "Add Expense" → `/expenses/new`
+2. OR tap **Add Expense** button in Personal tab header
+3. OR tap **Add** in a Group's quick actions → `/expenses/new?group=ID`
+4. OR swipe left on a friend row → tap **➕ Add** → `/expenses/new?friend=ID`
+5. OR tap **Add expense** button in Friend Detail hero
+6. Select participants (chip picker), enter description + amount
+7. Optionally adjust split method (Equal / Exact / % / Shares)
+8. Submit → toast confirmation → back to previous screen
 
 ### Scanning a Receipt
 1. Tap **+** FAB → "Scan Bill" → `/scan`

@@ -9,6 +9,7 @@ import {
   CreditCardIcon,
   SparklesIcon,
   ArrowTrendingUpIcon,
+  PlusIcon,
 } from '@heroicons/react/24/outline';
 
 const categoryMeta = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.value, c]));
@@ -37,7 +38,16 @@ export const PersonalTab: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-lg space-y-5 pb-8">
-      <h1 className="font-display text-3xl font-extrabold" style={{ color: 'var(--text)' }}>Personal</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-3xl font-extrabold" style={{ color: 'var(--text)' }}>Personal</h1>
+        <Link
+          to="/expenses/new"
+          className="flex items-center gap-1.5 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-button transition active:scale-95"
+        >
+          <PlusIcon className="h-4 w-4" />
+          Add Expense
+        </Link>
+      </div>
 
       {/* Monthly spend hero */}
       <div className="rounded-3xl bg-gradient-to-br from-primary-600 to-primary-800 p-6 text-white shadow-button">

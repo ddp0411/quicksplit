@@ -3,15 +3,16 @@ import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '@/state/userStore';
 import { Button } from '../ui/Button';
 import {
+  HomeIcon,
   UsersIcon,
   UserGroupIcon,
   BoltIcon,
   UserCircleIcon,
   SparklesIcon,
-  PlusIcon,
 } from '@heroicons/react/24/outline';
 
 const navItems = [
+  { to: '/home',     label: 'Home',     icon: HomeIcon },
   { to: '/friends',  label: 'Friends',  icon: UsersIcon },
   { to: '/groups',   label: 'Groups',   icon: UserGroupIcon },
   { to: '/personal', label: 'Personal', icon: SparklesIcon },
@@ -45,7 +46,7 @@ export const Navbar: React.FC = () => {
       <div className="app-container">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link to={isAuthenticated ? '/friends' : '/'} className="flex min-w-0 items-center gap-2.5">
+          <Link to={isAuthenticated ? '/home' : '/'} className="flex min-w-0 items-center gap-2.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-primary-600 text-lg font-black text-white shadow-button">
               Q
             </span>
@@ -63,15 +64,6 @@ export const Navbar: React.FC = () => {
                     {label}
                   </NavLink>
                 ))}
-                <span className="mx-1 hidden h-5 w-px bg-slate-200 dark:bg-slate-700 lg:block" />
-                <Button
-                  size="sm"
-                  className="hidden md:inline-flex"
-                  onClick={() => navigate('/expenses/new')}
-                >
-                  <PlusIcon className="mr-1.5 h-4 w-4" />
-                  Add expense
-                </Button>
                 <button
                   onClick={handleLogout}
                   className="hidden rounded-2xl px-3 py-2 text-sm font-semibold text-slate-400 transition hover:text-negative md:inline-flex"

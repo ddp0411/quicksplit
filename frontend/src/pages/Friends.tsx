@@ -39,20 +39,26 @@ function FriendRow({ friend, onSettle, onRemind, onRemove }: {
       {/* Action tray (revealed on swipe) */}
       <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
         <button
+          onClick={() => navigate(`/expenses/new?friend=${friend.user.id}`)}
+          className="flex h-12 w-14 flex-col items-center justify-center rounded-xl bg-emerald-500 text-[10px] font-bold text-white"
+        >
+          <span className="text-base">➕</span>Add
+        </button>
+        <button
           onClick={onSettle}
-          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-primary-600 text-[10px] font-bold text-white"
+          className="flex h-12 w-14 flex-col items-center justify-center rounded-xl bg-primary-600 text-[10px] font-bold text-white"
         >
           <span className="text-base">💸</span>Settle
         </button>
         <button
           onClick={onRemind}
-          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-warning text-[10px] font-bold text-white"
+          className="flex h-12 w-14 flex-col items-center justify-center rounded-xl bg-warning text-[10px] font-bold text-white"
         >
           <span className="text-base">🔔</span>Remind
         </button>
         <button
           onClick={onRemove}
-          className="flex h-12 w-16 flex-col items-center justify-center rounded-xl bg-negative text-[10px] font-bold text-white"
+          className="flex h-12 w-14 flex-col items-center justify-center rounded-xl bg-negative text-[10px] font-bold text-white"
         >
           <span className="text-base">🗑</span>Remove
         </button>
@@ -60,10 +66,10 @@ function FriendRow({ friend, onSettle, onRemind, onRemove }: {
 
       {/* Main row */}
       <motion.div
-        animate={{ x: swiped ? -160 : 0 }}
+        animate={{ x: swiped ? -208 : 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         drag="x"
-        dragConstraints={{ left: -160, right: 0 }}
+        dragConstraints={{ left: -208, right: 0 }}
         dragElastic={0.05}
         onDragEnd={(_, info) => {
           if (info.offset.x < -60) setSwiped(true);

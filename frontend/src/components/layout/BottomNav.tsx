@@ -3,26 +3,26 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useUserStore } from '@/state/userStore';
 import { ActionSheet } from '@/components/ui/ActionSheet';
 import {
+  HomeIcon,
   UsersIcon,
   UserGroupIcon,
-  BoltIcon,
   UserCircleIcon,
   SparklesIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline';
 import {
+  HomeIcon as HomeSolid,
   UsersIcon as UsersSolid,
   UserGroupIcon as UserGroupSolid,
-  BoltIcon as BoltSolid,
   UserCircleIcon as UserCircleSolid,
   SparklesIcon as SparklesSolid,
 } from '@heroicons/react/24/solid';
 
 const tabs = [
+  { to: '/home',     label: 'Home',     icon: HomeIcon,        iconActive: HomeSolid },
   { to: '/friends',  label: 'Friends',  icon: UsersIcon,       iconActive: UsersSolid },
   { to: '/groups',   label: 'Groups',   icon: UserGroupIcon,   iconActive: UserGroupSolid },
   { to: '/personal', label: 'Personal', icon: SparklesIcon,    iconActive: SparklesSolid },
-  { to: '/activity', label: 'Activity', icon: BoltIcon,        iconActive: BoltSolid },
   { to: '/account',  label: 'Account',  icon: UserCircleIcon,  iconActive: UserCircleSolid },
 ];
 
