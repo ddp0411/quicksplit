@@ -202,7 +202,7 @@ export const Friends: React.FC = () => {
           </button>
           <button
             onClick={() => navigate('/friends/add')}
-            className="flex items-center gap-1.5 rounded-2xl bg-primary-600 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-primary-700"
+            className="flex items-center gap-1.5 rounded-2xl bg-accent-500 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-accent-600"
           >
             <UserPlusIcon className="h-4 w-4" />
             Add
@@ -303,7 +303,7 @@ export const Friends: React.FC = () => {
                     <button
                       onClick={() => acceptMutation.mutate(req.id)}
                       disabled={acceptMutation.isPending}
-                      className="flex items-center gap-1 rounded-xl bg-primary-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+                      className="flex items-center gap-1 rounded-xl bg-accent-500 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
                     >
                       <CheckIcon className="h-3.5 w-3.5" /> Accept
                     </button>
@@ -335,7 +335,7 @@ export const Friends: React.FC = () => {
               <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>Add friends to start splitting expenses</p>
               <button
                 onClick={() => navigate('/friends/add')}
-                className="mx-auto mt-4 flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700"
+                className="mx-auto mt-4 flex items-center gap-2 rounded-2xl bg-accent-500 px-4 py-2 text-sm font-bold text-white hover:bg-accent-600"
               >
                 <UserPlusIcon className="h-4 w-4" /> Add your first friend
               </button>

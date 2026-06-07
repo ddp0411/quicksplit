@@ -1,6 +1,6 @@
 # QuickSplit — UX Guide
 > User experience principles, design system, route map, and design decisions
-> Last updated: 2026-06-06 (reflects moodboard v1 — Social Casual Dining)
+> Last updated: 2026-06-07 (Session 5 — V2 moodboard rebrand implemented)
 
 ---
 
@@ -47,7 +47,7 @@
 | **Info** | `#2D7A57` | Informational alerts, secondary green accents |
 | **Border** | `#E7E5E4` | Card borders, dividers, input outlines |
 
-**Current implementation uses:** `#0F9D94` (teal) as primary. Migration to `#1B4332` + `#FF6B35` is the V2 design target — the moodboard is aspirational for the full rebrand.
+**V2 implementation complete.** Migration from `#0F9D94` (teal) to `#1B4332` (forest green) primary + `#FF6B35` (orange) accent is done across all Tailwind tokens, CSS variables, components, and pages.
 
 ### CSS Variable Mapping (current → target)
 
@@ -74,7 +74,7 @@
 | **Body 2** | Inter | 14px | Regular | Secondary body text |
 | **Small** | Inter | 12px | Regular | Captions, badges, timestamps |
 
-**Current implementation uses:** Urbanist for display, system-ui for body. Target: Playfair Display (headings) + Inter (UI).
+**V2 implementation complete.** Urbanist removed. Playfair Display loaded via Google Fonts for display/hero headings (`font-display` class), Inter for all UI text (`font-sans` default).
 
 ### Spacing & Radius
 
@@ -328,37 +328,31 @@ All routes inside `<ProtectedRoute>` redirect to `/login` if `isAuthenticated` i
 
 | Decision | Tradeoff | Reason |
 |----------|----------|--------|
-| CSV import assigns all expenses to current user | Splitwise CSV has names, not user IDs | No backend lookup; user can re-edit expenses after import |
 | Web Share API with clipboard fallback | Not all browsers support Share API | Works universally; desktop gets clipboard copy |
-| Scan tab in QR page is a placeholder | Camera access requires native / HTTPS | Actual scanning not available in web preview |
-| AI chat uses mock keyword replies | Claude API requires backend proxy + billing | Backend integration is V2 scope |
-| Settlement doesn't clear `is_settled` on backend | Backend bug | Frontend shows optimistic settled state; backend fix is deferred |
-| Teal (#0F9D94) as current primary vs moodboard green (#1B4332) | Full rebrand requires updating all Tailwind tokens | Moodboard is the design target; token migration is a discrete V2 task |
+| Overlapping avatar circles use deterministic colors from group ID | Groups list API only returns member_count, not member names/avatars | Visually correct without extra API calls; actual member avatars require detail endpoint |
+| Settlement doesn't clear `is_settled` on backend | Backend edge case | Frontend shows optimistic settled state; backend schema fix is deferred |
+| AI chat requires API key in backend/.env | Multi-provider: Anthropic / OpenAI / Groq (free) | Backend auto-detects whichever key is present; Groq is free at console.groq.com |
 
 ---
 
-## V2 Roadmap (UX impact)
+## V2 Design Rebrand — Implementation Status
 
-### Design Rebrand
-- Migrate from teal (`#0F9D94`) to forest green (`#1B4332`) primary + orange (`#FF6B35`) accent
-- Swap Urbanist → Playfair Display (headings) + Inter (body)
-- Illustrated empty states (replace icon-only states)
-- Overlapping member avatar circles on group cards
-- Expense table view (moodboard shows a list/table layout option)
-- "Overdue" badge for long-pending expenses
-- Analytics tab replacing or supplementing Personal tab
+### ✅ Completed (Session 5)
+- **Color tokens** — `tailwind.config.js`: `primary` scale → forest green `#1B4332`; new `accent` scale → orange `#FF6B35`
+- **Fonts** — Google Fonts (Playfair Display + Inter), `font-display` / `font-sans` in Tailwind config; `index.css` import updated
+- **CSS variables** — Light: `--bg: #FFFDF9`, dark: `--bg: #0F1F17 / --card: #1A2E22 / --border: #2D4A38`
+- **Button system** — `btn-primary` → orange accent; `btn-secondary` → forest green outline; `btn-brand` → forest green fill; `Button.tsx` primary variant → accent
+- **FAB** — BottomNav center FAB → `bg-accent-500` (orange)
+- **All CTA buttons** — Login / Register / AddExpense / SettleUp / CreateGroup / ImportGroup / Friends / AddFriend → orange
+- **Home balance hero card** — Dark `#1B4332` bg card: "You are owed ₹X" headline + orange "Settle up now →" CTA + net/owed/owe sub-row
+- **Overlapping avatars** — Group cards show stacked color circles (up to 4 + "+N more"), colors derived deterministically from group ID
+- **Badge system** — `ExpenseBadge` component: Unsettled / Settled / You paid / Owes you / You owe / Overdue; wired into FriendDetail + GroupDetail expense rows with "₹X each" per-person amount
+- **Toast system** — `ToastContainer` + `toastStore` (Zustand); auto-dismiss 4s; success / warning / error / info types; global via `useToastStore()` from any component
+- **index.html** — `theme-color: #1B4332`, font preconnect, updated tagline
+
+### 🔲 Remaining
+- Illustrated empty states (replace icon-only placeholder states)
+- Expense table view option
+- Analytics tab
 - Wallet section in navigation
-
-### Features
-- **Real AI chat** — Streaming Claude API responses (replace mock keyword replies)
-- **Guest mode** — Try the app before signing up
-- **Phone OTP login** — SMS verification for Indian users
-- **Voice input** — "Split ₹1200 dinner with Rahul and Nehal"
-- **Group chat** — Threaded messages per group
-- **Bank SMS parsing** — Auto-detect expenses from SMS notifications
-- **Home screen widgets** — Live balance widget for iOS/Android
-- **Expense search** — Global search with filters (merchant, category, amount range)
-- **Gamification** — Best Saver, Fast Settler badges
-- **Multi-currency** — Live exchange rates
-- **Export reports** — CSV / PDF / Excel
-- **Recurring expenses** — Auto-detect from patterns
+- Gamification badges, voice input, multi-currency, export reports

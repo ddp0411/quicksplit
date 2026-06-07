@@ -95,7 +95,7 @@ export const AddFriend: React.FC = () => {
               <button
                 onClick={handleDirectAdd}
                 disabled={addMutation.isPending || sentTo.has(query.trim().toLowerCase())}
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-2xl bg-accent-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
               >
                 <UserPlusIcon className="h-4 w-4" />
                 {sentTo.has(query.trim().toLowerCase()) ? 'Request sent!' : 'Send invite'}
@@ -134,7 +134,7 @@ export const AddFriend: React.FC = () => {
                       className={`flex items-center gap-1.5 rounded-2xl px-3 py-1.5 text-xs font-bold transition disabled:opacity-60 ${
                         sent
                           ? 'bg-emerald-100 text-positive dark:bg-emerald-900/30'
-                          : 'bg-primary-600 text-white hover:bg-primary-700'
+                          : 'bg-accent-500 text-white hover:bg-accent-600'
                       }`}
                     >
                       {sent ? (
@@ -184,7 +184,7 @@ export const AddFriend: React.FC = () => {
             </div>
             <div className="rounded-2xl border-2 border-dashed py-8 text-center" style={{ borderColor: 'var(--border)' }}>
               <p className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>Camera access required</p>
-              <button className="mt-3 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700">
+              <button className="mt-3 rounded-2xl bg-accent-500 px-4 py-2 text-sm font-bold text-white hover:bg-accent-600">
                 Open Camera
               </button>
             </div>

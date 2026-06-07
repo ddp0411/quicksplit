@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { groupsAPI } from '@/services/api/groupsAPI';
+import { groupsAPI, type GroupMessage } from '@/services/api/groupsAPI';
 import { expensesAPI, type ExpenseListItem, EXPENSE_CATEGORIES } from '@/services/api/expensesAPI';
 import { useUserStore } from '@/state/userStore';
 import { formatCurrency } from '@/utils/upi';
 import { formatDate } from '@/utils/helpers';
 import { SkeletonRow } from '@/components/ui/SkeletonCard';
+import { ExpenseBadge, type BadgeType } from '@/components/ui/ExpenseBadge';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -44,6 +45,8 @@ export const GroupDetail: React.FC = () => {
   const [showAddMember, setShowAddMember] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const chatBottomRef = useRef<HTMLDivElement>(null);
 
   const { data: group, isLoading: groupLoading } = useQuery({
     queryKey: ['group', groupId],
@@ -81,6 +84,25 @@ export const GroupDetail: React.FC = () => {
     mutationFn: () => groupsAPI.deleteGroup(groupId!),
     onSuccess: () => navigate('/groups'),
   });
+
+  const { data: chatMessages = [], isLoading: chatLoading } = useQuery({
+    queryKey: ['group-chat', groupId],
+    queryFn: () => groupsAPI.getGroupChat(groupId!),
+    enabled: !!groupId,
+    refetchInterval: 10000,
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: (content: string) => groupsAPI.sendGroupMessage(groupId!, content),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['group-chat', groupId] });
+      setChatMessage('');
+    },
+  });
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages.length]);
 
   const handleInvite = () => {
     const inviteLink = `${window.location.origin}/join/${groupId}`;
@@ -184,7 +206,7 @@ export const GroupDetail: React.FC = () => {
       <div className="grid grid-cols-5 gap-2">
         {[
           { label: 'Add', emoji: '➕', action: () => navigate(`/expenses/new?group=${groupId}`) },
-          { label: 'Scan', emoji: '📷', action: () => navigate('/scan') },
+          { label: 'Scan', emoji: '📷', action: () => navigate(`/scan?group=${groupId}`) },
           { label: 'Settle', emoji: '💸', action: () => navigate(`/settle-up?group=${groupId}`) },
           { label: 'Insights', emoji: '📊', action: () => navigate(`/groups/${groupId}/insights`) },
           { label: linkCopied ? 'Copied!' : 'Invite', emoji: linkCopied ? '✓' : '🔗', action: handleInvite },
@@ -305,6 +327,9 @@ export const GroupDetail: React.FC = () => {
             {expenses.map((exp: ExpenseListItem) => {
               const cat = catMeta[exp.category];
               const youPaid = exp.paid_by.id === user?.id;
+              const badge: BadgeType = youPaid
+                ? (exp.your_share < exp.amount ? 'owes-you' : 'you-paid')
+                : 'you-owe';
               return (
                 <Link
                   key={exp.id}
@@ -316,15 +341,18 @@ export const GroupDetail: React.FC = () => {
                     {cat?.emoji ?? '📦'}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-sm" style={{ color: 'var(--text)' }}>{exp.description}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate font-semibold text-sm" style={{ color: 'var(--text)' }}>{exp.description}</p>
+                      <ExpenseBadge type={badge} />
+                    </div>
                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                       {youPaid ? 'You paid' : `${exp.paid_by.name} paid`} · {formatDate(exp.date)}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{formatCurrency(exp.amount)}</p>
-                    <p className={`text-xs font-bold ${youPaid ? 'text-positive' : 'text-negative'}`}>
-                      {youPaid ? `lent ${formatCurrency(exp.amount - exp.your_share)}` : `owe ${formatCurrency(exp.your_share)}`}
+                    <p className={`text-xs font-extrabold ${youPaid ? 'text-accent-500' : 'text-negative'}`}>
+                      {youPaid ? formatCurrency(exp.amount - exp.your_share) : formatCurrency(exp.your_share)} each
                     </p>
                   </div>
                 </Link>
@@ -332,6 +360,96 @@ export const GroupDetail: React.FC = () => {
             })}
           </div>
         )}
+      </div>
+
+      {/* Group Chat */}
+      <div className="card">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-base">💬</span>
+          <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>
+            Group Chat
+            {chatMessages.length > 0 && (
+              <span className="ml-2 rounded-full bg-primary-100 dark:bg-primary-900/30 px-1.5 py-0.5 text-[10px] font-bold text-primary-600">
+                {chatMessages.length}
+              </span>
+            )}
+          </p>
+        </div>
+
+        {/* Messages */}
+        <div className="max-h-80 overflow-y-auto space-y-2 pr-1 mb-3">
+          {chatLoading ? (
+            <div className="space-y-2">{[1, 2].map(i => <SkeletonRow key={i} />)}</div>
+          ) : chatMessages.length === 0 ? (
+            <div className="py-6 text-center">
+              <p className="text-2xl">💬</p>
+              <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>No messages yet. Say hello!</p>
+            </div>
+          ) : (
+            chatMessages.map((msg: GroupMessage) => {
+              const isMe = msg.user.id === user?.id;
+              const initials = msg.user.name.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+              return (
+                <div key={msg.id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                  {!isMe && (
+                    <div
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-2xl text-[10px] font-extrabold text-white mt-0.5"
+                      style={{ background: msg.user.avatar_color }}
+                    >
+                      {initials}
+                    </div>
+                  )}
+                  <div className={`max-w-[72%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                    {!isMe && (
+                      <p className="text-[10px] font-semibold mb-0.5 ml-1" style={{ color: 'var(--text-muted)' }}>
+                        {msg.user.name}
+                      </p>
+                    )}
+                    <div
+                      className={`rounded-2xl px-3 py-2 text-sm leading-snug ${
+                        isMe
+                          ? 'bg-primary-600 text-white rounded-tr-sm'
+                          : 'rounded-tl-sm'
+                      }`}
+                      style={!isMe ? { background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)' } : undefined}
+                    >
+                      {msg.content}
+                    </div>
+                    <p className="text-[10px] mt-0.5 mx-1" style={{ color: 'var(--text-muted)' }}>
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={chatBottomRef} />
+        </div>
+
+        {/* Input */}
+        <div className="flex gap-2 border-t pt-3" style={{ borderColor: 'var(--border)' }}>
+          <input
+            value={chatMessage}
+            onChange={e => setChatMessage(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && chatMessage.trim()) {
+                e.preventDefault();
+                sendMessageMutation.mutate(chatMessage.trim());
+              }
+            }}
+            placeholder="Type a message…"
+            className="flex-1 rounded-2xl border px-3 py-2 text-sm outline-none focus:border-primary-400"
+            style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
+            disabled={sendMessageMutation.isPending}
+          />
+          <button
+            onClick={() => chatMessage.trim() && sendMessageMutation.mutate(chatMessage.trim())}
+            disabled={!chatMessage.trim() || sendMessageMutation.isPending}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-primary-600 text-white disabled:opacity-40 transition active:scale-95"
+          >
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Members collapsible */}

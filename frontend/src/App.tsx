@@ -5,6 +5,13 @@ import { ThemeProvider } from './app/ThemeProvider';
 import AppRoutes from './routes/AppRoutes';
 import { Navbar } from './components/layout/Navbar';
 import { BottomNav } from './components/layout/BottomNav';
+import { ToastContainer } from './components/ui/Toast';
+import { useToastStore } from './state/toastStore';
+
+function ToastLayer() {
+  const { toasts, dismiss } = useToastStore();
+  return <ToastContainer toasts={toasts} onDismiss={dismiss} />;
+}
 
 function App() {
   return (
@@ -12,6 +19,7 @@ function App() {
       <ThemeProvider>
         <BrowserRouter>
           <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+            <ToastLayer />
             <Navbar />
             <main className="app-container py-6 pb-28 md:py-8 md:pb-10">
               <AppRoutes />

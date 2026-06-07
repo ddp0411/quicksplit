@@ -183,11 +183,34 @@ export const ImportGroup: React.FC = () => {
       const mappedEmails = Object.values(memberMappings).filter(e => e.includes('@'));
       const group = await groupsAPI.createGroup({ name: groupName.trim(), category, member_emails: mappedEmails });
 
+      // Build email → userId from the returned group members
+      const emailToUserId: Record<string, string> = {};
+      group.members?.forEach(m => { emailToUserId[m.user.email] = m.user.id; });
+
+      // Build CSV member name → userId:
+      //   - myIdentity (the CSV name the user chose for themselves) → user.id
+      //   - other members: name → email (from memberMappings) → userId (from emailToUserId)
+      const nameToUserId: Record<string, string> = {};
+      if (user) {
+        nameToUserId[user.name] = user.id;
+        if (myIdentity) nameToUserId[myIdentity] = user.id;
+      }
+      Object.entries(memberMappings).forEach(([name, email]) => {
+        if (emailToUserId[email]) nameToUserId[name] = emailToUserId[email];
+      });
+
+      // All mapped member IDs for participant list
+      const allMemberIds = [...new Set([
+        ...(user ? [user.id] : []),
+        ...Object.values(nameToUserId),
+      ])];
+
       const exps = parsed?.expenses ?? [];
       if (exps.length > 0 && user) {
         for (let i = 0; i < exps.length; i++) {
           setImportProgress({ done: i, total: exps.length });
           const exp = exps[i];
+          const paidById = nameToUserId[exp.paidByName] ?? user.id;
           try {
             await expensesAPI.createExpense({
               group_id: group.id,
@@ -195,10 +218,10 @@ export const ImportGroup: React.FC = () => {
               amount: exp.amount,
               currency: exp.currency,
               category: 'other',
-              paid_by_user_id: user.id,
+              paid_by_user_id: paidById,
               split_type: 'equal',
               date: exp.date,
-              participant_ids: [user.id],
+              participant_ids: allMemberIds,
             });
           } catch {
             // Non-fatal: continue with next expense
@@ -289,7 +312,7 @@ export const ImportGroup: React.FC = () => {
           <input ref={fileRef} type="file" accept=".csv" onChange={handleFile} className="hidden" />
           <button
             onClick={() => fileRef.current?.click()}
-            className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700"
+            className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600"
           >
             SELECT FILE
           </button>
@@ -424,7 +447,7 @@ export const ImportGroup: React.FC = () => {
                         className={`rounded-xl px-4 py-2 text-xs font-bold transition ${
                           mapped
                             ? 'bg-positive/10 text-positive'
-                            : 'bg-primary-600 text-white hover:bg-primary-700'
+                            : 'bg-accent-500 text-white hover:bg-accent-600'
                         }`}
                       >
                         {mapped ? 'MAPPED' : 'MAP'}
@@ -465,7 +488,7 @@ export const ImportGroup: React.FC = () => {
                                 setOpenMapping(null);
                               }
                             }}
-                            className="rounded-2xl bg-primary-600 px-3 py-2 text-sm font-bold text-white hover:bg-primary-700"
+                            className="rounded-2xl bg-accent-500 px-3 py-2 text-sm font-bold text-white hover:bg-accent-600"
                           >
                             ✓
                           </button>
@@ -492,7 +515,7 @@ export const ImportGroup: React.FC = () => {
         <button
           onClick={() => importMutation.mutate()}
           disabled={importMutation.isPending}
-          className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+          className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
         >
           {importMutation.isPending
             ? importProgress
@@ -541,7 +564,7 @@ export const ImportGroup: React.FC = () => {
         <div className="flex gap-3">
           <button
             onClick={handleShare}
-            className="flex-1 rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700"
+            className="flex-1 rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600"
           >
             Share link
           </button>

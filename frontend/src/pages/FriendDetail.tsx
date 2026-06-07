@@ -10,6 +10,7 @@ import { formatCurrency } from '@/utils/upi';
 import { formatDate } from '@/utils/helpers';
 import { Button } from '@/components/ui/Button';
 import { SkeletonRow } from '@/components/ui/SkeletonCard';
+import { ExpenseBadge, type BadgeType } from '@/components/ui/ExpenseBadge';
 
 const catMeta = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.value, c]));
 
@@ -143,21 +144,30 @@ export const FriendDetail: React.FC = () => {
               {sharedExpenses.map(exp => {
                 const cat = catMeta[exp.category];
                 const youPaid = exp.paid_by.id === me?.id;
+                const badge: BadgeType = youPaid
+                  ? (exp.your_share < exp.amount ? 'owes-you' : 'you-paid')
+                  : 'you-owe';
+                const shareLabel = youPaid
+                  ? formatCurrency(exp.amount - exp.your_share)
+                  : formatCurrency(exp.your_share);
                 return (
                   <Link key={exp.id} to={`/expenses/${exp.id}`} className="flex items-center gap-3 rounded-2xl border p-3 transition hover:border-primary-300 hover:bg-primary-50/50 dark:hover:bg-primary-900/10" style={{ borderColor: 'var(--border)' }}>
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-lg">
                       {cat?.emoji ?? '📦'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="truncate font-semibold text-sm" style={{ color: 'var(--text)' }}>{exp.description}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate font-semibold text-sm" style={{ color: 'var(--text)' }}>{exp.description}</p>
+                        <ExpenseBadge type={badge} />
+                      </div>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         {youPaid ? 'You paid' : `${exp.paid_by.name} paid`} · {formatDate(exp.date)}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{formatCurrency(exp.amount)}</p>
-                      <p className={`text-xs font-bold ${youPaid ? 'text-positive' : 'text-negative'}`}>
-                        {youPaid ? `you lent ${formatCurrency(exp.amount - exp.your_share)}` : `you owe ${formatCurrency(exp.your_share)}`}
+                      <p className={`text-xs font-extrabold ${youPaid ? 'text-accent-500' : 'text-negative'}`}>
+                        {shareLabel} each
                       </p>
                     </div>
                   </Link>

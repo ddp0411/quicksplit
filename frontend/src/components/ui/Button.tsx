@@ -17,12 +17,12 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-lg font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+  const baseStyles = 'inline-flex items-center justify-center rounded-lg font-semibold transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
   
   const variantStyles = {
-    primary: 'bg-primary-600 text-white shadow-button hover:bg-primary-700 active:translate-y-px',
-    secondary: 'border border-primary-200 bg-white text-primary-700 hover:bg-primary-50',
-    ghost: 'text-slate-700 hover:bg-slate-100',
+    primary: 'bg-accent-500 text-white shadow-button hover:bg-accent-600 active:translate-y-px',
+    secondary: 'border border-primary-600 bg-white text-primary-600 hover:bg-primary-50 dark:bg-transparent dark:border-primary-400 dark:text-primary-300',
+    ghost: 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
     danger: 'bg-rose-600 text-white shadow-button hover:bg-rose-700 active:translate-y-px',
   };
 

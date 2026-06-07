@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeftIcon, PaperAirplaneIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
+import { aiAPI } from '@/services/api/aiAPI';
 
 interface Message {
   role: 'user' | 'ai';
@@ -15,43 +16,45 @@ const suggestions = [
   'Show my recurring expenses',
 ];
 
-const fakeReplies: Record<string, string> = {
-  default: "Based on your recent activity, I can see some patterns in your spending. Housing and dining are your top categories. Would you like specific recommendations for any area?",
-  overspend: "Your dining expenses increased by 23% this month compared to last month. Specifically, food delivery orders went up from 8 to 14. Cooking at home 3 more times per week could save you around ₹1,200 monthly.",
-  category: "Your top spending categories are: 1) Dining & Food (42%) 2) Transport (24%) 3) Entertainment (18%) 4) Shopping (16%). Food and transport together make up 66% of your tracked spending.",
-  save: "Here are 3 quick wins: 1) Cancel unused subscriptions (saving ~₹200/mo) 2) Reduce food delivery to 2x per week (-₹900/mo) 3) Use public transport on weekends (-₹400/mo). Total potential saving: ~₹1,500/month.",
-  recurring: "I found 3 recurring expenses: Netflix ₹649/mo (Jan 12), Spotify ₹119/mo (Jan 26), Gym ₹1,200/mo (Jan 1). Total: ₹1,968/month in subscriptions.",
-};
-
-function getReply(text: string): string {
-  const lower = text.toLowerCase();
-  if (lower.includes('overspend') || lower.includes('over')) return fakeReplies.overspend;
-  if (lower.includes('category') || lower.includes('top')) return fakeReplies.category;
-  if (lower.includes('save') || lower.includes('saving')) return fakeReplies.save;
-  if (lower.includes('recurring') || lower.includes('subscription')) return fakeReplies.recurring;
-  return fakeReplies.default;
-}
-
 export const AIChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
+  const [apiError, setApiError] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, thinking]);
 
-  const send = (text: string) => {
+  const send = async (text: string) => {
     if (!text.trim() || thinking) return;
     const userMsg: Message = { role: 'user', text: text.trim() };
-    setMessages(m => [...m, userMsg]);
+    const updated = [...messages, userMsg];
+    setMessages(updated);
     setInput('');
     setThinking(true);
-    setTimeout(() => {
+    setApiError('');
+
+    try {
+      // Build message history in API format (user/assistant roles)
+      const history = updated.map(m => ({
+        role: (m.role === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+        content: m.text,
+      }));
+      const reply = await aiAPI.chat(history);
+      setMessages(m => [...m, { role: 'ai', text: reply }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'AI is unavailable right now.';
+      // Show a friendly error if no API key is configured
+      const friendlyMsg = msg.includes('503') || msg.includes('No AI API key')
+        ? 'AI assistant is not configured yet. Add an API key to backend/.env to enable it.'
+        : 'Could not reach AI assistant. Please try again.';
+      setMessages(m => [...m, { role: 'ai', text: friendlyMsg }]);
+      setApiError(friendlyMsg);
+    } finally {
       setThinking(false);
-      setMessages(m => [...m, { role: 'ai', text: getReply(text) }]);
-    }, 1200);
+    }
   };
 
   return (
@@ -67,7 +70,9 @@ export const AIChat: React.FC = () => {
           </div>
           <div>
             <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>AI Finance Assistant</p>
-            <p className="text-xs text-positive">Online</p>
+            <p className={`text-xs ${apiError ? 'text-negative' : 'text-positive'}`}>
+              {apiError ? 'Unavailable' : 'Online'}
+            </p>
           </div>
         </div>
       </div>
@@ -160,6 +165,7 @@ export const AIChat: React.FC = () => {
             placeholder="Ask about your finances..."
             className="flex-1 bg-transparent text-sm outline-none"
             style={{ color: 'var(--text)' }}
+            disabled={thinking}
           />
           <button
             type="submit"

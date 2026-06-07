@@ -33,12 +33,13 @@ export const AddExpense: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group');
+  const amountParam = searchParams.get('amount');
   const { user } = useUserStore();
   const qc = useQueryClient();
 
   // Form state
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(amountParam ?? '');
   const [category, setCategory] = useState('other');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
@@ -177,7 +178,7 @@ export const AddExpense: React.FC = () => {
         <button
           onClick={handleSave}
           disabled={createMutation.isPending}
-          className="rounded-2xl bg-primary-600 px-4 py-1.5 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+          className="rounded-2xl bg-accent-500 px-4 py-1.5 text-sm font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
         >
           {createMutation.isPending ? '…' : 'Save'}
         </button>

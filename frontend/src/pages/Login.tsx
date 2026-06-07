@@ -118,7 +118,7 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoggingIn || !email || !password}
-            className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-primary-700 disabled:opacity-60"
+            className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-accent-600 disabled:opacity-60"
           >
             {isLoggingIn ? 'Signing in…' : 'Sign in'}
           </button>

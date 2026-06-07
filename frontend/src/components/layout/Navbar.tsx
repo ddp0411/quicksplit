@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
   const linkClass = ({ isActive }: { isActive: boolean }) => [
     'hidden items-center gap-2 rounded-2xl px-3 py-2 text-sm font-semibold transition md:inline-flex',
     isActive
-      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
+      ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300'
       : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
   ].join(' ');
 

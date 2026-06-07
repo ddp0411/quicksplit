@@ -1,159 +1,152 @@
 # QuickSplit — Complete Feature Checklist
 
 > Cross-reference against: `Quicksplit UI and features guide.md` + Moodboard v1 (Social Casual Dining)
-> Last updated: 2026-06-06 (Session 4 — moodboard integrated)
+> Last updated: 2026-06-07 (Session 6 — Mobile Status column added; web_mobile_feature_comparison.md created)
+>
+> **Mobile Status Key**: ✅ Complete · 🟡 Partial · 🔲 Stub (screen exists, placeholder UI) · ❌ Missing
 
 ---
 
-## ✅ Complete Features (47 items)
+## ✅ Complete Web Features (52 items)
 
-### Auth & Onboarding
-- ✅ Splash Screen — animated teal logo, auto-redirect (authed → /home dashboard, unauthed → /onboarding)
-- ✅ Onboarding Carousel — 5 slides (Shared Expenses, Scan Bills, AI Insights, Smart Budgets, Recurring), progress dots, Skip, localStorage `qs_onboarded` flag
-- ✅ Login — Google/Apple UI buttons, email + password, show/hide password toggle, teal CTA → redirects to /home
-- ✅ Register — name, email, password, confirm password, terms checkbox, Google signup UI → redirects to /home
-- ✅ Permission Setup — Contacts / Notifications / Camera step cards, skip each, navigates to /home on finish
-
-### Navigation
-- ✅ 5-tab Bottom Nav — Friends | Groups | +FAB | Personal | Account
-- ✅ FAB Action Sheet — slide-up with 3 options: Add Expense / Scan Bill / Settle Up
-- ✅ Filter Sheet — slide-up radio options, reused across Friends + Groups
-- ✅ Desktop Navbar — left sidebar with teal brand, 5 sections
-- ✅ Dark Mode — CSS variables (--bg, --card, --border, --text, --text-muted), ThemeProvider, persisted via Zustand
-
-### Friends
-- ✅ Friends Tab — search bar, FilterSheet (All/Outstanding/You owe/Owe you), balance summary chips, "all settled up" banner
-- ✅ Swipe Actions — drag="x" to reveal Settle / Remind / Remove on friend rows
-- ✅ Friend Detail — hero with balance, Expenses tab, Settlements tab, floating Add Expense FAB
-- ✅ Add Friend — search by name/email with live results (debounced), QR tab placeholder, sent invite tracking
-
-### Groups
-- ✅ Groups Tab — search, FilterSheet, category emoji icons (✈️🏠❤️💼📅📁), balance chips, category quick-filter pill row
-- ✅ Create Group — 3-step wizard: name + 6-type grid → member email chips → split method + currency
-- ✅ Group Detail — gradient hero by category type, 3-stat row, 5-button quick actions (Add/Scan/Settle/Insights/Invite), group analytics mini card, collapsible members section
-- ✅ Group Insights — per-member horizontal bar chart, SVG donut by category, settlement plan list
-- ✅ Group Types — Trip ✈️ / Home 🏠 / Couple ❤️ / Office 💼 / Event 📅 / Other 📁
-- ✅ Import from Splitwise (create group) — /groups/import, 3-screen flow: CSV upload → setup (identity + type + map friends) → success bottom sheet with invite link
-- ✅ Invite link — GroupDetail quick action uses Web Share API / clipboard copy, animated "Copied!" toast
-
-### Expense Management
-- ✅ Add Expense — Splitwise-style: "With you and:" chip picker, category emoji + description field, large ₹ amount field, "Paid by / split" expandable panel (Equal/Exact/%/Shares tabs), bottom toolbar (Date/Group/Scan/Notes)
-- ✅ Expense Detail — teal gradient hero, paid-by + split table, emoji reactions (👍❤️😂😮🎉🙏), receipt attachment CTA, comments section with send button
-- ✅ Split Methods — Equal, Exact amounts, Percentage, Shares (UI complete; backend wires to equal for now)
-
-### Settlement & Payments
-- ✅ Settle Up — 5 UPI method tabs (GPay/PhonePe/Paytm/Cash/Other), amount + notes, AI suggestion card, transaction ID field (hidden for cash), success screen with QR placeholder + spring animation
-- ✅ Smart Settlement Suggestions — static AI card ("settle in 2 instead of 6") shown on Settle Up screen
-
-### Personal / AI Finance Hub
-- ✅ Personal Tab — monthly spend hero, budget status ring, upcoming bills preview, rotating AI insight card, quick links, recent expenses feed
-- ✅ AI Chat — chat UI, 6 suggested prompts, mock AI with keyword pattern replies, "thinking" animation, Claude API note
-- ✅ Budget Dashboard — SVG ring (% used, remaining, days left), category bars with OVER/NEAR/ON TRACK badges, add budget form, localStorage (`qs_budgets`)
-- ✅ Spending Insights — SVG donut (pure, no lib), date filter chips (Jun/May/All/Custom), category list with % bars, Export (coming soon)
-- ✅ Subscription Tracker — list view, add/delete subscriptions, monthly total summary, localStorage (`qs_subs`)
-
-### Account & Settings
-- ✅ Account Tab — user avatar card, QR code row, Pro banner, all settings rows (Notifications/Security/Appearance/Referral/Import/Rate/Contact), logout with confirm dialog
-- ✅ Edit Profile — 8-color avatar picker (live preview), name field, UPI ID field, email (read-only), PATCH /auth/me/
-- ✅ Appearance Settings — Light / Dark / System rows, instantly applies dark class to `<html>`
-- ✅ Notification Settings — grouped toggles (Groups/Expenses/News), Save button, localStorage (`qs_notif_prefs`)
-- ✅ Security Settings — biometrics toggle placeholder, session history placeholder
-- ✅ Pro Upgrade — feature checklist, Yearly/Quarterly/Monthly plan cards (BEST VALUE badge), timeline, "Try It Free" CTA
-- ✅ Referral Page — X/3 referral progress bar, how-it-works accordion, Share link + Copy link
-- ✅ Import from Splitwise — standalone page at /account/import (Option 1: direct instructions, Option 2: CSV file upload)
-- ✅ QR Code page — /account/qr with "My Code" tab (qrcode.react, teal SVG, Copy/Share) + "Scan" tab (animated viewfinder, fallback CTA)
-
-### Home Dashboard
-- ✅ Home page — /home, default post-login destination (replaces /friends as landing)
-- ✅ Hero greeting card — time-based greeting + daily rotating finance/travel quote (20 quotes, teal gradient)
-- ✅ Balance summary strip — Net / Owed to you / You owe (3-column card with skeleton loading)
-- ✅ Quick actions row — ➕ Add / 📷 Scan / 💸 Settle / 👤 Friend (4 coloured pill buttons)
-- ✅ Active groups strip — horizontal scroll, up to 4 groups sorted by outstanding balance
-- ✅ Who owes you / You owe — compact friend rows with Remind 🔔 / Settle → inline actions
-- ✅ Recent activity feed — last 5 items from activityAPI with category emoji and stagger animation
-- ✅ AI insight card — rotating daily insight + "Chat with AI →" link
-
-### System & OCR Flow
-- ✅ OCR Scan Flow — Scan → Split → Review → History pages (full existing flow kept)
-- ✅ Skeleton Loading — SkeletonCard + SkeletonRow used on Friends, Groups, GroupDetail, GroupInsights, Home
-- ✅ Teal Design System — #0F9D94 brand (moodboard target: #1B4332 primary + #FF6B35 accent — see V2)
-- ✅ Balances page — existing page kept, accessible from Friends/Groups balance chips
-- ✅ Activity page — themed with CSS variables (dark mode), enhanced empty state, date-grouped feed
-- ✅ Page transition animations — enter-only fade + y-slide via PageTransition component (no blank flash)
-- ✅ Pull-to-refresh — touch gesture (≥65px drag from top) on Friends, Groups, Activity → triggers query refetch with spinner indicator
-- ✅ usePullToRefresh hook — reusable touch handler (touchstart/touchmove/touchend), works across all list pages
+| # | Feature | Web Status | Mobile Status |
+|---|---------|------------|---------------|
+| **Auth & Onboarding** | | | |
+| 1 | Splash Screen — animated logo, auto-redirect (authed → /home, unauthed → /onboarding) | ✅ | ✅ Complete |
+| 2 | Onboarding Carousel — 5 slides (Shared Expenses, Scan Bills, AI Insights, Smart Budgets, Recurring), progress dots, Skip, localStorage flag | ✅ | ✅ Complete |
+| 3 | Login — Google/Apple UI buttons, email + password, show/hide toggle, teal CTA → /home | ✅ | ✅ Complete |
+| 4 | Register — name, email, password, confirm password, terms checkbox, Google signup UI → /home | ✅ | ✅ Complete |
+| 5 | Permission Setup — Contacts / Notifications / Camera step cards, skip each, navigates to /home | ✅ | ❌ Missing |
+| **Navigation** | | | |
+| 6 | 6-tab Bottom Nav — Home / Friends / +FAB / Groups / Personal / Account | ✅ | 🟡 Partial (5 tabs, no FAB) |
+| 7 | FAB Action Sheet — slide-up with 3 options: Add Expense / Scan Bill / Settle Up | ✅ | ❌ Missing (quick-action row used instead) |
+| 8 | Filter Sheet — slide-up radio options, reused across Friends + Groups | ✅ | ❌ Missing |
+| 9 | Desktop Navbar — Home, no redundant "Add Expense" button | ✅ | N/A (native app) |
+| 10 | Dark Mode — CSS variables, ThemeProvider, persisted via Zustand | ✅ | 🟡 Partial (themeStore + AppearanceSettings exist; theme not applied app-wide) |
+| **Friends** | | | |
+| 11 | Friends Tab — search bar, FilterSheet (All / Outstanding / You owe / Owe you), balance summary chips | ✅ | 🟡 Partial (search works; no filter sheet or summary chips) |
+| 12 | Swipe Actions — drag to reveal ➕ Add / Settle / Remind / Remove on friend rows | ✅ | ❌ Missing |
+| 13 | Friend Detail — hero with balance, Expenses tab, Settlements tab, floating Add Expense FAB | ✅ | 🟡 Partial (balance hero + expenses; no Settlements tab) |
+| 14 | Add Friend — search by name/email with live debounced results, QR tab, sent invite tracking | ✅ | 🟡 Partial (email search works; no QR tab) |
+| **Groups** | | | |
+| 15 | Groups Tab — search, FilterSheet, category emoji icons, balance chips, category quick-filter pills | ✅ | 🟡 Partial (list + search works; no filter or pills) |
+| 16 | Create Group — 3-step wizard: name + 6-type grid → member email chips → split method + currency | ✅ | 🟡 Partial (name + category; no member chips or split method step) |
+| 17 | Group Detail — gradient hero by category type, 3-stat row, 5-button quick actions, group analytics mini card, collapsible members section | ✅ | 🟡 Partial (stats row + expenses + debts; no gradient hero, no 5 actions, no analytics card) |
+| 18 | Group Insights — per-member horizontal bar chart, SVG donut by category, settlement plan list | ✅ | 🔲 Stub |
+| 19 | Group Types — Trip ✈️ / Home 🏠 / Couple ❤️ / Office 💼 / Event 📅 / Other 📁 | ✅ | ✅ Complete |
+| 20 | Import from Splitwise — /groups/import, 3-screen CSV flow → success bottom sheet | ✅ | 🔲 Stub |
+| 21 | Invite link — GroupDetail quick action, Web Share API / clipboard copy, "Copied!" toast | ✅ | ❌ Missing |
+| 22 | Group Chat — full messaging thread per group; bubble UI; send input; 10s polling; backend GroupMessage model | ✅ | ❌ Missing |
+| **Expense Management** | | | |
+| 23 | Add Expense — Splitwise-style: "With you and:" chip picker, category emoji + description, large ₹ amount, Paid by / split expandable panel (Equal/Exact/%/Shares), bottom toolbar (Date/Group/Scan/Notes) | ✅ | 🟡 Partial (description + amount + category + 3 split types + group picker; NO paid-by selector, NO participant chips, NO date picker, NO notes, NO Shares type) |
+| 24 | Expense Detail — gradient hero, paid-by + split table, emoji reactions, receipt attachment CTA, comments section | ✅ | 🟡 Partial (paid-by + split table + delete; no reactions, comments, or receipt) |
+| 25 | Split Methods — Equal, Exact amounts, Percentage, Shares | ✅ | 🟡 Partial (Equal, Exact, Percentage only) |
+| 26 | Scan Receipt with Group Context — GroupDetail Scan button passes `?group=ID`; amount pre-filled from OCR | ✅ | ❌ Missing |
+| **Settlement & Payments** | | | |
+| 27 | Settle Up — 5 UPI method tabs (GPay/PhonePe/Paytm/Cash/Other), amount + notes, AI suggestion card, transaction ID, success screen with QR | ✅ | 🟡 Partial (amount + notes + txn ID; no payment method tabs, no QR, no success screen) |
+| 28 | Smart Settlement Suggestions — static AI card ("settle in 2 instead of 6") on Settle Up | ✅ | ❌ Missing |
+| **Personal / AI Finance Hub** | | | |
+| 29 | Personal Tab — monthly spend hero, budget status ring, upcoming bills preview, rotating AI insight card, quick links, recent expenses feed | ✅ | 🟡 Partial (4 cards for sub-screens; no spend hero, budget ring, or AI insight card) |
+| 30 | AI Chat — real multi-provider backend (Anthropic → OpenAI → Groq); full conversation history; expense context; status indicator Online/Unavailable | ✅ | 🟡 Partial (real AI calls work; no suggestion chips, no typing indicator, no status badge) |
+| 31 | Budget Dashboard — SVG ring (% used, remaining, days left), category bars with OVER/NEAR/ON TRACK badges, add budget form, localStorage | ✅ | 🔲 Stub (hardcoded progress bars; no add form; no badges) |
+| 32 | Spending Insights — SVG donut, date filter chips (Jun/May/All/Custom), category list with % bars | ✅ | 🔲 Stub (hardcoded bars; no date filter) |
+| 33 | Subscription Tracker — list view, add/delete subscriptions, monthly total, localStorage | ✅ | 🔲 Stub (hardcoded list; no add/delete) |
+| **Account & Settings** | | | |
+| 34 | Account Tab — user avatar card, QR code row, Pro banner, all settings rows (Notifications/Security/Appearance/Referral/Import/Rate/Contact), logout | ✅ | ✅ Complete |
+| 35 | Edit Profile — 8-color avatar picker (live preview), name, UPI ID, email (read-only), PATCH /auth/me/ | ✅ | 🟡 Partial (name + UPI ID + email; no avatar color picker) |
+| 36 | Appearance Settings — Light / Dark / System rows, instantly applies dark class to `<html>` | ✅ | 🔲 Stub (radio buttons render; theme not applied) |
+| 37 | Notification Settings — grouped toggles (Groups/Expenses/News), Save button, localStorage | ✅ | 🔲 Stub (4 toggles; no API call) |
+| 38 | Security Settings — biometrics toggle placeholder, session history placeholder | ✅ | 🔲 Stub |
+| 39 | Pro Upgrade — feature checklist, Yearly/Quarterly/Monthly plan cards, BEST VALUE badge, "Try It Free" CTA | ✅ | 🔲 Stub |
+| 40 | Referral Page — X/3 referral progress bar, how-it-works accordion, Share link + Copy link | ✅ | 🟡 Partial (Share.share() works; no progress bar or API) |
+| 41 | Import from Splitwise — /account/import, Option 1: instructions, Option 2: CSV upload | ✅ | 🔲 Stub |
+| 42 | QR Code page — "My Code" tab (real QR via qrcode.react + copy/share) + "Scan" tab (webcam decode at 200ms, navigate to /friends/add) | ✅ | 🔲 Stub (placeholder; no real QR generation) |
+| **Home Dashboard** | | | |
+| 43 | Home page — default post-login destination | ✅ | ✅ Complete |
+| 44 | Hero greeting card — time-based greeting + daily rotating quote (20 quotes, forest green gradient) | ✅ | ✅ Complete |
+| 45 | Balance summary strip — Net / Owed to you / You owe (3-column card with skeleton loading) | ✅ | ✅ Complete |
+| 46 | Quick actions row — ➕ Add / 📷 Scan / 💸 Settle / 👤 Friend (4 pill buttons) | ✅ | ✅ Complete |
+| 47 | Active groups strip — horizontal scroll, up to 4 groups sorted by outstanding balance | ✅ | ✅ Complete |
+| 48 | Who owes you / You owe — compact friend rows with Remind 🔔 / Settle → inline actions | ✅ | 🟡 Partial (rows render; Remind is a no-op) |
+| 49 | Recent activity feed — last 5 items with category emoji and timestamps | ✅ | ✅ Complete |
+| 50 | AI insight card — rotating daily insight + "Chat with AI →" link | ✅ | ❌ Missing |
+| **System & OCR Flow** | | | |
+| 51 | OCR Scan Flow — Scan → Split → Review → History pages (camera + file upload, OCR processing) | ✅ | 🔲 Stub (all 4 screens are placeholders) |
+| 52 | Skeleton Loading — SkeletonCard + SkeletonRow on Friends, Groups, GroupDetail, Home | ✅ | ❌ Missing |
+| | Pull-to-refresh — touch gesture on Friends, Groups, Activity | ✅ | ✅ Complete |
+| | Balances page — accessible from Friends/Groups balance chips | ✅ | ✅ Complete |
+| | Activity page — date-grouped feed, dark mode themed | ✅ | ✅ Complete |
+| | Page transition animations — enter fade + y-slide via PageTransition | ✅ | ❌ Missing |
 
 ---
 
-## 🟡 Partial Features (implemented but not complete)
+## 🟡 Partial Web Features
 
-| Feature | Status | What's missing |
-|---------|--------|----------------|
-| Import from Splitwise in Create Group | 🟡 Partial | `paid_by_user_id` always defaults to current user — CSV names can't be auto-matched to user IDs without backend lookup |
-| AI Chat | 🟡 Mock only | Real Claude API integration needed — currently uses keyword pattern matching |
-| QR Code payments | 🟡 UI only | QR code page exists and shows real QR; actual UPI deep-links / camera scanning not wired |
-| Scan receipt | 🟡 Partial | OCR flow exists; "Scan receipt" buttons in GroupDetail/AddExpense navigate to /scan |
-| Group Chat | 🟡 Placeholder | Comments on expenses exist; full group thread/pinned messages not built |
+None. All previously partial features are now ✅ Complete on web.
 
 ---
 
-## ❌ Missing Features
+## 🎨 V2 Design Rebrand
 
-### Phase 9 Polish
-All Phase 9 items are complete. ✅
+> Moodboard: Option 3 — Social Casual Dining
+> Primary: `#1B4332` forest green · Accent: `#FF6B35` orange · Background: `#FFFDF9`
+> Typography: Playfair Display (headings) + Inter (body)
 
-### V2 / Post-launch
+| # | Feature | Web Status | Mobile Status |
+|---|---------|------------|---------------|
+| 1 | Tailwind token migration (forest green + orange accent) | ✅ Complete | ✅ Complete (StyleSheet.create with #1B4332 / #FF6B35) |
+| 2 | Google Fonts — Playfair Display + Inter | ✅ Complete | ✅ Complete (@expo-google-fonts) |
+| 3 | Primary CTA buttons → orange (#FF6B35) | ✅ Complete | 🟡 Partial (most CTAs are green; orange used selectively) |
+| 4 | Navbar & BottomNav rebrand (forest green active states, FAB) | ✅ Complete | ✅ Complete |
+| 5 | Balance hero card redesign (dark #1B4332 bg + orange Settle CTA) | ✅ Complete | ✅ Complete |
+| 6 | Overlapping member avatars (stacked circles, up to 4 + "+N more") | ✅ Complete | ✅ Complete |
+| 7 | Badge system (Unsettled / Settled / You paid / Owes you / Overdue) | ✅ Complete | 🟡 Partial (balance chips exist; no Overdue/You-paid badges) |
+| 8 | Illustrated empty states | ✅ Complete | ❌ Missing (text-only empty states) |
+| 9 | Alert / toast system (dismissible, success/warning/error/info, auto-dismiss 4s) | ✅ Complete | ✅ Complete (built-in Animated, no reanimated) |
+| 10 | Sparkline trend charts (inline SVG) | ✅ Complete | ❌ Missing |
+| 11 | Per-person amount on cards ("₹310.00 each" in accent color) | ✅ Complete | ❌ Missing |
+| 12 | Dark mode forest green tokens (#0F1F17, #1A2E22, #2D4A38) | ✅ Complete | ❌ Missing (dark mode not applied) |
 
-#### 🎨 Design Rebrand (from Moodboard v1)
-| Feature | Notes |
-|---------|-------|
-| Primary color rebrand | Migrate #0F9D94 (teal) → #1B4332 (forest green) + #FF6B35 (orange) accent across all Tailwind tokens |
-| Typography rebrand | Swap Urbanist → Playfair Display (headings) + Inter (body) |
-| Illustrated empty states | Replace icon-only empty states with warm lifestyle illustrations |
-| Overlapping member avatars | Group cards show stacked avatar circles (up to 4 + "+N more") |
-| Badge system | Unsettled / Settled / You paid / Owes you / **Overdue** status badges on expense rows |
-| Expense table view | Optional table layout showing: icon / name / paid by / total / you owe / status / date / actions |
-| Per-person amount on cards | "₹310.00 each" shown prominently on expense cards |
-| Alert / notification toasts | Dismissible in-app alerts: success (green) / warning (amber) / error (red) / info (green) |
-| Analytics tab | Dedicated analytics route with charts (replacing or supplementing Personal tab) |
-| Wallet section | Wallet tab in nav for UPI balance / payment history |
-| Balance hero card redesign | Dark #1B4332 bg card: "You are owed ₹2,450.75" + "Settle up now →" in orange |
-| Sparkline trend charts | Inline SVG sparklines on balance/summary cards (+12.5% vs last month) |
+---
 
-#### 🚀 New Features
-| Feature | Notes |
-|---------|-------|
-| Guest mode | Use app without login |
-| Phone OTP login | SMS verification for Indian users |
-| Real AI (Claude API) in chat | /personal/ai-chat currently uses mock keyword replies |
-| Voice AI assistant | "Split ₹1200 dinner with Rahul and Nehal" voice input |
-| Multi-currency with live exchange rates | Currency field exists; no exchange rate API |
-| Export reports | CSV / PDF / Excel — button shows "coming soon" toast |
-| Full Group Chat | Threaded messages, pinned messages, per-group feed |
-| Haptic feedback | On settlement, add expense success, reactions |
-| Home screen widgets | Live balance widget for iOS/Android |
-| Recurring expense auto-detection | Auto-detect from bank SMS / email parsing |
-| Expense search engine | Global search with filters (merchant, category, amount range) |
-| Gamification / badges | Best Saver, Fast Settler, Most Active badges |
-| Smart auto-categorization | ML-based merchant name → expense category |
-| AI fraud detection | Duplicate/unusual expense detection alerts |
-| Long-term ledger | Persistent couple/roommate debt history with monthly cycles |
-| Travel mode | Trip budget tracking, expense itinerary, shared docs |
-| Bank SMS detection | Auto-parse SMS for expense amounts |
-| Spending heatmap | Day-of-week / time-of-day heat map chart |
-| Advanced batch settlement | Full minimize-transactions algorithm |
-| Multi-device session management | Security → "active sessions" list with revoke |
-| Email parsing | Parse Gmail/Outlook for expense detection |
+## ❌ Missing Features (V2 New Features)
+
+| Feature | Notes | Mobile Status |
+|---------|-------|---------------|
+| Guest mode | Use app without login | ❌ Missing |
+| Phone OTP login | SMS verification for Indian users | ❌ Missing |
+| Voice AI assistant | "Split ₹1200 dinner with Rahul and Nehal" voice input | ❌ Missing |
+| Multi-currency with live exchange rates | Currency field exists; no exchange rate API | ❌ Missing |
+| Export reports | CSV / PDF / Excel — "coming soon" toast | ❌ Missing |
+| Haptic feedback | On settlement, add expense success, reactions | ❌ Missing (React Native `Haptics` not wired) |
+| Home screen widgets | Live balance widget for iOS/Android | ❌ Missing |
+| Recurring expense auto-detection | Auto-detect from bank SMS / email parsing | ❌ Missing |
+| Expense search engine | Global search with filters (merchant, category, amount range) | ❌ Missing |
+| Gamification / badges | Best Saver, Fast Settler, Most Active badges | ❌ Missing |
+| Smart auto-categorization | ML-based merchant name → expense category | ❌ Missing |
+| AI fraud detection | Duplicate/unusual expense detection alerts | ❌ Missing |
+| Long-term ledger | Persistent couple/roommate debt history with monthly cycles | ❌ Missing |
+| Travel mode | Trip budget tracking, expense itinerary, shared docs | ❌ Missing |
+| Bank SMS detection | Auto-parse SMS for expense amounts | ❌ Missing |
+| Spending heatmap | Day-of-week / time-of-day heat map chart | ❌ Missing |
+| Advanced batch settlement | Full minimize-transactions algorithm | ❌ Missing |
+| Multi-device session management | Security → "active sessions" list with revoke | ❌ Missing |
+| Email parsing | Parse Gmail/Outlook for expense detection | ❌ Missing |
+| Analytics tab | Dedicated analytics route (replacing/supplementing Personal tab) | ❌ Missing |
+| Wallet section | Wallet tab in nav for UPI balance / payment history | ❌ Missing |
 
 ---
 
 ## Summary
 
-| Status | Count |
-|--------|-------|
-| ✅ Complete | 55 |
-| 🟡 Partial | 5 |
-| ❌ Phase 9 remaining | 0 |
-| ❌ Missing (V2 design rebrand) | 12 |
-| ❌ Missing (V2 new features) | 21 |
-| **Total tracked** | **93** |
+| Status | Web Count | Mobile Count |
+|--------|-----------|--------------|
+| ✅ Complete | 52 | ~25 |
+| 🟡 Partial | 0 | ~13 |
+| 🔲 Stub (screen exists, placeholder UI) | — | ~14 |
+| 🎨 V2 Rebrand | 12 ✅ | 5 ✅ / 2 🟡 / 5 ❌ |
+| ❌ Missing (V2 new features) | 21 | 21 |
+| **Web complete features missing on mobile** | — | **~27 features** |
+| **Total tracked** | **85** | — |
+
+> For full feature-by-feature breakdown see [`web_mobile_feature_comparison.md`](web_mobile_feature_comparison.md)

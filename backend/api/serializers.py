@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from api.models import (
     Comment, DatasetEntry, Expense, ExpenseShare, Friendship,
-    GroupMember, Participant, Settlement, Split, SplitGroup, User,
+    GroupMember, GroupMessage, Participant, Settlement, Split, SplitGroup, User,
 )
 
 
@@ -393,3 +393,11 @@ class OverallBalanceSerializer(serializers.Serializer):
     total_you_owe = serializers.FloatField()
     net_balance = serializers.FloatField()
     balances = BalanceWithUserSerializer(many=True)
+
+
+class GroupMessageSerializer(serializers.ModelSerializer):
+    user = UserMiniSerializer(read_only=True)
+
+    class Meta:
+        model = GroupMessage
+        fields = ["id", "user", "content", "created_at"]

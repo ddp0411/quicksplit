@@ -95,7 +95,7 @@ export const SettleUp: React.FC = () => {
           {result.upi_link && (
             <a
               href={result.upi_link}
-              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-700"
+              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-accent-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-accent-600"
             >
               <QrCodeIcon className="h-4 w-4" />
               Open UPI app
@@ -112,7 +112,7 @@ export const SettleUp: React.FC = () => {
             </button>
             <button
               onClick={() => navigate('/activity')}
-              className="flex-1 rounded-2xl bg-primary-600 py-3 text-sm font-bold text-white hover:bg-primary-700"
+              className="flex-1 rounded-2xl bg-accent-500 py-3 text-sm font-bold text-white hover:bg-accent-600"
             >
               Activity
             </button>
@@ -275,7 +275,7 @@ export const SettleUp: React.FC = () => {
         <button
           onClick={() => { setError(''); settleMutation.mutate(); }}
           disabled={settleMutation.isPending || !amount || parseFloat(amount) <= 0 || !userId}
-          className="flex-1 rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-primary-700 disabled:opacity-60"
+          className="flex-1 rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-accent-600 disabled:opacity-60"
         >
           {settleMutation.isPending ? 'Recording…' : 'Record payment'}
         </button>

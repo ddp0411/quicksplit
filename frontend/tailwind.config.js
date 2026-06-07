@@ -8,22 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Primary: Forest Green — brand identity, nav, hero sections, avatars
         primary: {
-          50:  '#f0fdfb',
-          100: '#ccfbf5',
-          200: '#99f6eb',
-          300: '#5eead9',
-          400: '#2dd4c2',
-          500: '#14b8a9',
-          600: '#0F9D94',
-          700: '#087F75',
-          800: '#0a615a',
-          900: '#0c4f49',
+          50:  '#f0fdf6',
+          100: '#d1fae5',
+          200: '#a3e9c8',
+          300: '#6bcba4',
+          400: '#3aad81',
+          500: '#2d7a57',
+          600: '#1B4332',
+          700: '#163829',
+          800: '#112d21',
+          900: '#0d221a',
+        },
+        // Accent: Orange — primary CTA buttons ("Split Bill", "Add Expense", "Settle Up")
+        accent: {
+          50:  '#fff7f3',
+          100: '#ffede4',
+          200: '#ffc9ae',
+          300: '#ffa07a',
+          400: '#ff7a4d',
+          500: '#FF6B35',
+          600: '#e55a25',
+          700: '#cc4d1f',
+          800: '#a83d18',
+          900: '#8a3012',
         },
         ink: '#111111',
-        positive: '#2BB673',
-        negative: '#E74C3C',
-        warning: '#F4A300',
+        positive: '#22C55E',
+        negative: '#EF4444',
+        warning:  '#F59E0B',
+        info:     '#2D7A57',
       },
       borderRadius: {
         '2xl': '1rem',
@@ -32,11 +47,12 @@ export default {
       boxShadow: {
         soft:   '0 4px 24px rgba(0, 0, 0, 0.06)',
         card:   '0 2px 12px rgba(0, 0, 0, 0.08)',
-        button: '0 8px 20px rgba(15, 157, 148, 0.30)',
+        button: '0 8px 20px rgba(255, 107, 53, 0.35)',
+        green:  '0 8px 20px rgba(27, 67, 50, 0.25)',
       },
       fontFamily: {
-        sans:    ['Urbanist', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Urbanist', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'ui-serif', 'Georgia', 'serif'],
       },
       animation: {
         'spin-slow':   'spin 3s linear infinite',

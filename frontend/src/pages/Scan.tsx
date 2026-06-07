@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import clsx from 'clsx';
 import { OCRScanner } from '@/components/ocr/OCRScanner';
@@ -36,6 +36,8 @@ const scanTraits = [
 
 export const Scan: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('group');
   const { result, error, setResult } = useOCRStore();
   const { setBillTotal } = useSplitStore();
   const [reviewTotal, setReviewTotal] = useState('');
@@ -61,8 +63,14 @@ export const Scan: React.FC = () => {
   const handleProceed = () => {
     const total = Number.parseFloat(reviewTotal);
     if (Number.isFinite(total) && total > 0) {
-      setBillTotal(Math.round(total * 100) / 100);
-      navigate('/split');
+      const rounded = Math.round(total * 100) / 100;
+      if (groupId) {
+        // Came from a group — go straight to AddExpense with amount + group pre-filled
+        navigate(`/expenses/new?group=${groupId}&amount=${rounded}`);
+      } else {
+        setBillTotal(rounded);
+        navigate('/split');
+      }
     }
   };
 

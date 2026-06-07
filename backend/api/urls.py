@@ -40,6 +40,7 @@ urlpatterns = [
     path("groups/<uuid:group_id>/members/", views.GroupMemberView.as_view(), name="group-member-add"),
     path("groups/<uuid:group_id>/members/<uuid:user_id>/", views.GroupMemberView.as_view(), name="group-member-remove"),
     path("groups/<uuid:group_id>/balances/", views.GroupBalanceView.as_view(), name="group-balances"),
+    path("groups/<uuid:group_id>/chat/", views.GroupChatView.as_view(), name="group-chat"),
 
     # Expenses
     path("expenses/", views.ExpenseListView.as_view(), name="expense-list"),
@@ -54,4 +55,7 @@ urlpatterns = [
 
     # Activity
     path("activity/", views.ActivityFeedView.as_view(), name="activity"),
+
+    # AI Chat
+    path("ai/chat/", views.AIChatView.as_view(), name="ai-chat"),
 ]

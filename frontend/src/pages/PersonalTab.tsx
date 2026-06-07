@@ -42,7 +42,7 @@ export const PersonalTab: React.FC = () => {
         <h1 className="font-display text-3xl font-extrabold" style={{ color: 'var(--text)' }}>Personal</h1>
         <Link
           to="/expenses/new"
-          className="flex items-center gap-1.5 rounded-2xl bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-button transition active:scale-95"
+          className="flex items-center gap-1.5 rounded-2xl bg-accent-500 px-4 py-2 text-sm font-bold text-white shadow-button transition active:scale-95"
         >
           <PlusIcon className="h-4 w-4" />
           Add Expense

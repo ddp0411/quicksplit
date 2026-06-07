@@ -135,7 +135,7 @@ export const CreateGroup: React.FC = () => {
 
             <button
               onClick={() => { if (name.trim()) { setError(''); setStep(2); } else setError('Enter a group name'); }}
-              className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+              className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
             >
               Continue
             </button>
@@ -205,7 +205,7 @@ export const CreateGroup: React.FC = () => {
 
             <button
               onClick={() => setStep(3)}
-              className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700"
+              className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600"
             >
               {memberEmails.length > 0 ? `Continue with ${memberEmails.length} member${memberEmails.length > 1 ? 's' : ''}` : 'Skip for now'}
             </button>
@@ -295,7 +295,7 @@ export const CreateGroup: React.FC = () => {
             <button
               onClick={() => createMutation.mutate()}
               disabled={createMutation.isPending}
-              className="w-full rounded-2xl bg-primary-600 py-3.5 text-sm font-bold text-white transition hover:bg-primary-700 disabled:opacity-60"
+              className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white transition hover:bg-accent-600 disabled:opacity-60"
             >
               {createMutation.isPending ? 'Creating…' : '🚀 Create Group'}
             </button>

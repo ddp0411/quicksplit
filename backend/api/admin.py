@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User, SplitGroup, GroupMember, Expense, ExpenseShare,
-    Settlement, Comment, Friendship, Split, Participant, DatasetEntry
+    Settlement, Comment, Friendship, Split, Participant, DatasetEntry, GroupMessage
 )
 
 
@@ -135,3 +135,15 @@ class DatasetEntryAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'ocr_text')
     readonly_fields = ('id', 'image_hash', 'created_at')
     date_hierarchy = 'created_at'
+
+
+@admin.register(GroupMessage)
+class GroupMessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'group', 'user', 'content_preview', 'created_at')
+    search_fields = ('user__email', 'group__name', 'content')
+    readonly_fields = ('id', 'created_at')
+    date_hierarchy = 'created_at'
+
+    def content_preview(self, obj):
+        return obj.content[:60] + '…' if len(obj.content) > 60 else obj.content
+    content_preview.short_description = 'Message'

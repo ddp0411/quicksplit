@@ -1,0 +1,144 @@
+import React, { useState } from 'react';
+import {
+  View, Text, FlatList, TouchableOpacity,
+  StyleSheet, RefreshControl,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { groupsAPI, type Group } from '../services/api/groupsAPI';
+import { formatCurrency } from '../utils/upi';
+
+const CATEGORY: Record<string, { emoji: string; color: string }> = {
+  home:    { emoji: '🏠', color: '#10B981' },
+  trip:    { emoji: '✈️', color: '#6366F1' },
+  couple:  { emoji: '💑', color: '#EC4899' },
+  work:    { emoji: '💼', color: '#F59E0B' },
+  other:   { emoji: '🎉', color: '#1B4332' },
+};
+
+function avatarInitials(name: string) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function MemberDots({ count, color }: { count: number; color: string }) {
+  const dots = Math.min(count, 4);
+  return (
+    <View style={s.dots}>
+      {Array.from({ length: dots }).map((_, i) => (
+        <View key={i} style={[s.dot, { backgroundColor: color, marginLeft: i === 0 ? 0 : -8, zIndex: dots - i }]}>
+          <Text style={s.dotText}>{String.fromCharCode(65 + i)}</Text>
+        </View>
+      ))}
+      {count > 4 && (
+        <View style={[s.dot, { backgroundColor: '#9CA3AF', marginLeft: -8 }]}>
+          <Text style={s.dotText}>+{count - 4}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+export const GroupsScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const { data: groups = [], isLoading, refetch } = useQuery({
+    queryKey: ['groups'],
+    queryFn: groupsAPI.getGroups,
+  });
+
+  return (
+    <SafeAreaView style={s.safe}>
+      <View style={s.header}>
+        <Text style={s.title}>Groups</Text>
+        <TouchableOpacity style={s.addBtn} onPress={() => navigation.navigate('CreateGroup')}>
+          <Text style={s.addBtnText}>+ New</Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={groups as Group[]}
+        keyExtractor={item => item.id}
+        contentContainerStyle={s.list}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#1B4332" />}
+        ListEmptyComponent={
+          !isLoading ? (
+            <View style={s.empty}>
+              <Text style={s.emptyEmoji}>🏝️</Text>
+              <Text style={s.emptyTitle}>No groups yet</Text>
+              <Text style={s.emptySub}>Create a group to start splitting with friends</Text>
+              <TouchableOpacity style={s.emptyBtn} onPress={() => navigation.navigate('CreateGroup')}>
+                <Text style={s.emptyBtnText}>Create group</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null
+        }
+        renderItem={({ item: g }) => {
+          const cat = CATEGORY[g.category] ?? CATEGORY.other;
+          const settled = Math.abs(g.your_balance) < 0.01;
+          return (
+            <TouchableOpacity
+              style={s.card}
+              onPress={() => navigation.navigate('GroupDetail', { groupId: g.id })}
+              activeOpacity={0.8}
+            >
+              <View style={[s.catBadge, { backgroundColor: cat.color + '22' }]}>
+                <Text style={s.catEmoji}>{cat.emoji}</Text>
+              </View>
+              <View style={s.cardBody}>
+                <Text style={s.groupName}>{g.name}</Text>
+                <View style={s.cardMeta}>
+                  <MemberDots count={g.member_count} color={cat.color} />
+                  <Text style={s.memberCount}>{g.member_count} member{g.member_count !== 1 ? 's' : ''}</Text>
+                </View>
+              </View>
+              {settled ? (
+                <View style={s.settledChip}>
+                  <Text style={s.settledText}>Settled</Text>
+                </View>
+              ) : g.your_balance > 0 ? (
+                <View style={s.owedChip}>
+                  <Text style={s.owedText}>+{formatCurrency(g.your_balance)}</Text>
+                </View>
+              ) : (
+                <View style={s.oweChip}>
+                  <Text style={s.oweText}>-{formatCurrency(Math.abs(g.your_balance))}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </SafeAreaView>
+  );
+};
+
+const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: '#FFFDF9' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
+  title: { fontSize: 24, fontWeight: '800', color: '#111827', fontFamily: 'PlayfairDisplay_700Bold' },
+  addBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
+  addBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  list: { paddingHorizontal: 20, paddingBottom: 100 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#E7E5E4', padding: 14, marginBottom: 10 },
+  catBadge: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  catEmoji: { fontSize: 22 },
+  cardBody: { flex: 1 },
+  groupName: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 4 },
+  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  dots: { flexDirection: 'row' },
+  dot: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#FFFFFF' },
+  dotText: { color: '#FFFFFF', fontSize: 8, fontWeight: '700' },
+  memberCount: { fontSize: 12, color: '#6B7280' },
+  settledChip: { backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  settledText: { fontSize: 11, fontWeight: '700', color: '#6B7280' },
+  owedChip: { backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  owedText: { fontSize: 11, fontWeight: '700', color: '#16A34A' },
+  oweChip: { backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  oweText: { fontSize: 11, fontWeight: '700', color: '#DC2626' },
+  empty: { alignItems: 'center', paddingTop: 80 },
+  emptyEmoji: { fontSize: 52, marginBottom: 16 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
+  emptySub: { fontSize: 14, color: '#6B7280', textAlign: 'center', maxWidth: 260, marginBottom: 24 },
+  emptyBtn: { backgroundColor: '#FF6B35', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
+});

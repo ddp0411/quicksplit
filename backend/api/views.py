@@ -6,7 +6,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Avg, Count, Q
+from django.db.models import Avg, Count, Q, Sum
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import parsers, permissions, status
@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import (
     Comment, DatasetEntry, Expense, ExpenseShare, Friendship,
-    GroupMember, Participant, Settlement, Split, SplitGroup, User,
+    GroupMember, GroupMessage, Participant, Settlement, Split, SplitGroup, User,
 )
 from api.serializers import (
     AddFriendSerializer, AddGroupMemberSerializer,
@@ -26,7 +26,7 @@ from api.serializers import (
     ExpenseListSerializer, ExpenseSerializer, FriendshipSerializer,
     GroupBalanceSerializer, LoginSerializer, OCRResultSerializer,
     OCRUploadSerializer, OCRValidationResponseSerializer, OCRValidationSerializer,
-    OverallBalanceSerializer, ParticipantPaymentResponseSerializer,
+    GroupMessageSerializer, OverallBalanceSerializer, ParticipantPaymentResponseSerializer,
     RegisterSerializer, SettlementSerializer,
     SimplifiedDebtSerializer, SplitCreateSerializer, SplitGroupDetailSerializer,
     SplitGroupSerializer, SplitHistoryItemSerializer, SplitResponseSerializer,
@@ -754,6 +754,29 @@ class ExpenseCommentView(APIView):
         return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 
 
+class GroupChatView(APIView):
+    """GET/POST /groups/{group_id}/chat/"""
+
+    def get(self, request, group_id):
+        if not GroupMember.objects.filter(group_id=group_id, user=request.user).exists():
+            return Response({"detail": "Not a group member."}, status=status.HTTP_403_FORBIDDEN)
+        messages = GroupMessage.objects.filter(group_id=group_id).select_related("user")
+        return Response(GroupMessageSerializer(messages, many=True).data)
+
+    def post(self, request, group_id):
+        if not GroupMember.objects.filter(group_id=group_id, user=request.user).exists():
+            return Response({"detail": "Not a group member."}, status=status.HTTP_403_FORBIDDEN)
+        content = request.data.get("content", "").strip()
+        if not content:
+            return Response({"detail": "Message cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            group = SplitGroup.objects.get(pk=group_id)
+        except SplitGroup.DoesNotExist:
+            return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
+        msg = GroupMessage.objects.create(group=group, user=request.user, content=content)
+        return Response(GroupMessageSerializer(msg).data, status=status.HTTP_201_CREATED)
+
+
 # ─── Balances ─────────────────────────────────────────────────────────────────
 
 class OverallBalanceView(APIView):
@@ -891,3 +914,78 @@ class ActivityFeedView(APIView):
 
         activity.sort(key=lambda x: x["created_at"], reverse=True)
         return Response(activity[:limit])
+
+
+# ─── AI Chat ──────────────────────────────────────────────────────────────────
+
+class AIChatView(APIView):
+    """POST /ai/chat/ — multi-provider AI assistant with user expense context"""
+
+    def post(self, request):
+        messages = request.data.get("messages", [])
+        if not messages:
+            return Response({"error": "No messages provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Build expense context for the system prompt
+        expenses = (
+            Expense.objects
+            .filter(Q(paid_by=request.user) | Q(shares__user=request.user))
+            .distinct()
+            .order_by("-date")[:20]
+        )
+        total_spent = sum(float(e.amount) for e in expenses)
+        top_cat = (
+            expenses.values("category")
+            .annotate(total=Sum("amount"))
+            .order_by("-total")
+            .first()
+        )
+
+        system = (
+            "You are QuickSplit AI, a friendly personal finance assistant embedded in a bill-splitting app. "
+            f"User context: ₹{total_spent:.0f} tracked across {len(expenses)} expenses. "
+            f"Top spending category: {top_cat['category'] if top_cat else 'none'}. "
+            "Keep answers concise (2-3 sentences). Use ₹ for Indian Rupees. Be friendly and practical."
+        )
+
+        anthropic_key = getattr(settings, "ANTHROPIC_API_KEY", "")
+        openai_key = getattr(settings, "OPENAI_API_KEY", "")
+        groq_key = getattr(settings, "GROQ_API_KEY", "")
+
+        try:
+            if anthropic_key:
+                import anthropic as ac
+                client = ac.Anthropic(api_key=anthropic_key)
+                resp = client.messages.create(
+                    model="claude-haiku-4-5-20251001",
+                    max_tokens=300,
+                    system=system,
+                    messages=messages,
+                )
+                reply = resp.content[0].text
+
+            elif openai_key or groq_key:
+                from openai import OpenAI
+                use_groq = groq_key and not openai_key
+                client = OpenAI(
+                    api_key=groq_key if use_groq else openai_key,
+                    base_url="https://api.groq.com/openai/v1" if use_groq else None,
+                )
+                model = "llama3-8b-8192" if use_groq else "gpt-4o-mini"
+                resp = client.chat.completions.create(
+                    model=model,
+                    max_tokens=300,
+                    messages=[{"role": "system", "content": system}] + messages,
+                )
+                reply = resp.choices[0].message.content
+
+            else:
+                return Response(
+                    {"error": "No AI API key configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY to backend/.env"},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
+
+        except Exception as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"reply": reply})

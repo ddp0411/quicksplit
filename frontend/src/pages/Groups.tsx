@@ -17,6 +17,37 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type BalanceFilter = 'None' | 'Outstanding' | 'You owe' | 'Owe you';
 
+const AVATAR_COLORS = ['#1B4332', '#FF6B35', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6', '#0EA5E9', '#EC4899'];
+
+function avatarColorFromIndex(groupId: string, idx: number): string {
+  const seed = groupId.charCodeAt(idx % groupId.length) + idx * 7;
+  return AVATAR_COLORS[seed % AVATAR_COLORS.length];
+}
+
+function MemberAvatarStack({ memberCount, groupId }: { memberCount: number; groupId: string }) {
+  const show = Math.min(memberCount, 4);
+  const extra = memberCount - show;
+  return (
+    <div className="flex items-center">
+      {Array.from({ length: show }).map((_, i) => (
+        <div
+          key={i}
+          className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1A2E22] flex items-center justify-center text-[9px] font-bold text-white shadow-sm"
+          style={{ background: avatarColorFromIndex(groupId, i), marginLeft: i === 0 ? 0 : '-6px', zIndex: show - i }}
+        />
+      ))}
+      {extra > 0 && (
+        <div
+          className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1A2E22] flex items-center justify-center text-[9px] font-bold text-white shadow-sm bg-slate-400"
+          style={{ marginLeft: '-6px' }}
+        >
+          +{extra}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CATEGORY_META: Record<string, { emoji: string; label: string; gradient: string }> = {
   home:   { emoji: '🏠', label: 'Home',   gradient: 'from-sky-500 to-sky-700' },
   trip:   { emoji: '✈️', label: 'Trip',   gradient: 'from-amber-500 to-amber-700' },
@@ -49,9 +80,12 @@ function GroupCard({ group }: { group: Group }) {
         {/* Info */}
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold text-sm" style={{ color: 'var(--text)' }}>{group.name}</p>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-            {meta.label} · {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
-          </p>
+          <div className="mt-1 flex items-center gap-2">
+            <MemberAvatarStack memberCount={group.member_count} groupId={group.id} />
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              {group.member_count} {group.member_count === 1 ? 'member' : 'members'}
+            </p>
+          </div>
         </div>
 
         {/* Balance chip */}

@@ -115,7 +115,7 @@ export const Home: React.FC = () => {
       <div className="mx-auto max-w-lg space-y-4 pb-24">
 
         {/* Hero — greeting + daily quote */}
-        <div className="rounded-3xl bg-gradient-to-br from-primary-600 to-primary-800 p-6 shadow-button">
+        <div className="rounded-3xl p-6 shadow-green" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #163829 100%)' }}>
           <div className="mb-4 flex items-start justify-between">
             <p className="font-display text-xl font-extrabold text-white">
               {user ? getGreeting(user.name) : 'Welcome 👋'}
@@ -130,41 +130,69 @@ export const Home: React.FC = () => {
           </blockquote>
         </div>
 
-        {/* Balance summary */}
-        <div className="card overflow-hidden p-0">
+        {/* Balance hero card — dark forest green, moodboard style */}
+        <div className="rounded-3xl p-5 shadow-green" style={{ background: '#1B4332' }}>
           {balanceLoading ? (
-            <div className="grid grid-cols-3">
-              {[0, 1, 2].map(i => (
-                <div key={i} className="flex flex-col gap-1.5 px-4 py-3">
-                  <div className="h-2.5 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                  <div className="h-5 w-12 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                </div>
-              ))}
+            <div className="space-y-2">
+              <div className="h-3 w-24 animate-pulse rounded bg-white/20" />
+              <div className="h-8 w-40 animate-pulse rounded bg-white/20" />
+              <div className="h-8 w-28 animate-pulse rounded bg-white/10" />
             </div>
           ) : (
-            <div className="grid grid-cols-3 divide-x" style={{ borderColor: 'var(--border)' }}>
-              <div className="px-4 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Net</p>
-                <p className={`mt-0.5 text-base font-extrabold ${(balance?.net_balance ?? 0) >= 0 ? 'text-positive' : 'text-negative'}`}>
-                  {(balance?.net_balance ?? 0) >= 0 ? '+' : ''}{formatCurrency(balance?.net_balance ?? 0)}
-                </p>
+            <>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-white/60">
+                    {(balance?.total_owed_to_you ?? 0) > 0 ? 'You are owed' : (balance?.total_you_owe ?? 0) > 0 ? 'You owe' : 'All settled up'}
+                  </p>
+                  <p className="mt-1 font-display text-3xl font-extrabold text-white">
+                    {(balance?.total_owed_to_you ?? 0) > 0
+                      ? formatCurrency(balance?.total_owed_to_you ?? 0)
+                      : (balance?.total_you_owe ?? 0) > 0
+                        ? formatCurrency(balance?.total_you_owe ?? 0)
+                        : '₹0.00'}
+                  </p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10">
+                  <span className="text-lg">💼</span>
+                </div>
               </div>
-              <div className="px-4 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Owed to you</p>
-                <p className="mt-0.5 text-base font-extrabold text-positive">{formatCurrency(balance?.total_owed_to_you ?? 0)}</p>
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold text-white/50">Net</p>
+                    <p className={`text-sm font-extrabold ${(balance?.net_balance ?? 0) >= 0 ? 'text-positive' : 'text-negative'}`}>
+                      {(balance?.net_balance ?? 0) >= 0 ? '+' : ''}{formatCurrency(balance?.net_balance ?? 0)}
+                    </p>
+                  </div>
+                  <div className="w-px bg-white/10" />
+                  <div>
+                    <p className="text-[10px] font-semibold text-white/50">Owe you</p>
+                    <p className="text-sm font-extrabold text-positive">{formatCurrency(balance?.total_owed_to_you ?? 0)}</p>
+                  </div>
+                  <div className="w-px bg-white/10" />
+                  <div>
+                    <p className="text-[10px] font-semibold text-white/50">You owe</p>
+                    <p className="text-sm font-extrabold text-negative">{formatCurrency(balance?.total_you_owe ?? 0)}</p>
+                  </div>
+                </div>
+                {(balance?.total_you_owe ?? 0) > 0 && (
+                  <button
+                    onClick={() => navigate('/settle-up')}
+                    className="rounded-xl bg-accent-500 px-3 py-1.5 text-xs font-bold text-white shadow-button transition hover:bg-accent-600"
+                  >
+                    Settle up now →
+                  </button>
+                )}
               </div>
-              <div className="px-4 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>You owe</p>
-                <p className="mt-0.5 text-base font-extrabold text-negative">{formatCurrency(balance?.total_you_owe ?? 0)}</p>
-              </div>
-            </div>
+            </>
           )}
         </div>
 
         {/* Quick actions */}
         <div className="grid grid-cols-4 gap-2">
           {[
-            { emoji: '➕', label: 'Add', bg: 'bg-primary-600 hover:bg-primary-700', route: '/expenses/new' },
+            { emoji: '➕', label: 'Add', bg: 'bg-accent-500 hover:bg-accent-600', route: '/expenses/new' },
             { emoji: '📷', label: 'Scan', bg: 'bg-amber-500 hover:bg-amber-600', route: '/scan' },
             { emoji: '💸', label: 'Settle', bg: 'bg-emerald-500 hover:bg-emerald-600', route: '/settle-up' },
             { emoji: '👤', label: 'Friend', bg: 'bg-violet-500 hover:bg-violet-600', route: '/friends/add' },
@@ -284,7 +312,7 @@ export const Home: React.FC = () => {
                   <span className="text-sm font-extrabold text-negative">{formatCurrency(Math.abs(f.balance))}</span>
                   <button
                     onClick={() => navigate(`/settle-up/${f.user.id}`)}
-                    className="rounded-xl bg-primary-600 px-2.5 py-1 text-[10px] font-bold text-white transition hover:bg-primary-700"
+                    className="rounded-xl bg-accent-500 px-2.5 py-1 text-[10px] font-bold text-white transition hover:bg-accent-600"
                   >
                     Settle →
                   </button>
@@ -348,7 +376,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* AI insight */}
-        <div className="rounded-3xl bg-gradient-to-br from-primary-600 to-primary-800 p-5">
+        <div className="rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #163829 100%)' }}>
           <div className="mb-3 flex items-center gap-2">
             <SparklesIcon className="h-4 w-4 text-white/80" />
             <p className="text-xs font-bold uppercase tracking-wide text-white/80">AI Insight</p>

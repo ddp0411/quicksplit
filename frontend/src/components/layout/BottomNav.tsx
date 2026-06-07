@@ -72,7 +72,7 @@ export const BottomNav: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowAction(true)}
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 shadow-button transition-transform active:scale-95"
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-500 shadow-button transition-transform active:scale-95"
             >
               <PlusIcon className="h-6 w-6 text-white" />
             </button>
