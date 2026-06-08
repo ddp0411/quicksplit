@@ -74,6 +74,7 @@ export const RegisterScreen: React.FC = () => {
   const { colors } = useTheme();
   const s = createStyles(colors);
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -87,11 +88,17 @@ export const RegisterScreen: React.FC = () => {
   const handleSubmit = () => {
     setLocalError('');
     if (!name.trim()) { setLocalError('Please enter your name'); return; }
-    if (!email.trim().includes('@')) { setLocalError('Enter a valid email'); return; }
+    if (!/^[6-9]\d{9}$/.test(phone.trim())) { setLocalError('Enter a valid 10-digit mobile number (must start with 6–9)'); return; }
+    if (email.trim() && !email.trim().includes('@')) { setLocalError('Enter a valid email address'); return; }
     if (password.length < 6) { setLocalError('Password must be at least 6 characters'); return; }
     if (password !== confirmPassword) { setLocalError('Passwords do not match'); return; }
     if (!agree) { setLocalError('Please accept the terms to continue'); return; }
-    registerUser({ name: name.trim(), email: email.trim().toLowerCase(), password });
+    registerUser({
+      phone_number: phone.trim(),
+      name: name.trim(),
+      email: email.trim().toLowerCase() || undefined,
+      password,
+    });
   };
 
   return (
@@ -119,9 +126,17 @@ export const RegisterScreen: React.FC = () => {
               placeholder="Rohan Mehta" placeholderTextColor="#9CA3AF" autoCapitalize="words" autoCorrect={false} />
           </View>
 
-          {/* Email */}
+          {/* Phone number */}
           <View style={s.fieldGroup}>
-            <Text style={s.label}>Email</Text>
+            <Text style={s.label}>Phone number</Text>
+            <TextInput style={s.input} value={phone} onChangeText={setPhone}
+              placeholder="10-digit mobile number" placeholderTextColor="#9CA3AF"
+              keyboardType="phone-pad" maxLength={10} autoCorrect={false} />
+          </View>
+
+          {/* Email (optional) */}
+          <View style={s.fieldGroup}>
+            <Text style={s.label}>Email <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>(optional)</Text></Text>
             <TextInput style={s.input} value={email} onChangeText={setEmail}
               placeholder="you@example.com" placeholderTextColor="#9CA3AF"
               keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />

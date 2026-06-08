@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch,
   Share, Alert, TextInput, Modal, FlatList, Animated,
-  Image, Platform,
+  Image, Platform, ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,10 +10,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Camera, CameraView } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import QRCode from 'react-native-qrcode-svg';
 import { groupsAPI } from '../services/api/groupsAPI';
 import { expensesAPI, EXPENSE_CATEGORIES } from '../services/api/expensesAPI';
 import { ocrAPI } from '../services/api/ocrAPI';
+import { splitAPI } from '../services/api/splitAPI';
 import { useUserStore } from '../state/userStore';
 import { useToastStore } from '../state/toastStore';
 import { useThemeStore } from '../state/themeStore';
@@ -758,13 +760,35 @@ function createNsStyles(c: C) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Security Settings
 // ─────────────────────────────────────────────────────────────────────────────
+function decodeJwtPayload(token: string): Record<string, any> | null {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(
+      atob(base64).split('').map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('')
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
 export const SecuritySettingsScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const { toast } = useToastStore();
   const { colors } = useTheme();
+  const { token, logout } = useUserStore();
   const s = createScStyles(colors);
   const [faceId, setFaceId] = useState(false);
   const [currentPwd, setCurrentPwd] = useState('');
   const [newPwd, setNewPwd] = useState('');
+
+  const sessionInfo = token ? decodeJwtPayload(token) : null;
+  const loginTime = sessionInfo?.iat
+    ? new Date(sessionInfo.iat * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : 'Unknown';
+  const expiryTime = sessionInfo?.exp
+    ? new Date(sessionInfo.exp * 1000).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    : 'Unknown';
 
   return (
     <SafeAreaView style={s.safe}>
@@ -814,9 +838,22 @@ export const SecuritySettingsScreen: React.FC = () => {
         <View style={s.section}>
           <Text style={s.sectionLabel}>Active Sessions</Text>
           <View style={s.sessionRow}>
-            <Text style={s.sessionDevice}>📱 This Device</Text>
-            <Text style={s.sessionBadge}>Current</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.sessionDevice}>📱 This Device — Current</Text>
+              <Text style={s.sessionMeta}>Logged in: {loginTime}</Text>
+              <Text style={s.sessionMeta}>Expires: {expiryTime}</Text>
+            </View>
+            <Text style={s.sessionBadge}>Active</Text>
           </View>
+          <TouchableOpacity
+            style={s.signOutAllBtn}
+            onPress={() => Alert.alert('Sign out all devices', 'This will log you out from all devices.', [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Sign out all', style: 'destructive', onPress: () => { logout(); navigation.navigate('Login'); } },
+            ])}
+          >
+            <Text style={s.signOutAllText}>Sign out all devices</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -835,9 +872,12 @@ function createScStyles(c: C) {
     input: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text, marginBottom: 10 },
     saveBtn: { backgroundColor: '#1B4332', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
     saveBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
-    sessionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14 },
-    sessionDevice: { fontSize: 14, color: c.text },
+    sessionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10 },
+    sessionDevice: { fontSize: 14, fontWeight: '700', color: c.text, marginBottom: 4 },
+    sessionMeta: { fontSize: 11, color: c.textMuted, marginTop: 2 },
     sessionBadge: { fontSize: 12, fontWeight: '700', color: c.successText, backgroundColor: c.successBg, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+    signOutAllBtn: { backgroundColor: '#FEF2F2', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: '#FECACA' },
+    signOutAllText: { fontSize: 14, fontWeight: '700', color: '#DC2626' },
   });
 }
 
@@ -1502,9 +1542,56 @@ function createRvStyles(c: C) {
 // Import Group Screen
 // ─────────────────────────────────────────────────────────────────────────────
 export const ImportGroupScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const { toast } = useToastStore();
   const { colors } = useTheme();
   const s = createIgStyles(colors);
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const [imported, setImported] = useState<{ name: string; count: number } | null>(null);
+
+  const handleSelectCSV = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['text/csv', 'text/comma-separated-values', 'application/csv', '*/*'],
+        copyToCacheDirectory: true,
+      });
+      if (result.canceled || !result.assets?.[0]) return;
+
+      const asset = result.assets[0];
+      setIsLoading(true);
+      const data = await groupsAPI.importGroup(asset.uri, asset.name);
+      setImported({ name: data.group.name, count: data.expenses_imported });
+      toast(data.message, 'success');
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+    } catch (err: any) {
+      toast(`Import failed: ${err?.response?.data?.error ?? err?.message ?? 'Unknown error'}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (imported) {
+    return (
+      <SafeAreaView style={s.safe}>
+        <ScreenHeader title="Import Group" />
+        <View style={s.successWrap}>
+          <Text style={s.successEmoji}>✅</Text>
+          <Text style={s.successTitle}>Import Complete!</Text>
+          <Text style={s.successSub}>
+            Created group "{imported.name}" with {imported.count} expense{imported.count !== 1 ? 's' : ''}.
+          </Text>
+          <TouchableOpacity style={s.btn} onPress={() => navigation.navigate('Groups')}>
+            <Text style={s.btnText}>View in Groups →</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={s.secondaryBtn} onPress={() => setImported(null)}>
+            <Text style={s.secondaryBtnText}>Import Another</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={s.safe}>
       <ScreenHeader title="Import Group" />
@@ -1515,15 +1602,28 @@ export const ImportGroupScreen: React.FC = () => {
           <Text style={s.heroSub}>Transfer your existing groups with all expenses and balances</Text>
         </View>
         <View style={s.stepsCard}>
-          {['Export your group from Splitwise as CSV', 'Choose the group CSV file', 'Map members to QuickSplit users', 'Review and confirm import'].map((step, i) => (
-            <View key={i} style={s.step}>
+          {[
+            'Open Splitwise → your group → Export as CSV',
+            'Tap "Select Group CSV" below and choose the file',
+            'QuickSplit creates the group and imports all expenses',
+            'Review the imported group in your Groups tab',
+          ].map((step, i) => (
+            <View key={i} style={[s.step, i < 3 && s.stepBorder]}>
               <View style={s.stepNum}><Text style={s.stepNumText}>{i + 1}</Text></View>
               <Text style={s.stepText}>{step}</Text>
             </View>
           ))}
         </View>
-        <TouchableOpacity style={s.btn} onPress={() => toast('Group import pipeline coming soon', 'info')}>
-          <Text style={s.btnText}>Select Group CSV</Text>
+        <View style={s.formatNote}>
+          <Text style={s.formatNoteText}>
+            Supports Splitwise CSV format (Date, Description, Category, Cost, Currency, members…)
+          </Text>
+        </View>
+        <TouchableOpacity style={[s.btn, isLoading && s.btnDisabled]} onPress={handleSelectCSV} disabled={isLoading}>
+          {isLoading
+            ? <ActivityIndicator color="#FFFFFF" />
+            : <Text style={s.btnText}>📂  Select Group CSV</Text>
+          }
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -1538,13 +1638,87 @@ function createIgStyles(c: C) {
     heroEmoji: { fontSize: 52, marginBottom: 12 },
     heroTitle: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold', textAlign: 'center' },
     heroSub: { fontSize: 14, color: c.textSub, textAlign: 'center', marginTop: 6, maxWidth: 280 },
-    stepsCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 20 },
-    step: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
-    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center' },
+    stepsCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 16 },
+    step: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingBottom: 16 },
+    stepBorder: { borderBottomWidth: 1, borderBottomColor: c.cardBorder, marginBottom: 16 },
+    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     stepNumText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-    stepText: { flex: 1, fontSize: 14, color: c.sectionLabel },
-    btn: { backgroundColor: '#1B4332', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+    stepText: { flex: 1, fontSize: 14, color: c.sectionLabel, lineHeight: 20, paddingTop: 4 },
+    formatNote: { backgroundColor: '#FFF7ED', borderRadius: 12, borderWidth: 1, borderColor: '#FED7AA', padding: 12, marginBottom: 20 },
+    formatNoteText: { fontSize: 12, color: '#92400E', textAlign: 'center', lineHeight: 18 },
+    btn: { backgroundColor: '#FF6B35', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 12 },
+    btnDisabled: { opacity: 0.6 },
     btnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+    successWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
+    successEmoji: { fontSize: 64, marginBottom: 20 },
+    successTitle: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold', marginBottom: 10, textAlign: 'center' },
+    successSub: { fontSize: 15, color: c.textSub, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
+    secondaryBtn: { backgroundColor: c.pillBg, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 32, alignItems: 'center' },
+    secondaryBtnText: { color: c.text, fontSize: 15, fontWeight: '600' },
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OCR History Screen
+// ─────────────────────────────────────────────────────────────────────────────
+export const OCRHistoryScreen: React.FC = () => {
+  const { colors } = useTheme();
+  const s = createOhStyles(colors);
+
+  const { data: splits = [], isLoading } = useQuery({
+    queryKey: ['splits-history'],
+    queryFn: splitAPI.getUserSplits,
+  });
+
+  return (
+    <SafeAreaView style={s.safe}>
+      <ScreenHeader title="Scan History" />
+      {isLoading ? (
+        <View style={s.loadingBox}>
+          <Text style={s.loadingText}>Loading…</Text>
+        </View>
+      ) : (splits as any[]).length === 0 ? (
+        <View style={s.empty}>
+          <Text style={s.emptyEmoji}>📄</Text>
+          <Text style={s.emptyTitle}>No scans yet</Text>
+          <Text style={s.emptySub}>Receipts you scan will appear here</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={splits as any[]}
+          keyExtractor={(item) => item.split_id}
+          contentContainerStyle={s.list}
+          renderItem={({ item }) => (
+            <View style={s.row}>
+              <View style={s.iconBox}><Text style={{ fontSize: 20 }}>🧾</Text></View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.rowTitle}>Receipt Split</Text>
+                <Text style={s.rowMeta}>{item.participant_count} participants · {formatDate(item.created_at)}</Text>
+              </View>
+              <Text style={s.rowAmount}>{formatCurrency(item.total_amount)}</Text>
+            </View>
+          )}
+        />
+      )}
+    </SafeAreaView>
+  );
+};
+
+function createOhStyles(c: C) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: c.bg },
+    loadingBox: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    loadingText: { fontSize: 15, color: c.textMuted },
+    empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
+    emptyEmoji: { fontSize: 52, marginBottom: 12 },
+    emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
+    emptySub: { fontSize: 14, color: c.textMuted, textAlign: 'center' },
+    list: { paddingHorizontal: 20, paddingBottom: 100 },
+    row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
+    iconBox: { width: 42, height: 42, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    rowTitle: { fontSize: 14, fontWeight: '700', color: c.text },
+    rowMeta: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+    rowAmount: { fontSize: 15, fontWeight: '800', color: '#1B4332' },
   });
 }
 

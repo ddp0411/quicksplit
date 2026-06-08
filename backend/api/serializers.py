@@ -1,5 +1,8 @@
 import re
+import re as _re
 from decimal import Decimal
+
+INDIAN_PHONE_RE = _re.compile(r'^[6-9]\d{9}$')
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
@@ -17,51 +20,86 @@ UPI_RE = re.compile(r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$")
 class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "name", "is_active", "avatar_color", "upi_id", "created_at"]
+        fields = ["id", "email", "name", "is_active", "avatar_color", "upi_id", "phone_number", "created_at"]
 
 
 class UserMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "name", "avatar_color", "upi_id"]
+        fields = ["id", "email", "name", "avatar_color", "upi_id", "phone_number"]
 
 
 class RegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    name = serializers.CharField(min_length=2, max_length=100)
-    password = serializers.CharField(min_length=6, max_length=100, write_only=True)
+    phone_number = serializers.CharField()
+    name         = serializers.CharField(min_length=2, max_length=100)
+    password     = serializers.CharField(min_length=6, max_length=100, write_only=True)
+    email        = serializers.EmailField(required=False, allow_blank=True, default='')
+
+    def validate_phone_number(self, value):
+        value = value.strip().replace(' ', '').replace('-', '')
+        if not INDIAN_PHONE_RE.match(value):
+            raise serializers.ValidationError(
+                'Enter a valid 10-digit Indian mobile number (must start with 6, 7, 8, or 9)'
+            )
+        if User.objects.filter(phone_number=value).exists():
+            raise serializers.ValidationError('Phone number already registered')
+        return value
 
     def validate_email(self, value):
+        if not value:
+            return None
         email = value.lower().strip()
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError("Email already registered")
+            raise serializers.ValidationError('Email already registered')
         return email
 
     def create(self, validated_data):
-        email = validated_data["email"]
+        phone = validated_data['phone_number']
+        email = validated_data.get('email') or None
         user = User(
-            username=email,
+            username=phone,
+            phone_number=phone,
             email=email,
-            name=validated_data["name"],
-            first_name=validated_data["name"],
+            name=validated_data['name'],
+            first_name=validated_data['name'],
         )
-        user.set_password(validated_data["password"])
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    identifier = serializers.CharField()    # email OR phone number
+    password   = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs["username"].lower().strip()
-        user = authenticate(username=email, password=attrs["password"])
+        raw = attrs['identifier'].strip()
+        password = attrs['password']
+        user = None
+
+        if '@' in raw:
+            # Try email login
+            user = authenticate(username=raw.lower(), password=password)
+            if not user:
+                # Username may differ from email for older accounts
+                try:
+                    u = User.objects.get(email=raw.lower())
+                    user = authenticate(username=u.username, password=password)
+                except User.DoesNotExist:
+                    pass
+        else:
+            # Phone number login
+            try:
+                u = User.objects.get(phone_number=raw)
+                user = authenticate(username=u.username, password=password)
+            except User.DoesNotExist:
+                pass
+
         if not user:
-            raise serializers.ValidationError("Incorrect email or password")
+            raise serializers.ValidationError('Incorrect credentials')
         if not user.is_active:
-            raise serializers.ValidationError("Inactive user")
-        attrs["user"] = user
+            raise serializers.ValidationError('Inactive user')
+        attrs['user'] = user
         return attrs
 
 

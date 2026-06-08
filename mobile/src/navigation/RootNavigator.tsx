@@ -21,7 +21,7 @@ import {
   GroupDetailScreen, CreateGroupScreen, GroupInsightsScreen, ImportGroupScreen,
   AddExpenseScreen, ExpenseDetailScreen,
   BalancesScreen, ActivityScreen, SettleUpScreen,
-  ScanScreen, SplitScreen, ReviewScreen,
+  ScanScreen, SplitScreen, ReviewScreen, OCRHistoryScreen,
   AIChatScreen, BudgetDashboardScreen, SubscriptionTrackerScreen, SpendingInsightsScreen,
   EditProfileScreen, QRCodeScreen, AppearanceSettingsScreen, NotificationSettingsScreen,
   SecuritySettingsScreen, ProUpgradeScreen, ReferralScreen, ImportSplitwiseScreen,
@@ -64,9 +64,15 @@ function MainTabs() {
   );
 }
 
+const STACK_OPTIONS = {
+  headerShown: false,
+  animation: 'slide_from_right' as const,
+  animationDuration: 220,
+};
+
 function HomeStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="HomeMain" component={HomeScreen} />
       <Stack.Screen name="Activity" component={ActivityScreen} />
       <Stack.Screen name="Balances" component={BalancesScreen} />
@@ -76,13 +82,14 @@ function HomeStack() {
       <Stack.Screen name="Scan" component={ScanScreen} />
       <Stack.Screen name="Split" component={SplitScreen} />
       <Stack.Screen name="Review" component={ReviewScreen} />
+      <Stack.Screen name="OCRHistory" component={OCRHistoryScreen} />
     </Stack.Navigator>
   );
 }
 
 function FriendsStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="FriendsMain" component={FriendsScreen} />
       <Stack.Screen name="FriendDetail" component={FriendDetailScreen} />
       <Stack.Screen name="AddFriend" component={AddFriendScreen} />
@@ -92,7 +99,7 @@ function FriendsStack() {
 
 function GroupsStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="GroupsMain" component={GroupsScreen} />
       <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
       <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
@@ -104,7 +111,7 @@ function GroupsStack() {
 
 function PersonalStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="PersonalMain" component={PersonalScreen} />
       <Stack.Screen name="AIChat" component={AIChatScreen} />
       <Stack.Screen name="BudgetDashboard" component={BudgetDashboardScreen} />
@@ -116,7 +123,7 @@ function PersonalStack() {
 
 function AccountStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="AccountMain" component={AccountScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="QRCode" component={QRCodeScreen} />
@@ -133,7 +140,7 @@ function AccountStack() {
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />

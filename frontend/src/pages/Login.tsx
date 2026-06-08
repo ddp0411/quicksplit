@@ -6,7 +6,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export const Login: React.FC = () => {
   const { login, isLoggingIn, loginError } = useAuth();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
 
@@ -14,8 +14,8 @@ export const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) return;
-    login({ email: email.trim().toLowerCase(), password });
+    if (!identifier.trim() || !password) return;
+    login({ identifier: identifier.trim(), password });
   };
 
   return (
@@ -75,14 +75,14 @@ export const Login: React.FC = () => {
           )}
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Email</label>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Email or phone number</label>
             <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              type="text"
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
               className="input-field"
-              placeholder="you@example.com"
-              autoComplete="email"
+              placeholder="you@example.com or 9876543210"
+              autoComplete="username"
             />
           </div>
 
@@ -117,7 +117,7 @@ export const Login: React.FC = () => {
 
           <button
             type="submit"
-            disabled={isLoggingIn || !email || !password}
+            disabled={isLoggingIn || !identifier || !password}
             className="w-full rounded-2xl bg-accent-500 py-3.5 text-sm font-bold text-white shadow-button transition hover:bg-accent-600 disabled:opacity-60"
           >
             {isLoggingIn ? 'Signing in…' : 'Sign in'}

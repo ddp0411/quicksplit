@@ -5,18 +5,19 @@ from django.db import models
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, blank=True, null=True, default=None)
     name = models.CharField(max_length=100)
     avatar_color = models.CharField(max_length=7, default='#5b34cd')
     upi_id = models.CharField(max_length=100, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True, default='', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         if self.email:
             self.email = self.email.lower().strip()
-        if not self.username and self.email:
-            self.username = self.email
+        if not self.username:
+            self.username = self.phone_number or (self.email or '') or str(uuid.uuid4())
         super().save(*args, **kwargs)
 
 

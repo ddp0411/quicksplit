@@ -1,7 +1,7 @@
 import hashlib
 import json
 import time
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from django.conf import settings
@@ -89,7 +89,13 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if not serializer.is_valid():
-            detail = serializer.errors.get("email", serializer.errors)
+            # Return first meaningful error: phone_number > email > name > non_field > fallback
+            for key in ("phone_number", "email", "name", "non_field_errors"):
+                if key in serializer.errors:
+                    detail = serializer.errors[key]
+                    break
+            else:
+                detail = list(serializer.errors.values())[0]
             if isinstance(detail, list):
                 detail = detail[0]
             return Response({"detail": str(detail)}, status=status.HTTP_400_BAD_REQUEST)
@@ -119,10 +125,10 @@ class MeView(APIView):
 
     def patch(self, request):
         user = request.user
-        for field in ("name", "upi_id", "avatar_color"):
+        for field in ("name", "upi_id", "avatar_color", "phone_number"):
             if field in request.data:
                 setattr(user, field, request.data[field])
-        user.save(update_fields=["name", "upi_id", "avatar_color", "updated_at"])
+        user.save(update_fields=["name", "upi_id", "avatar_color", "phone_number", "updated_at"])
         return Response(UserResponseSerializer(user).data)
 
 
@@ -738,18 +744,27 @@ class ExpenseDetailView(APIView):
 class ExpenseCommentView(APIView):
     """GET/POST /expenses/{expense_id}/comments/"""
 
+    def _has_access(self, request, expense_id):
+        paid_ids  = Expense.objects.filter(paid_by=request.user).values_list("id", flat=True)
+        share_ids = ExpenseShare.objects.filter(user=request.user).values_list("expense_id", flat=True)
+        return Expense.objects.filter(
+            Q(id__in=paid_ids) | Q(id__in=share_ids) | Q(created_by=request.user),
+            pk=expense_id,
+        ).exists()
+
     def get(self, request, expense_id):
+        if not self._has_access(request, expense_id):
+            return Response({"detail": "Expense not found."}, status=status.HTTP_404_NOT_FOUND)
         comments = Comment.objects.filter(expense_id=expense_id).select_related("user")
         return Response(CommentSerializer(comments, many=True).data)
 
     def post(self, request, expense_id):
+        if not self._has_access(request, expense_id):
+            return Response({"detail": "Expense not found."}, status=status.HTTP_404_NOT_FOUND)
         content = request.data.get("content", "").strip()
         if not content:
             return Response({"detail": "Comment cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            expense = Expense.objects.get(pk=expense_id)
-        except Expense.DoesNotExist:
-            return Response({"detail": "Expense not found."}, status=status.HTTP_404_NOT_FOUND)
+        expense = Expense.objects.get(pk=expense_id)
         comment = Comment.objects.create(expense=expense, user=request.user, content=content)
         return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
 
@@ -775,6 +790,86 @@ class GroupChatView(APIView):
             return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
         msg = GroupMessage.objects.create(group=group, user=request.user, content=content)
         return Response(GroupMessageSerializer(msg).data, status=status.HTTP_201_CREATED)
+
+
+# ─── Group Import ─────────────────────────────────────────────────────────────
+
+class GroupImportView(APIView):
+    """POST /groups/import/ — import a Splitwise CSV export as a new QuickSplit group"""
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+
+    def post(self, request):
+        import csv
+        import io
+        from datetime import datetime
+
+        csv_file = request.FILES.get('file')
+        if not csv_file:
+            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
+        content = csv_file.read().decode('utf-8', errors='ignore')
+        reader = csv.reader(io.StringIO(content))
+        rows = list(reader)
+        if len(rows) < 2:
+            return Response({"error": "CSV has no data rows."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Derive group name from filename (strip extension, title-case)
+        raw_name = csv_file.name.rsplit('.', 1)[0]
+        group_name = raw_name.replace('-', ' ').replace('_', ' ').title() or "Imported Group"
+
+        cat_map = {
+            'food': 'food', 'groceries': 'food', 'restaurant': 'food',
+            'transport': 'transport', 'transportation': 'transport',
+            'shopping': 'shopping', 'entertainment': 'entertainment',
+            'utilities': 'utilities', 'utilities & bills': 'utilities',
+        }
+
+        with transaction.atomic():
+            group = SplitGroup.objects.create(
+                name=group_name,
+                created_by=request.user,
+                category='other',
+            )
+            GroupMember.objects.create(group=group, user=request.user, role='admin')
+
+            expense_count = 0
+            for row in rows[1:]:
+                if len(row) < 4:
+                    continue
+                try:
+                    date_str = row[0].strip()
+                    description = row[1].strip()
+                    category = row[2].strip().lower() if len(row) > 2 else ''
+                    cost_str = row[3].strip() if len(row) > 3 else ''
+
+                    if not date_str or not description or not cost_str:
+                        continue
+                    expense_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                    cost = Decimal(cost_str)
+                    if cost <= 0:
+                        continue
+
+                    mapped_cat = cat_map.get(category, 'other')
+                    expense = Expense.objects.create(
+                        group=group,
+                        description=description,
+                        amount=cost,
+                        category=mapped_cat,
+                        paid_by=request.user,
+                        date=expense_date,
+                        split_type='equal',
+                    )
+                    ExpenseShare.objects.create(expense=expense, user=request.user, amount_owed=cost)
+                    expense_count += 1
+                except (ValueError, InvalidOperation):
+                    continue
+
+        return Response({
+            "group": {"id": str(group.id), "name": group.name},
+            "expenses_imported": expense_count,
+            "message": f"Imported {expense_count} expense{'s' if expense_count != 1 else ''} into '{group.name}'",
+        }, status=status.HTTP_201_CREATED)
 
 
 # ─── Balances ─────────────────────────────────────────────────────────────────
@@ -948,12 +1043,41 @@ class AIChatView(APIView):
             "Keep answers concise (2-3 sentences). Use ₹ for Indian Rupees. Be friendly and practical."
         )
 
+        groq_key = getattr(settings, "GROQ_API_KEY", "")
+        gemini_key = getattr(settings, "GEMINI_API_KEY", "")
         anthropic_key = getattr(settings, "ANTHROPIC_API_KEY", "")
         openai_key = getattr(settings, "OPENAI_API_KEY", "")
-        groq_key = getattr(settings, "GROQ_API_KEY", "")
 
         try:
-            if anthropic_key:
+            if groq_key:
+                # Primary: Groq (free tier, fast) — sign up at console.groq.com
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=groq_key,
+                    base_url="https://api.groq.com/openai/v1",
+                )
+                resp = client.chat.completions.create(
+                    model="llama-3.1-70b-versatile",
+                    max_tokens=300,
+                    messages=[{"role": "system", "content": system}] + messages,
+                )
+                reply = resp.choices[0].message.content
+
+            elif gemini_key:
+                # Secondary: Gemini 1.5 Flash (free tier) — get key at aistudio.google.com
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=gemini_key,
+                    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+                )
+                resp = client.chat.completions.create(
+                    model="gemini-1.5-flash",
+                    max_tokens=300,
+                    messages=[{"role": "system", "content": system}] + messages,
+                )
+                reply = resp.choices[0].message.content
+
+            elif anthropic_key:
                 import anthropic as ac
                 client = ac.Anthropic(api_key=anthropic_key)
                 resp = client.messages.create(
@@ -964,16 +1088,11 @@ class AIChatView(APIView):
                 )
                 reply = resp.content[0].text
 
-            elif openai_key or groq_key:
+            elif openai_key:
                 from openai import OpenAI
-                use_groq = groq_key and not openai_key
-                client = OpenAI(
-                    api_key=groq_key if use_groq else openai_key,
-                    base_url="https://api.groq.com/openai/v1" if use_groq else None,
-                )
-                model = "llama3-8b-8192" if use_groq else "gpt-4o-mini"
+                client = OpenAI(api_key=openai_key)
                 resp = client.chat.completions.create(
-                    model=model,
+                    model="gpt-4o-mini",
                     max_tokens=300,
                     messages=[{"role": "system", "content": system}] + messages,
                 )
@@ -981,7 +1100,7 @@ class AIChatView(APIView):
 
             else:
                 return Response(
-                    {"error": "No AI API key configured. Add ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY to backend/.env"},
+                    {"error": "No AI API key configured. Add GROQ_API_KEY (console.groq.com) or GEMINI_API_KEY (aistudio.google.com) to backend/.env — both are free."},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
 

@@ -8,14 +8,14 @@ from .models import (
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'name', 'username', 'is_staff', 'is_superuser', 'created_at')
+    list_display = ('email', 'name', 'username', 'phone_number', 'upi_id', 'is_staff', 'is_superuser', 'created_at')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
-    search_fields = ('email', 'name', 'username')
+    search_fields = ('email', 'name', 'username', 'phone_number')
     ordering = ('-created_at',)
     readonly_fields = ('id', 'created_at', 'updated_at')
     fieldsets = (
         (None, {'fields': ('id', 'username', 'email', 'password')}),
-        ('Personal', {'fields': ('name', 'avatar_color', 'upi_id')}),
+        ('Personal', {'fields': ('name', 'avatar_color', 'upi_id', 'phone_number')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Timestamps', {'fields': ('created_at', 'updated_at')}),
     )

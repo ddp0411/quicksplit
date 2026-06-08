@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, TextInput,
   StyleSheet, RefreshControl, Alert,
 } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,8 +11,10 @@ import { friendsAPI, type Friend } from '../services/api/friendsAPI';
 import { balancesAPI } from '../services/api/balancesAPI';
 import { FilterSheet, type FilterOption } from '../components/FilterSheet';
 import { SkeletonFriendRow } from '../components/SkeletonLoader';
+import { EmptyState } from '../components/EmptyState';
 import { formatCurrency } from '../utils/upi';
 import { useTheme } from '../theme/useTheme';
+import { useToastStore } from '../state/toastStore';
 
 type C = ReturnType<typeof useTheme>['colors'];
 
@@ -26,14 +29,65 @@ const FILTER_OPTIONS: FilterOption[] = [
   { label: 'You owe them', value: 'you_owe' },
 ];
 
+function SwipeActions({
+  f,
+  onClose,
+  onAdd,
+  onSettle,
+  onRemind,
+  onRemove,
+  c,
+}: {
+  f: Friend;
+  onClose: () => void;
+  onAdd: () => void;
+  onSettle: () => void;
+  onRemind: () => void;
+  onRemove: () => void;
+  c: ReturnType<typeof useTheme>['colors'];
+}) {
+  const s = createSwipeStyles(c);
+  const actions = [
+    { label: '➕', sublabel: 'Add', onPress: onAdd, bg: '#1B4332' },
+    { label: '💸', sublabel: 'Settle', onPress: onSettle, bg: '#FF6B35' },
+    { label: '🔔', sublabel: 'Remind', onPress: onRemind, bg: '#D97706' },
+    { label: '✕', sublabel: 'Remove', onPress: onRemove, bg: '#DC2626' },
+  ];
+  return (
+    <View style={s.actionsRow}>
+      {actions.map((a) => (
+        <TouchableOpacity
+          key={a.sublabel}
+          style={[s.actionBtn, { backgroundColor: a.bg }]}
+          onPress={() => { onClose(); a.onPress(); }}
+        >
+          <Text style={s.actionEmoji}>{a.label}</Text>
+          <Text style={s.actionLabel}>{a.sublabel}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+function createSwipeStyles(c: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    actionsRow: { flexDirection: 'row', alignItems: 'stretch', marginBottom: 8, borderRadius: 16, overflow: 'hidden' },
+    actionBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 12, minWidth: 60 },
+    actionEmoji: { fontSize: 16, marginBottom: 2 },
+    actionLabel: { fontSize: 9, fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.3 },
+  });
+}
+
 export const FriendsScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const queryClient = useQueryClient();
   const { colors } = useTheme();
+  const { toast } = useToastStore();
   const s = createStyles(colors);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [showFilter, setShowFilter] = useState(false);
+  const swipeRefs = useRef<Record<string, Swipeable | null>>({});
 
   const { data: friends = [], isLoading, refetch } = useQuery({
     queryKey: ['friends'],
@@ -160,55 +214,66 @@ export const FriendsScreen: React.FC = () => {
           contentContainerStyle={s.list}
           refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#1B4332" />}
           ListEmptyComponent={
-            <View style={s.empty}>
-              <Text style={s.emptyEmoji}>👥</Text>
-              <Text style={s.emptyTitle}>{search || filter !== 'all' ? 'No results' : 'No friends yet'}</Text>
-              <Text style={s.emptySub}>
-                {search ? 'Try a different name' : filter !== 'all' ? 'No friends match this filter' : 'Add friends to start splitting expenses'}
-              </Text>
-              {!search && filter === 'all' && (
-                <TouchableOpacity style={s.emptyBtn} onPress={() => navigation.navigate('AddFriend')}>
-                  <Text style={s.emptyBtnText}>Add a friend</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            <EmptyState
+              icon={search || filter !== 'all' ? '🔍' : '👥'}
+              title={search || filter !== 'all' ? 'No results' : 'No friends yet'}
+              subtitle={search ? 'Try a different name' : filter !== 'all' ? 'No friends match this filter' : 'Add friends to start splitting expenses'}
+              actionLabel={!search && filter === 'all' ? 'Add a friend' : undefined}
+              onAction={!search && filter === 'all' ? () => navigation.navigate('AddFriend') : undefined}
+            />
           }
           renderItem={({ item: f }) => {
             const settled = Math.abs(f.balance) < 0.01;
+            const key = String(f.friendship_id);
+            const closeSwipe = () => swipeRefs.current[key]?.close();
             return (
-              <TouchableOpacity
-                style={s.friendRow}
-                onPress={() => navigation.navigate('FriendDetail', { userId: f.user.id })}
-                onLongPress={() => handleRemove(f)}
-                activeOpacity={0.8}
-              >
-                <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
-                  <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.friendName}>{f.user.name}</Text>
-                  <Text style={s.friendEmail}>{f.user.email}</Text>
-                </View>
-                {settled ? (
-                  <View style={s.settledChip}><Text style={s.settledText}>Settled</Text></View>
-                ) : f.balance > 0 ? (
-                  <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                    <Text style={s.owedText}>+{formatCurrency(f.balance)}</Text>
-                    <TouchableOpacity style={s.actionChipGreen}
-                      onPress={() => navigation.navigate('SettleUp', { userId: f.user.id, friendName: f.user.name })}>
-                      <Text style={s.actionChipGreenText}>Remind</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                    <Text style={s.oweText}>-{formatCurrency(Math.abs(f.balance))}</Text>
-                    <TouchableOpacity style={s.actionChipRed}
-                      onPress={() => navigation.navigate('SettleUp', { userId: f.user.id, friendName: f.user.name })}>
-                      <Text style={s.actionChipRedText}>Settle</Text>
-                    </TouchableOpacity>
-                  </View>
+              <Swipeable
+                ref={(ref) => { swipeRefs.current[key] = ref; }}
+                overshootRight={false}
+                friction={2}
+                renderRightActions={() => (
+                  <SwipeActions
+                    f={f}
+                    onClose={closeSwipe}
+                    onAdd={() => navigation.navigate('AddExpense', { userId: f.user.id, friendName: f.user.name })}
+                    onSettle={() => navigation.navigate('SettleUp', { userId: f.user.id, friendName: f.user.name })}
+                    onRemind={() => toast(`Reminder sent to ${f.user.name.split(' ')[0]}`, 'success')}
+                    onRemove={() => handleRemove(f)}
+                    c={colors}
+                  />
                 )}
-              </TouchableOpacity>
+              >
+                <TouchableOpacity
+                  style={s.friendRow}
+                  onPress={() => navigation.navigate('FriendDetail', { userId: f.user.id })}
+                  activeOpacity={0.8}
+                >
+                  <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
+                    <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.friendName}>{f.user.name}</Text>
+                    <Text style={s.friendEmail}>{f.user.email}</Text>
+                  </View>
+                  {settled ? (
+                    <View style={s.settledChip}><Text style={s.settledText}>Settled</Text></View>
+                  ) : f.balance > 0 ? (
+                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                      <Text style={s.owedText}>+{formatCurrency(f.balance)}</Text>
+                      <View style={s.actionChipGreen}>
+                        <Text style={s.actionChipGreenText}>Owes you</Text>
+                      </View>
+                    </View>
+                  ) : (
+                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                      <Text style={s.oweText}>-{formatCurrency(Math.abs(f.balance))}</Text>
+                      <View style={s.actionChipRed}>
+                        <Text style={s.actionChipRedText}>You owe</Text>
+                      </View>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </Swipeable>
             );
           }}
         />

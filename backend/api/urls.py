@@ -35,6 +35,7 @@ urlpatterns = [
     path("users/search/", views.SearchUsersView.as_view(), name="user-search"),
 
     # Groups
+    path("groups/import/", views.GroupImportView.as_view(), name="group-import"),
     path("groups/", views.GroupListView.as_view(), name="group-list"),
     path("groups/<uuid:group_id>/", views.GroupDetailView.as_view(), name="group-detail"),
     path("groups/<uuid:group_id>/members/", views.GroupMemberView.as_view(), name="group-member-add"),

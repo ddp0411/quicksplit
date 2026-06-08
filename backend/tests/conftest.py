@@ -19,6 +19,7 @@ def auth_client(api_client):
     response = api_client.post(
         "/api/v1/auth/register",
         {
+            "phone_number": "9876543210",
             "email": "rohan@example.com",
             "password": "testpassword123",
             "name": "Rohan",

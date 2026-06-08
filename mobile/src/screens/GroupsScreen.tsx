@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsAPI, type Group } from '../services/api/groupsAPI';
 import { FilterSheet, type FilterOption } from '../components/FilterSheet';
 import { SkeletonCard } from '../components/SkeletonLoader';
+import { EmptyState } from '../components/EmptyState';
 import { formatCurrency } from '../utils/upi';
 
 const CATEGORY: Record<string, { emoji: string; color: string }> = {
@@ -139,16 +140,13 @@ export const GroupsScreen: React.FC = () => {
           refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#1B4332" />}
           ListEmptyComponent={
             !isLoading ? (
-              <View style={s.empty}>
-                <Text style={s.emptyEmoji}>🏝️</Text>
-                <Text style={s.emptyTitle}>{search || filter !== 'all' || categoryFilter !== 'all' ? 'No results' : 'No groups yet'}</Text>
-                <Text style={s.emptySub}>Create a group to start splitting with friends</Text>
-                {!search && filter === 'all' && categoryFilter === 'all' && (
-                  <TouchableOpacity style={s.emptyBtn} onPress={() => navigation.navigate('CreateGroup')}>
-                    <Text style={s.emptyBtnText}>Create group</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <EmptyState
+                icon={search || filter !== 'all' || categoryFilter !== 'all' ? '🔍' : '🏝️'}
+                title={search || filter !== 'all' || categoryFilter !== 'all' ? 'No results' : 'No groups yet'}
+                subtitle="Create a group to start splitting with friends"
+                actionLabel={!search && filter === 'all' && categoryFilter === 'all' ? 'Create group' : undefined}
+                onAction={!search && filter === 'all' && categoryFilter === 'all' ? () => navigation.navigate('CreateGroup') : undefined}
+              />
             ) : null
           }
           renderItem={({ item: g }) => {

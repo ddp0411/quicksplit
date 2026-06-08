@@ -103,4 +103,13 @@ export const groupsAPI = {
     const res = await axiosClient.post<GroupMessage>(`/groups/${groupId}/chat/`, { content });
     return res.data;
   },
+
+  importGroup: async (fileUri: string, fileName: string): Promise<{ group: { id: string; name: string }; expenses_imported: number; message: string }> => {
+    const formData = new FormData();
+    formData.append('file', { uri: fileUri, name: fileName, type: 'text/csv' } as any);
+    const res = await axiosClient.post('/groups/import/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
 };

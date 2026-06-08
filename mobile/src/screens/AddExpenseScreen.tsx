@@ -369,6 +369,11 @@ export const AddExpenseScreen: React.FC = () => {
               keyboardType="decimal-pad"
             />
           </View>
+          {splitType === 'equal' && participants.length > 1 && parseFloat(amount) > 0 && (
+            <Text style={s.perPersonHint}>
+              ₹{(parseFloat(amount) / participants.length).toFixed(2)} each · {participants.length} people
+            </Text>
+          )}
 
           {/* Description */}
           <View style={s.field}>
@@ -510,6 +515,14 @@ export const AddExpenseScreen: React.FC = () => {
             </View>
           )}
 
+          {/* Scan Receipt */}
+          <TouchableOpacity
+            style={s.scanBtn}
+            onPress={() => navigation.navigate('Scan')}
+          >
+            <Text style={s.scanBtnText}>📷 Scan Receipt to Pre-fill Amount</Text>
+          </TouchableOpacity>
+
           {/* Date */}
           <View style={s.field}>
             <Text style={s.fieldLabel}>Date</Text>
@@ -600,12 +613,15 @@ function createStyles(c: C) {
     backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     backText: { fontSize: 18, color: c.text },
     title: { fontSize: 17, fontWeight: '700', color: c.text },
-    saveBtn: { backgroundColor: '#1B4332', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+    saveBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
     saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
     scroll: { paddingHorizontal: 20, paddingBottom: 120 },
-    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1B4332', borderRadius: 20, padding: 24, marginBottom: 20 },
+    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1B4332', borderRadius: 20, padding: 24, marginBottom: 6 },
     currencySymbol: { fontSize: 32, fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginRight: 4 },
     amountInput: { fontSize: 48, fontWeight: '800', color: '#FFFFFF', minWidth: 120, textAlign: 'center' },
+    perPersonHint: { textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#FF6B35', marginBottom: 16 },
+    scanBtn: { backgroundColor: c.pillBg, borderRadius: 14, paddingVertical: 12, alignItems: 'center', marginBottom: 16, borderWidth: 1.5, borderColor: c.cardBorder, borderStyle: 'dashed' },
+    scanBtnText: { fontSize: 13, fontWeight: '700', color: '#FF6B35' },
     field: { marginBottom: 16 },
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     fieldInput: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useRef } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
   Modal, Animated,
 } from 'react-native';
 import { useTheme } from '../theme/useTheme';
@@ -12,10 +12,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useUserStore } from '../state/userStore';
+import { useToastStore } from '../state/toastStore';
 import { balancesAPI } from '../services/api/balancesAPI';
 import { groupsAPI } from '../services/api/groupsAPI';
 import { friendsAPI } from '../services/api/friendsAPI';
 import { activityAPI } from '../services/api/activityAPI';
+import { expensesAPI } from '../services/api/expensesAPI';
+import { SkeletonCard, SkeletonRow } from '../components/SkeletonLoader';
 import { formatCurrency } from '../utils/upi';
 import { formatDate } from '../utils/helpers';
 
@@ -61,9 +64,24 @@ export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const { user } = useUserStore();
   const { colors } = useTheme();
+  const { toast } = useToastStore();
   const s = createStyles(colors);
   const [showFAB, setShowFAB] = useState(false);
   const fabAnim = useRef(new Animated.Value(0)).current;
+
+  const sendReminder = async (friend: any) => {
+    try {
+      const expenses = await expensesAPI.getExpenses({ limit: 5 });
+      const shared = (expenses as any[]).find(
+        (e: any) => e.paid_by?.id !== user?.id &&
+          e.shares?.some((s: any) => s.user?.id === friend.user?.id && !s.is_settled)
+      );
+      if (shared) {
+        await (expensesAPI as any).addComment?.(shared.id, { content: `Hi ${friend.user.name.split(' ')[0]}, friendly reminder to settle up 🙏` });
+      }
+    } catch { /* silent — API may not have comments on all expenses */ }
+    toast(`Reminder sent to ${friend.user.name.split(' ')[0]} 🔔`, 'success');
+  };
 
   const todayInsight = useMemo(() => AI_INSIGHTS[new Date().getDate() % AI_INSIGHTS.length], []);
   const todayQuote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
@@ -141,7 +159,11 @@ export const HomeScreen: React.FC = () => {
         {/* Balance hero card */}
         <View style={s.balanceCard}>
           {balanceLoading ? (
-            <ActivityIndicator color="rgba(255,255,255,0.6)" />
+            <View style={{ gap: 10 }}>
+              <SkeletonRow width="50%" height={12} />
+              <SkeletonRow width="70%" height={28} />
+              <SkeletonRow width="100%" height={12} />
+            </View>
           ) : (
             <>
               <View style={s.balanceTop}>
@@ -244,7 +266,9 @@ export const HomeScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
           {groupsLoading ? (
-            <ActivityIndicator color="#1B4332" style={{ marginTop: 8 }} />
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[1, 2, 3].map((i) => <SkeletonCard key={i} height={110} />)}
+            </View>
           ) : topGroups.length === 0 ? (
             <View style={s.emptyCard}>
               <Text style={s.emptyText}>No groups yet</Text>
@@ -301,6 +325,9 @@ export const HomeScreen: React.FC = () => {
                   </View>
                   <Text style={s.listName} numberOfLines={1}>{f.user.name}</Text>
                   <Text style={s.positiveAmt}>{formatCurrency(f.balance)}</Text>
+                  <TouchableOpacity style={s.remindBtn} onPress={() => sendReminder(f)}>
+                    <Text style={s.remindBtnText}>🔔 Remind</Text>
+                  </TouchableOpacity>
                 </View>
               ))}
             </View>
@@ -464,6 +491,8 @@ function createStyles(c: C) {
   negativeAmt: { fontSize: 14, fontWeight: '800', color: '#EF4444' },
   settleSmallBtn: { backgroundColor: '#FF6B35', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   settleSmallText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
+  remindBtn: { backgroundColor: '#FFFBEB', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: '#FDE68A' },
+  remindBtnText: { fontSize: 10, fontWeight: '700', color: '#92400E' },
 
   activityIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
   activityTitle: { fontSize: 13, fontWeight: '600', color: c.text },

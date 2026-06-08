@@ -66,15 +66,15 @@ export const LoginScreen: React.FC = () => {
   const { login, isLoggingIn, loginError } = useAuth();
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
 
   const authError = getAPIErrorMessage(loginError, 'Invalid credentials. Please try again.');
 
   const handleSubmit = () => {
-    if (!email.trim() || !password) return;
-    login({ email: email.trim().toLowerCase(), password });
+    if (!identifier.trim() || !password) return;
+    login({ identifier: identifier.trim(), password });
   };
 
   return (
@@ -96,12 +96,12 @@ export const LoginScreen: React.FC = () => {
           )}
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Email or phone number</Text>
             <TextInput
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
+              value={identifier}
+              onChangeText={setIdentifier}
+              placeholder="you@example.com or 9876543210"
               placeholderTextColor="#9CA3AF"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -132,9 +132,9 @@ export const LoginScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity
-            style={[styles.submitBtn, (isLoggingIn || !email || !password) && styles.disabled]}
+            style={[styles.submitBtn, (isLoggingIn || !identifier || !password) && styles.disabled]}
             onPress={handleSubmit}
-            disabled={isLoggingIn || !email || !password}
+            disabled={isLoggingIn || !identifier || !password}
             activeOpacity={0.85}
           >
             <Text style={styles.submitText}>{isLoggingIn ? 'Signing in…' : 'Sign in'}</Text>

@@ -7,6 +7,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 export const Register: React.FC = () => {
   const { register: registerUser, isRegistering, registerError } = useAuth();
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,11 +21,17 @@ export const Register: React.FC = () => {
     e.preventDefault();
     setLocalError('');
     if (!name.trim()) { setLocalError('Please enter your name'); return; }
-    if (!email.trim().includes('@')) { setLocalError('Enter a valid email'); return; }
+    if (!/^[6-9]\d{9}$/.test(phone.trim())) { setLocalError('Enter a valid 10-digit mobile number (must start with 6–9)'); return; }
+    if (email.trim() && !email.trim().includes('@')) { setLocalError('Enter a valid email address'); return; }
     if (password.length < 6) { setLocalError('Password must be at least 6 characters'); return; }
     if (password !== confirmPassword) { setLocalError('Passwords do not match'); return; }
     if (!agree) { setLocalError('Please accept the terms to continue'); return; }
-    registerUser({ name: name.trim(), email: email.trim().toLowerCase(), password });
+    registerUser({
+      phone_number: phone.trim(),
+      name: name.trim(),
+      email: email.trim().toLowerCase() || undefined,
+      password,
+    });
   };
 
   const error = localError || (registerError ? authError : '');
@@ -86,7 +93,22 @@ export const Register: React.FC = () => {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Email</label>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>Phone number</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              className="input-field"
+              placeholder="10-digit mobile number"
+              autoComplete="tel"
+              maxLength={10}
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold" style={{ color: 'var(--text)' }}>
+              Email <span className="font-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span>
+            </label>
             <input
               type="email"
               value={email}

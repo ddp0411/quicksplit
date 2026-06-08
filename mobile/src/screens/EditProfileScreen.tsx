@@ -30,6 +30,7 @@ export const EditProfileScreen: React.FC = () => {
 
   const [name, setName] = useState(user?.name ?? '');
   const [upiId, setUpiId] = useState(user?.upi_id ?? '');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone_number ?? '');
   const [avatarColor, setAvatarColor] = useState(user?.avatar_color ?? AVATAR_COLORS[3]);
   const [saving, setSaving] = useState(false);
 
@@ -41,6 +42,7 @@ export const EditProfileScreen: React.FC = () => {
         name: name.trim(),
         upi_id: upiId.trim() || undefined,
         avatar_color: avatarColor,
+        phone_number: phoneNumber.trim() || undefined,
       });
       setUser({ ...user!, ...updated }, token!);
       toast('Profile updated', 'success');
@@ -116,6 +118,18 @@ export const EditProfileScreen: React.FC = () => {
               autoCapitalize="none"
             />
           </View>
+
+          <View style={s.field}>
+            <Text style={s.fieldLabel}>Phone Number</Text>
+            <TextInput
+              style={s.fieldInput}
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              placeholder="+91 98765 43210"
+              placeholderTextColor="#9CA3AF"
+              keyboardType="phone-pad"
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -129,7 +143,7 @@ function createStyles(c: C) {
   backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
   backText: { fontSize: 18, color: c.text },
   title: { fontSize: 17, fontWeight: '700', color: c.text },
-  saveBtn: { backgroundColor: '#1B4332', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+  saveBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
   saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   scroll: { paddingHorizontal: 20, paddingBottom: 100 },
   avatarSection: { alignItems: 'center', paddingVertical: 24 },

@@ -8,6 +8,7 @@ interface User {
   name: string;
   avatar_color?: string;
   upi_id?: string;
+  phone_number?: string;
 }
 
 interface UserState {

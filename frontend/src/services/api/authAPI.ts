@@ -1,14 +1,15 @@
 import { axiosClient } from './axiosClient';
 
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  email: string;
-  password: string;
+  phone_number: string;
   name: string;
+  password: string;
+  email?: string;
 }
 
 export interface AuthResponse {
@@ -23,15 +24,7 @@ export interface AuthResponse {
 
 export const authAPI = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const formData = new FormData();
-    formData.append('username', data.email);
-    formData.append('password', data.password);
-    
-    const response = await axiosClient.post<AuthResponse>('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await axiosClient.post<AuthResponse>('/auth/login', data);
     return response.data;
   },
 
