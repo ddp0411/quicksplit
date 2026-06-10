@@ -27,7 +27,7 @@ Make sure you have:
 
 Terminal 1 - Backend:
 ```bash
-cd backend && source venv/bin/activate && python manage.py migrate && python manage.py runserver 127.0.0.1:8000
+cd backend && source venv/bin/activate && python manage.py migrate && python manage.py runserver 127.0.0.1:9000
 ```
 
 Terminal 2 - Celery:
@@ -43,7 +43,7 @@ cd frontend && npm run dev
 ### 4. Access the App
 
 - Frontend: http://localhost:3000
-- API Docs: http://localhost:8000/docs
+- API Docs: http://localhost:9000/docs
 
 ### 5. Test It Out
 

@@ -181,11 +181,11 @@ Once installation is complete:
    ```
 
 2. **Or start services manually:**
-   - Backend: `cd backend && source venv/bin/activate && python manage.py migrate && python manage.py runserver 127.0.0.1:8000`
+   - Backend: `cd backend && source venv/bin/activate && python manage.py migrate && python manage.py runserver 127.0.0.1:9000`
    - Celery: `cd backend && source venv/bin/activate && celery -A quicksplit worker --loglevel=info`
    - Frontend: `cd frontend && npm run dev`
 
 3. **Access the app:**
    - Frontend: http://localhost:3000
-   - Backend: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+   - Backend: http://localhost:9000
+   - API Docs: http://localhost:9000/docs

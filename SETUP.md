@@ -69,7 +69,7 @@ CELERY_RESULT_BACKEND=redis://localhost:6379/0
 Create `.env` file in `frontend/` directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:9000
 ```
 
 #### 5. Run Database Migrations
@@ -116,7 +116,7 @@ redis-server
 cd backend
 source venv/bin/activate
 python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:9000
 ```
 
 #### Terminal 4: Start Celery Worker
@@ -135,9 +135,9 @@ npm run dev
 ## Access the Application
 
 - **Frontend**: http://localhost:3000 (or http://localhost:5173)
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Alternative API Docs**: http://localhost:8000/redoc
+- **Backend API**: http://localhost:9000
+- **API Documentation**: http://localhost:9000/docs
+- **Alternative API Docs**: http://localhost:9000/redoc
 
 ## Using Docker Compose (Alternative)
 
@@ -165,7 +165,7 @@ This will start all services including PostgreSQL and Redis.
 - Check Tesseract language data is installed
 
 ### Port Already in Use
-- Change ports in configuration files if 3000, 8000, 5432, or 6379 are in use
+- Change ports in configuration files if 3000, 9000, 5432, or 6379 are in use
 
 ## Next Steps
 

@@ -87,19 +87,19 @@ DATABASE_URL=sqlite:////tmp/quicksplit-local.db \
 UPLOAD_DIR=/tmp/quicksplit-uploads \
 DATASET_DIR=/tmp/quicksplit-dataset \
 python manage.py migrate
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 127.0.0.1:9000
 ```
 
 Terminal 2:
 
 ```bash
 cd frontend
-VITE_API_URL=http://localhost:8000/api/v1 npm run dev -- --host 127.0.0.1 --port 3000
+VITE_API_URL=http://localhost:9000/api/v1 npm run dev -- --host 127.0.0.1 --port 3000
 ```
 
 Open:
 - Frontend: `http://127.0.0.1:3000`
-- Backend docs: `http://D127.0.0.1:8000/docs`
+- Backend docs: `http://127.0.0.1:9000/docs`
 
 ## How To Stop Running Servers
 
@@ -109,7 +109,7 @@ If a port is stuck:
 
 ```bash
 lsof -ti :3000 | xargs kill
-lsof -ti :8000 | xargs kill
+lsof -ti :9000 | xargs kill
 ```
 
 ## Verification Commands

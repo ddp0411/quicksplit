@@ -40,7 +40,7 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 127.0.0.1:9000
 ```
 
 Frontend:
@@ -57,7 +57,7 @@ Full stack with Docker:
 docker-compose up --build
 ```
 
-The API runs at `http://localhost:8000`, and the frontend runs at `http://localhost:3000`.
+The API runs at `http://localhost:9000`, and the frontend runs at `http://localhost:3000`.
 
 ## Environment
 
@@ -79,7 +79,7 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 Frontend:
 
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://localhost:9000/api/v1
 ```
 
 ## Verification
@@ -103,7 +103,7 @@ Or run separately:
 cd backend
 source venv/bin/activate
 python manage.py migrate
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 127.0.0.1:9000
 ```
 
 ```bash
@@ -115,7 +115,7 @@ Stop servers with `Ctrl+C` in each terminal. If a port is stuck:
 
 ```bash
 lsof -ti :3000 | xargs kill
-lsof -ti :8000 | xargs kill
+lsof -ti :9000 | xargs kill
 ```
 
 Development notes for future sessions are in [`docs/development-handoff.md`](./docs/development-handoff.md).
@@ -134,7 +134,7 @@ Development notes for future sessions are in [`docs/development-handoff.md`](./d
 - `POST /api/v1/dataset/submit`
 - `GET /api/v1/dataset/stats`
 
-Swagger UI is available at `http://localhost:8000/docs` when the backend is running.
+Swagger UI is available at `http://localhost:9000/docs` when the backend is running.
 
 ## Supabase Postgres
 

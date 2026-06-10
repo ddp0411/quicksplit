@@ -8,7 +8,7 @@
 
 | Field | Value |
 |-------|-------|
-| URL | http://127.0.0.1:8000/admin/ |
+| URL | http://127.0.0.1:9000/admin/ |
 | Username | `admin` |
 | Password | `admin123` |
 | Email | `admin@quicksplit.com` |
@@ -21,15 +21,15 @@ Start the backend first, then open the URL above in a browser.
 
 | Field | Value |
 |-------|-------|
-| Base URL | `http://127.0.0.1:8000/api/v1/` |
-| Auth endpoint | `http://127.0.0.1:8000/api/v1/auth/login/` |
-| Swagger / Browse | `http://127.0.0.1:8000/api/v1/` (DRF browsable API) |
+| Base URL | `http://127.0.0.1:9000/api/v1/` |
+| Auth endpoint | `http://127.0.0.1:9000/api/v1/auth/login/` |
+| Swagger / Browse | `http://127.0.0.1:9000/api/v1/` (DRF browsable API) |
 
 **Start backend:**
 ```bash
 cd backend
 source venv/bin/activate
-python manage.py runserver
+python manage.py runserver 127.0.0.1:9000
 ```
 
 ---

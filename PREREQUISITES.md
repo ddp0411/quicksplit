@@ -133,6 +133,5 @@ Once all prerequisites are installed:
 
 3. **Access the app**:
    - Frontend: http://localhost:3000
-   - Backend: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-
+   - Backend: http://localhost:9000
+   - API Docs: http://localhost:9000/docs

@@ -305,15 +305,15 @@ DATABASE_URL=sqlite:////tmp/quicksplit-local.db \
 UPLOAD_DIR=/tmp/quicksplit-uploads \
 DATASET_DIR=/tmp/quicksplit-dataset \
 python manage.py migrate
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 127.0.0.1:9000
 
 # Terminal 2 — Frontend
 cd frontend
 npm install
-VITE_API_URL=http://localhost:8000/api/v1 npm run dev -- --host 127.0.0.1 --port 3000
+VITE_API_URL=http://localhost:9000/api/v1 npm run dev -- --host 127.0.0.1 --port 3000
 ```
 
-Swagger UI: http://127.0.0.1:8000/docs
+Swagger UI: http://127.0.0.1:9000/docs
 
 ---
 
@@ -326,7 +326,7 @@ docker-compose up --build
 Services started:
 - `postgres` — PostgreSQL 16 on port 5432
 - `redis` — Redis 7.2 on port 6379
-- `backend` — Django on port 8000 (migrates then serves)
+- `backend` — Django on port 9000 (migrates then serves)
 - `celery_worker` — Celery worker
 - `celery_beat` — Celery beat scheduler
 - `frontend` — Vite dev server on port 3000

@@ -25,7 +25,7 @@ Optional (for background tasks):
 
 ```
 quicksplit test/
-├── backend/       Django REST API (port 8000)
+├── backend/       Django REST API (port 9000)
 ├── frontend/      React web app (port 5173)
 ├── mobile/        React Native / Expo mobile app
 ├── API_KEYS.md    Where to get API keys
@@ -72,12 +72,12 @@ python manage.py migrate
 python manage.py createsuperuser
 
 # Start the development server
-python manage.py runserver
+python manage.py runserver 0.0.0.0:9000
 ```
 
-Backend is now running at **http://localhost:8000**
+Backend is now running at **http://localhost:9000**
 
-API docs (Swagger UI): http://localhost:8000/api/schema/swagger-ui/
+API docs (Swagger UI): http://localhost:9000/api/schema/swagger-ui/
 
 ---
 
@@ -97,7 +97,7 @@ npm run dev
 
 Web app is now running at **http://localhost:5173**
 
-The web app talks to the backend at `localhost:8000` by default.
+The web app talks to the backend at `localhost:9000` by default.
 
 ---
 
@@ -180,14 +180,14 @@ pip install Pillow --no-cache-dir
 See `FIX-PILLOW.md` in the project root for more details.
 
 ### Expo "Network request failed" on physical device
-Your phone can't reach `localhost:8000`. Either:
+Your phone can't reach `localhost:9000`. Either:
 1. Use tunnel mode: `npx expo start --tunnel`
 2. Or update the API base URL in `mobile/src/config/api.ts` to your machine's local IP address (e.g., `192.168.1.x`)
 
 ### Port already in use
 ```bash
-# Find and kill the process on port 8000
-lsof -ti:8000 | xargs kill -9
+# Find and kill the process on port 9000
+lsof -ti:9000 | xargs kill -9
 ```
 
 ### Module not found after adding a new package
@@ -201,11 +201,11 @@ cd mobile && npx expo install <package-name>   # always use expo install, not np
 
 | Service | URL | Command |
 |---------|-----|---------|
-| Backend API | http://localhost:8000 | `python manage.py runserver` (in `backend/`) |
+| Backend API | http://localhost:9000 | `python manage.py runserver 0.0.0.0:9000` (in `backend/`) |
 | Web Frontend | http://localhost:5173 | `npm run dev` (in `frontend/`) |
 | Mobile App | Expo Go (QR scan) | `npx expo start` (in `mobile/`) |
-| API Docs | http://localhost:8000/api/schema/swagger-ui/ | — |
-| Django Admin | http://localhost:8000/admin/ | — |
+| API Docs | http://localhost:9000/api/schema/swagger-ui/ | — |
+| Django Admin | http://localhost:9000/admin/ | — |
 
 ---
 

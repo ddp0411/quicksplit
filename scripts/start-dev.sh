@@ -42,7 +42,7 @@ fi
 export DATABASE_URL UPLOAD_DIR DATASET_DIR REDIS_URL
 
 python manage.py migrate
-python manage.py runserver 0.0.0.0:8000 &
+python manage.py runserver 0.0.0.0:9000 &
 BACKEND_PID=$!
 cd ..
 
@@ -66,16 +66,16 @@ if [ ! -d "node_modules" ]; then
     echo "❌ Node modules not found. Installing..."
     npm install
 fi
-export VITE_API_URL="${VITE_API_URL:-http://localhost:8000/api/v1}"
+export VITE_API_URL="${VITE_API_URL:-http://localhost:9000/api/v1}"
 npm run dev &
 FRONTEND_PID=$!
 cd ..
 
 echo ""
 echo "✅ All services started!"
-echo "   Backend: http://localhost:8000"
+echo "   Backend: http://localhost:9000"
 echo "   Frontend: http://localhost:3000"
-echo "   API Docs: http://localhost:8000/docs"
+echo "   API Docs: http://localhost:9000/docs"
 echo ""
 echo "Press Ctrl+C to stop all services"
 

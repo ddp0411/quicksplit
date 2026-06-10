@@ -151,7 +151,7 @@ V2 New Features — Intentionally Pending (Do NOT implement)
 Guest mode · Phone OTP login · Voice AI assistant · Multi-currency live rates · Export reports (CSV/PDF) · Haptic feedback · Home screen widgets · Recurring auto-detection · Global expense search · Gamification/badges · Smart auto-categorization · AI fraud detection · Long-term ledger · Travel mode · Bank SMS detection · Spending heatmap · Advanced batch settlement · Multi-device session management · Email parsing · Analytics tab · Wallet section
 
 Verification Steps
-cd backend && python manage.py runserver — backend on port 8000
+cd backend && python manage.py runserver 127.0.0.1:9000 — backend on port 9000
 cd mobile && npx expo start — scan with Expo Go
 Test each fixed feature:
 FriendsScreen → swipe a friend row → 4 actions appear

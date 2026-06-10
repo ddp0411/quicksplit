@@ -54,7 +54,7 @@ cp frontend/.env.example frontend/.env
 For local development:
 
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://localhost:9000/api/v1
 ```
 
 ## Run
@@ -63,7 +63,7 @@ VITE_API_URL=http://localhost:8000/api/v1
 cd backend
 source venv/bin/activate
 python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:9000
 ```
 
 ```bash
