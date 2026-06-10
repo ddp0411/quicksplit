@@ -42,7 +42,7 @@ function avatarInitials(name: string) {
   return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 }
 
-function MemberDots({ count, color }: { count: number; color: string }) {
+function MemberDots({ count, color, s }: { count: number; color: string; s: ReturnType<typeof createStyles> }) {
   const dots = Math.min(count, 4);
   return (
     <View style={s.dots}>
@@ -164,7 +164,7 @@ export const GroupsScreen: React.FC = () => {
                 <View style={s.cardBody}>
                   <Text style={s.groupName}>{g.name}</Text>
                   <View style={s.cardMeta}>
-                    <MemberDots count={g.member_count} color={cat.color} />
+                    <MemberDots count={g.member_count} color={cat.color} s={s} />
                     <Text style={s.memberCount}>{g.member_count} member{g.member_count !== 1 ? 's' : ''}</Text>
                   </View>
                 </View>

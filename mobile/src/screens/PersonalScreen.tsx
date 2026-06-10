@@ -76,7 +76,7 @@ export const PersonalScreen: React.FC = () => {
 
   const { dailySpend, totalThisWeek, dayLabels } = useMemo(() => {
     const now = new Date();
-    const days: number[] = [];
+    const days: string[] = [];
     const labels: string[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now);
