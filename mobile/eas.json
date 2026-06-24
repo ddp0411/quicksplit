@@ -17,14 +17,14 @@
       "ios": { "simulator": false },
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE_WITH_RAILWAY_URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://quicksplit-production.up.railway.app/api/v1"
       }
     },
     "production": {
       "autoIncrement": true,
       "channel": "production",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE_WITH_RAILWAY_URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://quicksplit-production.up.railway.app/api/v1"
       }
     }
   },
