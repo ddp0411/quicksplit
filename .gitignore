@@ -52,3 +52,8 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Image assets that MUST be tracked (override the blanket *.png/*.jpg/*.jpeg rules above):
+# app icons/splash for EAS builds, and the landing page's logo/favicon.
+!mobile/assets/**
+!landing/assets/**
