@@ -20,8 +20,8 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/uploads /app/dataset /app/logs
 
-# Expose port
+# Expose port (Railway/Render inject $PORT at runtime; default 9000 locally)
 EXPOSE 9000
 
-# Run application
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:9000"]
+# Run application: migrate, collect static for WhiteNoise, serve via gunicorn
+CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn quicksplit.wsgi:application --bind 0.0.0.0:${PORT:-9000} --workers 3 --timeout 120"]

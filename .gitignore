@@ -32,6 +32,7 @@ yarn-error.log*
 dist/
 build/
 *.egg-info/
+staticfiles/
 
 # Database
 *.db

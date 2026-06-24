@@ -10,6 +10,7 @@ from django.db.models import Avg, Count, Q, Sum
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import parsers, permissions, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -652,6 +653,13 @@ class ExpenseListView(APIView):
             except (GroupMember.DoesNotExist, SplitGroup.DoesNotExist):
                 return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        # An expense must be split across at least one participant.
+        if data["split_type"] == "equal":
+            if not data.get("participant_ids"):
+                raise ValidationError({"detail": "At least one participant is required."})
+        elif not data.get("shares"):
+            raise ValidationError({"detail": "At least one participant share is required."})
+
         with transaction.atomic():
             expense = Expense.objects.create(
                 group=group,
@@ -680,18 +688,25 @@ class ExpenseListView(APIView):
                     ],
                 )
             except ValueError as exc:
-                raise Exception(str(exc))
+                # Invalid split (bad sums, no participants, …) → 400, rolls back.
+                raise ValidationError({"detail": str(exc)})
 
+            created_shares = 0
             for user_id_str, amount_owed in share_map.items():
                 try:
                     member = User.objects.get(pk=user_id_str)
-                    ExpenseShare.objects.create(
-                        expense=expense,
-                        user=member,
-                        amount_owed=amount_owed,
-                    )
                 except User.DoesNotExist:
-                    pass
+                    continue
+                ExpenseShare.objects.create(
+                    expense=expense,
+                    user=member,
+                    amount_owed=amount_owed,
+                )
+                created_shares += 1
+
+            # Never persist an expense that ended up with no real participants.
+            if created_shares == 0:
+                raise ValidationError({"detail": "Expense must have at least one valid participant."})
 
         return Response(ExpenseSerializer(expense).data, status=status.HTTP_201_CREATED)
 
@@ -884,15 +899,47 @@ class OverallBalanceView(APIView):
         total_owed = sum(b["balance"] for b in balances if b["balance"] > 0)
         total_you_owe = sum(-b["balance"] for b in balances if b["balance"] < 0)
 
-        return Response({
+        payload = {
             "total_owed_to_you": round(total_owed, 2),
             "total_you_owe": round(total_you_owe, 2),
             "net_balance": round(total_owed - total_you_owe, 2),
             "balances": balances,
-        })
+        }
+        # Serialize through OverallBalanceSerializer so nested User objects in
+        # `balances` are rendered (raw model instances aren't JSON-serializable).
+        return Response(OverallBalanceSerializer(payload).data)
 
 
 # ─── Settlements ──────────────────────────────────────────────────────────────
+
+def _settle_matching_shares(from_user, to_user, amount, group=None):
+    """When `from_user` pays `to_user`, mark their unsettled debt shares as settled.
+
+    Settles shares owed by `from_user` on expenses paid by `to_user`, oldest first,
+    until the paid `amount` is consumed. Full-share granularity: a share larger than
+    the remaining amount is left open (partial settlements aren't split). Scoped to
+    `group` when one is supplied.
+    """
+    remaining = Decimal(str(amount))
+    shares = (
+        ExpenseShare.objects
+        .filter(user=from_user, is_settled=False, expense__paid_by=to_user)
+        .select_related("expense")
+        .order_by("expense__date", "expense__created_at")
+    )
+    if group is not None:
+        shares = shares.filter(expense__group=group)
+
+    now = timezone.now()
+    for share in shares:
+        if remaining < Decimal("0.01"):
+            break
+        if share.amount_owed <= remaining + Decimal("0.01"):
+            share.is_settled = True
+            share.settled_at = now
+            share.save(update_fields=["is_settled", "settled_at"])
+            remaining -= share.amount_owed
+
 
 class SettlementListView(APIView):
     """GET /settlements/  — list settlements
@@ -921,14 +968,17 @@ class SettlementListView(APIView):
             except SplitGroup.DoesNotExist:
                 return Response({"detail": "Group not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        settlement = Settlement.objects.create(
-            from_user=request.user,
-            to_user=to_user,
-            amount=data["amount"],
-            group=group,
-            notes=data.get("notes", ""),
-            upi_transaction_id=data.get("upi_transaction_id", ""),
-        )
+        with transaction.atomic():
+            settlement = Settlement.objects.create(
+                from_user=request.user,
+                to_user=to_user,
+                amount=data["amount"],
+                group=group,
+                notes=data.get("notes", ""),
+                upi_transaction_id=data.get("upi_transaction_id", ""),
+            )
+            # Clear the debt this payment covers so balances reflect it.
+            _settle_matching_shares(request.user, to_user, settlement.amount, group)
 
         # Generate UPI link for settlement
         upi = UPIService()

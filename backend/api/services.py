@@ -288,7 +288,7 @@ class BalanceService:
         involving the user.
         Returns list of {user, balance} dicts (serializer-ready).
         """
-        from api.models import Expense, ExpenseShare, Settlement, User as UserModel
+        from api.models import Expense, ExpenseShare, User as UserModel
 
         # net[other_user_id] = amount other user owes current user (signed)
         net: dict[str, Decimal] = defaultdict(Decimal)
@@ -309,13 +309,9 @@ class BalanceService:
             if paid_by_id != str(user.pk):
                 net[paid_by_id] -= share.amount_owed
 
-        # Settlements FROM current user (current user paid someone)
-        for s in Settlement.objects.filter(from_user=user):
-            net[str(s.to_user_id)] -= s.amount
-
-        # Settlements TO current user (someone paid current user)
-        for s in Settlement.objects.filter(to_user=user):
-            net[str(s.from_user_id)] += s.amount
+        # Settlements are not summed here: recording a settlement marks the
+        # matching ExpenseShares settled (is_settled=True), so they drop out of
+        # the unsettled-share sums above. This avoids double-counting a payment.
 
         # Build response
         user_ids = [uid for uid, bal in net.items() if abs(bal) >= Decimal("0.01")]
@@ -336,22 +332,21 @@ class BalanceService:
         Balances within a single group.
         Returns member_balances (raw per-member net), simplified_debts, total_expenses.
         """
-        from api.models import Expense, ExpenseShare, Settlement, User as UserModel
+        from api.models import User as UserModel
 
         net: dict[str, Decimal] = defaultdict(Decimal)
         total_expenses = Decimal("0")
 
-        # Credit the payer, debit each share holder
+        # For each unsettled share: credit the payer, debit the share holder.
+        # Settled shares (cleared by a recorded settlement) are skipped, so a
+        # settlement reduces the outstanding balance without a separate term.
         for expense in group.expenses.all().prefetch_related("shares"):
             total_expenses += expense.amount
-            net[str(expense.paid_by_id)] += expense.amount
             for share in expense.shares.all():
+                if share.is_settled:
+                    continue
+                net[str(expense.paid_by_id)] += share.amount_owed
                 net[str(share.user_id)] -= share.amount_owed
-
-        # Apply group settlements
-        for s in group.settlements.all():
-            net[str(s.from_user_id)] += s.amount
-            net[str(s.to_user_id)] -= s.amount
 
         member_ids = list({str(m.user_id) for m in group.members.all()})
         users = {str(u.pk): u for u in UserModel.objects.filter(pk__in=member_ids)}
