@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useUserStore } from '../state/userStore';
 import { useTheme } from '../theme/useTheme';
+import { TabBarIcon, TabIconName } from '../components/TabBarIcon';
 
 // Auth screens
 import { SplashScreen } from '../screens/SplashScreen';
@@ -33,16 +34,15 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const navigationRef = createNavigationContainerRef();
 
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Home: '⌂', Friends: '♙', Groups: '◇', Personal: '✦', Account: '○',
-  };
-  return (
-    <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-      {icons[name] ?? '●'}
-    </Text>
-  );
-}
+const TAB_ICONS: Record<string, TabIconName> = {
+  Home: 'Home',
+  Friends: 'Friends',
+  Groups: 'Groups',
+  AIAssistant: 'AI',
+};
+
+const TAB_ACTIVE = '#FF6B35';
+const TAB_INACTIVE = '#9CA3AF';
 
 function PlaceholderScreen() {
   return null;
@@ -68,13 +68,13 @@ function MainTabs() {
             styles.tabBar,
             { backgroundColor: colors.card, borderColor: colors.cardBorder },
           ],
-          tabBarActiveTintColor: '#1B4332',
-          tabBarInactiveTintColor: '#9CA3AF',
+          tabBarActiveTintColor: TAB_ACTIVE,
+          tabBarInactiveTintColor: TAB_INACTIVE,
           tabBarLabelStyle: styles.tabLabel,
           tabBarItemStyle: route.name === 'Action' ? styles.actionTabItem : styles.tabItem,
-          tabBarIcon: ({ focused }) => route.name === 'Action'
-            ? null
-            : <TabIcon name={route.name} focused={focused} />,
+          tabBarIcon: ({ focused }) => TAB_ICONS[route.name]
+            ? <TabBarIcon name={TAB_ICONS[route.name]} color={focused ? TAB_ACTIVE : TAB_INACTIVE} />
+            : null,
           tabBarButton: route.name === 'Action'
             ? () => (
               <TouchableOpacity
@@ -92,8 +92,17 @@ function MainTabs() {
         <Tab.Screen name="Friends" component={FriendsStack} />
         <Tab.Screen name="Action" component={PlaceholderScreen} />
         <Tab.Screen name="Groups" component={GroupsStack} />
-        <Tab.Screen name="Personal" component={PersonalStack} />
-        <Tab.Screen name="Account" component={AccountStack} />
+        <Tab.Screen
+          name="AIAssistant"
+          component={PersonalStack}
+          options={{ tabBarLabel: 'AI Assistant' }}
+        />
+        {/* Account is reachable from the Home hero avatar, not the tab bar (matches the UI images). */}
+        <Tab.Screen
+          name="Account"
+          component={AccountStack}
+          options={{ tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }}
+        />
       </Tab.Navigator>
 
       <Modal
@@ -262,13 +271,6 @@ const styles = StyleSheet.create({
   },
   tabItem: { paddingTop: 1 },
   actionTabItem: { width: 64 },
-  tabIcon: {
-    fontSize: 23,
-    color: '#9CA3AF',
-    lineHeight: 25,
-    fontWeight: '800',
-  },
-  tabIconActive: { color: '#1B4332' },
   tabLabel: {
     fontSize: 10,
     fontWeight: '800',

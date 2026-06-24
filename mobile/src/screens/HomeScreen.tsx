@@ -132,11 +132,17 @@ export const HomeScreen: React.FC = () => {
             <Text style={s.heroGreeting}>
               {user ? getGreeting(user.name) : 'Welcome 👋'}
             </Text>
-            <View style={s.heroAvatar}>
+            <TouchableOpacity
+              style={s.heroAvatar}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Open account"
+              onPress={() => navigation.navigate('Account')}
+            >
               <Text style={s.heroAvatarText}>
                 {user?.name ? avatarInitials(user.name) : 'U'}
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={s.quoteBlock}>
             <Text style={s.quoteText}>"{todayQuote.text}"</Text>
