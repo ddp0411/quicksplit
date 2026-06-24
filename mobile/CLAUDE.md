@@ -72,8 +72,18 @@ populate `extra.eas.projectId`.
 ## Navigation redesign (done)
 The "+" action sheet (Add Expense / Scan Bill / Settle Up) is centralized into the tab bar's
 center button in `RootNavigator` (uses `navigationRef` to route into the Home stack); per-screen
-FABs are gone. Tab icons are minimalist glyphs (⌂ ♙ ◇ ✦ ○) on a floating rounded tab bar.
-Friends/Groups headers use a centered title + circular add button + search-row with filter-square.
+FABs are gone. The tab bar matches the Jun-11 UI images: **Home · Friends · ＋ · Groups · AI
+Assistant**, on a floating rounded bar, active tint orange `#FF6B35`. Icons are clean SVG line
+icons (`components/TabBarIcon.tsx`, via `react-native-svg`) — not emoji/glyphs. **Account** is off
+the tab bar and opened from the Home hero avatar (hidden tab, still mounted). The "AI Assistant"
+tab is the former Personal stack (AI chat + budget + subscriptions + insights).
+
+> The Jun-9 `UI_REFERENCE.md` text spec still lists 5 tabs (Home/Friends/Groups/Personal/Account)
+> + a FAB and says "all icons are emoji" — the Jun-11 UI images supersede it for navigation.
+
+Friends/Groups headers use a centered title + circular add button + a search row whose search and
+filter controls are SVG icons (`components/icons.tsx`). UI visuals still need an on-device pass in
+Radon (SVG icons + orange active tint not yet eyeballed).
 
 ## Stubs / not done
 `RemainingScreens.tsx` contains placeholder implementations for several account/premium/
