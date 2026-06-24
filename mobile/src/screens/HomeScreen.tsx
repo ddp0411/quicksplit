@@ -43,7 +43,7 @@ const QUOTES = [
 ];
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  home: '🏠', trip: '✈️', couple: '❤️', work: '💼', event: '📅', other: '📁',
+  home: '🏠', trip: '✈️', couple: '💑', work: '💼', event: '📅', other: '🎉',
 };
 const CATEGORY_BG: Record<string, string> = {
   home: '#0EA5E9', trip: '#F59E0B', couple: '#EF4444', work: '#64748B', event: '#8B5CF6', other: '#1B4332',
@@ -177,18 +177,21 @@ export const HomeScreen: React.FC = () => {
                         : '₹0.00'}
                   </Text>
                 </View>
-                <View style={s.balanceIcon}>
-                  <Text style={{ fontSize: 20 }}>💼</Text>
-                </View>
+                <View
+                  style={[
+                    s.balanceDot,
+                    {
+                      backgroundColor:
+                        (balance?.net_balance ?? 0) > 0
+                          ? '#22C55E'
+                          : (balance?.net_balance ?? 0) < 0
+                            ? '#EF4444'
+                            : '#9CA3AF',
+                    },
+                  ]}
+                />
               </View>
               <View style={s.balanceSubrow}>
-                <View style={s.balanceStat}>
-                  <Text style={s.balanceStatLabel}>Net</Text>
-                  <Text style={[s.balanceStatVal, { color: (balance?.net_balance ?? 0) >= 0 ? '#22C55E' : '#EF4444' }]}>
-                    {(balance?.net_balance ?? 0) >= 0 ? '+' : ''}{formatCurrency(balance?.net_balance ?? 0)}
-                  </Text>
-                </View>
-                <View style={s.divider} />
                 <View style={s.balanceStat}>
                   <Text style={s.balanceStatLabel}>Owe you</Text>
                   <Text style={[s.balanceStatVal, { color: '#22C55E' }]}>
@@ -200,6 +203,13 @@ export const HomeScreen: React.FC = () => {
                   <Text style={s.balanceStatLabel}>You owe</Text>
                   <Text style={[s.balanceStatVal, { color: '#EF4444' }]}>
                     {formatCurrency(balance?.total_you_owe ?? 0)}
+                  </Text>
+                </View>
+                <View style={s.divider} />
+                <View style={s.balanceStat}>
+                  <Text style={s.balanceStatLabel}>Net</Text>
+                  <Text style={[s.balanceStatVal, { color: (balance?.net_balance ?? 0) >= 0 ? '#22C55E' : '#EF4444' }]}>
+                    {(balance?.net_balance ?? 0) >= 0 ? '+' : ''}{formatCurrency(balance?.net_balance ?? 0)}
                   </Text>
                 </View>
                 {(balance?.total_you_owe ?? 0) > 0 && (
@@ -408,7 +418,7 @@ function createStyles(c: C) {
   balanceTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
   balanceLabel: { color: 'rgba(255,255,255,0.55)', fontSize: 10, fontWeight: '700', letterSpacing: 1.5 },
   balanceAmount: { color: '#FFFFFF', fontSize: 30, fontWeight: '800', fontFamily: 'PlayfairDisplay_700Bold', marginTop: 4 },
-  balanceIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  balanceDot: { width: 12, height: 12, borderRadius: 6, marginTop: 6, borderWidth: 2, borderColor: 'rgba(255,255,255,0.35)' },
   balanceSubrow: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
   balanceStat: { alignItems: 'flex-start' },
   balanceStatLabel: { color: 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: '600' },

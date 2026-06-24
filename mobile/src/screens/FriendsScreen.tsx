@@ -12,6 +12,7 @@ import { balancesAPI } from '../services/api/balancesAPI';
 import { FilterSheet, type FilterOption } from '../components/FilterSheet';
 import { SkeletonFriendRow } from '../components/SkeletonLoader';
 import { EmptyState } from '../components/EmptyState';
+import { SearchIcon, FilterIcon } from '../components/icons';
 import { formatCurrency } from '../utils/upi';
 import { useTheme } from '../theme/useTheme';
 import { useToastStore } from '../state/toastStore';
@@ -148,7 +149,9 @@ export const FriendsScreen: React.FC = () => {
 
       <View style={s.searchRow}>
         <View style={s.searchWrap}>
-          <Text style={s.searchIcon}>⌕</Text>
+          <View style={s.searchIcon}>
+            <SearchIcon color={colors.textMuted} size={18} />
+          </View>
           <TextInput
             style={s.searchInput}
             value={search}
@@ -162,7 +165,7 @@ export const FriendsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <Text style={[s.filterSquareText, filter !== 'all' && s.filterSquareTextActive]}>≡</Text>
+          <FilterIcon color={filter !== 'all' ? '#1B4332' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -313,7 +316,7 @@ function createStyles(c: C) {
   summaryLabel: { fontSize: 11, fontWeight: '600', color: '#16A34A', marginBottom: 2 },
   summaryValue: { fontSize: 16, fontWeight: '800', color: '#16A34A' },
   searchWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 15, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12 },
-  searchIcon: { fontSize: 18, marginRight: 8, color: c.textMuted },
+  searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   requestsBanner: { marginHorizontal: 20, backgroundColor: '#FFFBEB', borderRadius: 16, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FDE68A' },
   requestsLabel: { fontSize: 12, fontWeight: '700', color: '#92400E', marginBottom: 10 },

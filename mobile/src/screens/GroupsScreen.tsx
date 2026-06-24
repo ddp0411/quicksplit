@@ -13,15 +13,16 @@ import { groupsAPI, type Group } from '../services/api/groupsAPI';
 import { FilterSheet, type FilterOption } from '../components/FilterSheet';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import { EmptyState } from '../components/EmptyState';
+import { SearchIcon, FilterIcon } from '../components/icons';
 import { formatCurrency } from '../utils/upi';
 
 const CATEGORY: Record<string, { emoji: string; color: string }> = {
   home:   { emoji: '🏠', color: '#0EA5E9' },
   trip:   { emoji: '✈️', color: '#F59E0B' },
-  couple: { emoji: '❤️', color: '#EF4444' },
+  couple: { emoji: '💑', color: '#EF4444' },
   work:   { emoji: '💼', color: '#64748B' },
   event:  { emoji: '📅', color: '#8B5CF6' },
-  other:  { emoji: '📁', color: '#1B4332' },
+  other:  { emoji: '🎉', color: '#1B4332' },
 };
 
 const FILTER_OPTIONS: FilterOption[] = [
@@ -34,10 +35,10 @@ const CATEGORY_PILLS = [
   { value: 'all', label: 'All', emoji: '📋' },
   { value: 'home', label: 'Home', emoji: '🏠' },
   { value: 'trip', label: 'Trip', emoji: '✈️' },
-  { value: 'couple', label: 'Couple', emoji: '❤️' },
+  { value: 'couple', label: 'Couple', emoji: '💑' },
   { value: 'work', label: 'Work', emoji: '💼' },
   { value: 'event', label: 'Event', emoji: '📅' },
-  { value: 'other', label: 'Other', emoji: '📁' },
+  { value: 'other', label: 'Other', emoji: '🎉' },
 ];
 
 function avatarInitials(name: string) {
@@ -98,7 +99,9 @@ export const GroupsScreen: React.FC = () => {
 
       <View style={s.searchRow}>
         <View style={s.searchWrap}>
-          <Text style={s.searchIcon}>⌕</Text>
+          <View style={s.searchIcon}>
+            <SearchIcon color={colors.textMuted} size={18} />
+          </View>
           <TextInput
             style={s.searchInput}
             value={search}
@@ -112,7 +115,7 @@ export const GroupsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <Text style={[s.filterSquareText, filter !== 'all' && s.filterSquareTextActive]}>≡</Text>
+          <FilterIcon color={filter !== 'all' ? '#1B4332' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -206,7 +209,7 @@ function createStyles(c: C) {
   iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
   searchWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 15, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12 },
-  searchIcon: { fontSize: 18, marginRight: 8, color: c.textMuted },
+  searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
   filterSquareActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
