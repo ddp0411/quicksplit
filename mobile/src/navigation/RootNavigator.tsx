@@ -1,9 +1,10 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useUserStore } from '../state/userStore';
+import { useTheme } from '../theme/useTheme';
 
 // Auth screens
 import { SplashScreen } from '../screens/SplashScreen';
@@ -30,37 +31,120 @@ import {
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const navigationRef = createNavigationContainerRef();
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: Record<string, string> = {
-    Home: '🏠', Friends: '👥', Groups: '🏝️', Personal: '✨', Account: '👤',
+    Home: '⌂', Friends: '♙', Groups: '◇', Personal: '✦', Account: '○',
   };
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
+    <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
       {icons[name] ?? '●'}
     </Text>
   );
 }
 
+function PlaceholderScreen() {
+  return null;
+}
+
 function MainTabs() {
+  const { colors } = useTheme();
+  const [showActions, setShowActions] = useState(false);
+
+  const actionItems = [
+    { icon: '+', title: 'Add Expense', subtitle: 'Split a bill with friends', tab: 'Home', screen: 'AddExpense', color: '#FF6B35' },
+    { icon: '▣', title: 'Scan Bill', subtitle: 'Capture a receipt instantly', tab: 'Home', screen: 'Scan', color: '#F59E0B' },
+    { icon: '₹', title: 'Settle Up', subtitle: 'Record a payment', tab: 'Home', screen: 'SettleUp', color: '#1B4332' },
+  ];
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarShowLabel: true,
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#FF6B35',
-        tabBarInactiveTintColor: '#9CA3AF',
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Friends" component={FriendsStack} />
-      <Tab.Screen name="Groups" component={GroupsStack} />
-      <Tab.Screen name="Personal" component={PersonalStack} />
-      <Tab.Screen name="Account" component={AccountStack} />
-    </Tab.Navigator>
+    <>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarShowLabel: route.name !== 'Action',
+          tabBarStyle: [
+            styles.tabBar,
+            { backgroundColor: colors.card, borderColor: colors.cardBorder },
+          ],
+          tabBarActiveTintColor: '#1B4332',
+          tabBarInactiveTintColor: '#9CA3AF',
+          tabBarLabelStyle: styles.tabLabel,
+          tabBarItemStyle: route.name === 'Action' ? styles.actionTabItem : styles.tabItem,
+          tabBarIcon: ({ focused }) => route.name === 'Action'
+            ? null
+            : <TabIcon name={route.name} focused={focused} />,
+          tabBarButton: route.name === 'Action'
+            ? () => (
+              <TouchableOpacity
+                style={styles.centerAction}
+                activeOpacity={0.9}
+                onPress={() => setShowActions(true)}
+              >
+                <Text style={styles.centerActionText}>+</Text>
+              </TouchableOpacity>
+            )
+            : undefined,
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeStack} />
+        <Tab.Screen name="Friends" component={FriendsStack} />
+        <Tab.Screen name="Action" component={PlaceholderScreen} />
+        <Tab.Screen name="Groups" component={GroupsStack} />
+        <Tab.Screen name="Personal" component={PersonalStack} />
+        <Tab.Screen name="Account" component={AccountStack} />
+      </Tab.Navigator>
+
+      <Modal
+        visible={showActions}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowActions(false)}
+      >
+        <TouchableOpacity
+          style={styles.sheetOverlay}
+          activeOpacity={1}
+          onPress={() => setShowActions(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[styles.actionSheet, { backgroundColor: colors.bg }]}
+          >
+            <View style={styles.sheetHandle} />
+            <Text style={[styles.sheetTitle, { color: colors.text }]}>Quick action</Text>
+            <Text style={[styles.sheetSubtitle, { color: colors.textSub }]}>
+              Start the next split in one tap.
+            </Text>
+            {actionItems.map((item) => (
+              <TouchableOpacity
+                key={item.title}
+                style={[styles.sheetRow, { borderColor: colors.cardBorder }]}
+                activeOpacity={0.82}
+                onPress={() => {
+                  setShowActions(false);
+                  setTimeout(() => {
+                    // Screens live in the Home stack so this works from any tab.
+                    if (navigationRef.isReady()) {
+                      (navigationRef as any).navigate(item.tab, { screen: item.screen });
+                    }
+                  }, 180);
+                }}
+              >
+                <View style={[styles.sheetIcon, { backgroundColor: item.color }]}>
+                  <Text style={styles.sheetIconText}>{item.icon}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.sheetRowTitle, { color: colors.text }]}>{item.title}</Text>
+                  <Text style={[styles.sheetRowSub, { color: colors.textSub }]}>{item.subtitle}</Text>
+                </View>
+                <Text style={[styles.sheetArrow, { color: colors.textMuted }]}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+    </>
   );
 }
 
@@ -153,7 +237,7 @@ export function RootNavigator() {
   const { isAuthenticated } = useUserStore();
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {isAuthenticated ? <MainTabs /> : <AuthStack />}
     </NavigationContainer>
   );
@@ -161,16 +245,121 @@ export function RootNavigator() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#E7E5E4',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    height: 60,
-    paddingBottom: 8,
-    paddingTop: 6,
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 14,
+    height: 72,
+    borderRadius: 26,
+    borderWidth: 1,
+    paddingBottom: 10,
+    paddingTop: 9,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    elevation: 12,
   },
+  tabItem: { paddingTop: 1 },
+  actionTabItem: { width: 64 },
+  tabIcon: {
+    fontSize: 23,
+    color: '#9CA3AF',
+    lineHeight: 25,
+    fontWeight: '800',
+  },
+  tabIconActive: { color: '#1B4332' },
   tabLabel: {
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '800',
+    marginTop: 1,
+  },
+  centerAction: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#FF6B35',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginTop: -21,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 14,
+  },
+  centerActionText: {
+    color: '#FFFFFF',
+    fontSize: 34,
+    lineHeight: 36,
+    fontWeight: '300',
+  },
+  sheetOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(17,24,39,0.45)',
+    justifyContent: 'flex-end',
+  },
+  actionSheet: {
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 36,
+  },
+  sheetHandle: {
+    width: 38,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#D1D5DB',
+    alignSelf: 'center',
+    marginBottom: 18,
+  },
+  sheetTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    fontFamily: 'PlayfairDisplay_700Bold',
+    textAlign: 'center',
+  },
+  sheetSubtitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  sheetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 14,
+    marginTop: 10,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+  },
+  sheetIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetIconText: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+  },
+  sheetRowTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  sheetRowSub: {
+    fontSize: 12,
     marginTop: 2,
+  },
+  sheetArrow: {
+    fontSize: 24,
+    fontWeight: '300',
   },
 });

@@ -1,7 +1,6 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  Modal, Animated,
 } from 'react-native';
 import { useTheme } from '../theme/useTheme';
 
@@ -66,8 +65,6 @@ export const HomeScreen: React.FC = () => {
   const { colors } = useTheme();
   const { toast } = useToastStore();
   const s = createStyles(colors);
-  const [showFAB, setShowFAB] = useState(false);
-  const fabAnim = useRef(new Animated.Value(0)).current;
 
   const sendReminder = async (friend: any) => {
     try {
@@ -85,15 +82,6 @@ export const HomeScreen: React.FC = () => {
 
   const todayInsight = useMemo(() => AI_INSIGHTS[new Date().getDate() % AI_INSIGHTS.length], []);
   const todayQuote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
-
-  const openFAB = () => {
-    setShowFAB(true);
-    Animated.spring(fabAnim, { toValue: 1, useNativeDriver: true, damping: 20, stiffness: 200 }).start();
-  };
-
-  const closeFAB = () => {
-    Animated.timing(fabAnim, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => setShowFAB(false));
-  };
 
   const { data: balance, isLoading: balanceLoading } = useQuery({
     queryKey: ['balance-overview'],
@@ -392,44 +380,6 @@ export const HomeScreen: React.FC = () => {
 
       </ScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity style={s.fab} onPress={openFAB} activeOpacity={0.85}>
-        <Text style={s.fabText}>+</Text>
-      </TouchableOpacity>
-
-      {/* FAB Action Sheet */}
-      <Modal visible={showFAB} transparent animationType="none" onRequestClose={closeFAB}>
-        <TouchableOpacity style={s.fabOverlay} onPress={closeFAB} activeOpacity={1}>
-          <Animated.View
-            style={[s.fabSheet, {
-              transform: [{ translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [300, 0] }) }],
-              opacity: fabAnim,
-            }]}
-          >
-            <View style={s.fabHandle} />
-            {[
-              { emoji: '➕', label: 'Add Expense', sub: 'Split a bill or expense', screen: 'AddExpense', color: '#FF6B35' },
-              { emoji: '📷', label: 'Scan Bill', sub: 'Scan receipt with camera', screen: 'Scan', color: '#F59E0B' },
-              { emoji: '💸', label: 'Settle Up', sub: 'Record a payment', screen: 'SettleUp', color: '#1B4332' },
-            ].map((item) => (
-              <TouchableOpacity
-                key={item.label}
-                style={s.fabRow}
-                onPress={() => { closeFAB(); setTimeout(() => navigation.navigate(item.screen), 250); }}
-              >
-                <View style={[s.fabRowIcon, { backgroundColor: item.color }]}>
-                  <Text style={{ fontSize: 20 }}>{item.emoji}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.fabRowLabel}>{item.label}</Text>
-                  <Text style={s.fabRowSub}>{item.sub}</Text>
-                </View>
-                <Text style={s.fabRowArrow}>›</Text>
-              </TouchableOpacity>
-            ))}
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -503,15 +453,5 @@ function createStyles(c: C) {
   insightLabel: { fontSize: 10, fontWeight: '800', color: c.textMuted, letterSpacing: 1, marginBottom: 3 },
   insightText: { fontSize: 13, color: c.sectionLabel, lineHeight: 18 },
   insightCta: { fontSize: 13, fontWeight: '700', color: '#1B4332', marginLeft: 8 },
-  fab: { position: 'absolute', bottom: 90, right: 20, width: 56, height: 56, borderRadius: 28, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', shadowColor: '#1B4332', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 10 },
-  fabText: { color: '#FFFFFF', fontSize: 28, fontWeight: '300', lineHeight: 32 },
-  fabOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  fabSheet: { backgroundColor: c.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingBottom: 40, paddingTop: 12 },
-  fabHandle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginBottom: 16 },
-  fabRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
-  fabRowIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  fabRowLabel: { fontSize: 16, fontWeight: '700', color: c.text },
-  fabRowSub: { fontSize: 12, color: c.textMuted, marginTop: 2 },
-  fabRowArrow: { fontSize: 20, color: c.textMuted },
   });
 }

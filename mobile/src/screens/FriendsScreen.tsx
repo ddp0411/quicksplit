@@ -136,22 +136,35 @@ export const FriendsScreen: React.FC = () => {
 
   const totalOwedToYou = (balanceData as any)?.total_owed_to_you ?? 0;
   const totalYouOwe = (balanceData as any)?.total_you_owe ?? 0;
-  const activeFilter = FILTER_OPTIONS.find((o) => o.value === filter);
-
   return (
     <SafeAreaView style={s.safe}>
-      <View style={s.header}>
+      <View style={s.topBar}>
+        <View style={s.topBarSide} />
         <Text style={s.title}>Friends</Text>
-        <View style={s.headerRight}>
-          <TouchableOpacity style={[s.filterBtn, filter !== 'all' && s.filterBtnActive]} onPress={() => setShowFilter(true)}>
-            <Text style={[s.filterBtnText, filter !== 'all' && s.filterBtnTextActive]}>
-              {filter !== 'all' ? activeFilter?.label : '⚙ Filter'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={s.addBtn} onPress={() => navigation.navigate('AddFriend')}>
-            <Text style={s.addBtnText}>+ Add</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={s.iconBtn} onPress={() => navigation.navigate('AddFriend')}>
+          <Text style={s.iconBtnText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={s.searchRow}>
+        <View style={s.searchWrap}>
+          <Text style={s.searchIcon}>⌕</Text>
+          <TextInput
+            style={s.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search friends"
+            placeholderTextColor="#9CA3AF"
+          />
         </View>
+        <TouchableOpacity
+          style={[s.filterSquare, filter !== 'all' && s.filterSquareActive]}
+          onPress={() => setShowFilter(true)}
+          activeOpacity={0.8}
+        >
+          <Text style={[s.filterSquareText, filter !== 'all' && s.filterSquareTextActive]}>≡</Text>
+          {filter !== 'all' && <View style={s.filterDot} />}
+        </TouchableOpacity>
       </View>
 
       {/* Balance summary chips */}
@@ -171,17 +184,6 @@ export const FriendsScreen: React.FC = () => {
           )}
         </View>
       )}
-
-      <View style={s.searchWrap}>
-        <Text style={s.searchIcon}>🔍</Text>
-        <TextInput
-          style={s.searchInput}
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search friends…"
-          placeholderTextColor="#9CA3AF"
-        />
-      </View>
 
       {(requests as any[]).length > 0 && (
         <View style={s.requestsBanner}>
@@ -294,22 +296,24 @@ export const FriendsScreen: React.FC = () => {
 function createStyles(c: C) {
   return StyleSheet.create({
   safe: { flex: 1, backgroundColor: c.bg },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 },
-  title: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
-  headerRight: { flexDirection: 'row', gap: 8 },
-  filterBtn: { backgroundColor: c.pillBg, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
-  filterBtnActive: { backgroundColor: '#F0FDF4', borderWidth: 1, borderColor: '#1B4332' },
-  filterBtnText: { color: c.sectionLabel, fontSize: 12, fontWeight: '600' },
-  filterBtnTextActive: { color: '#1B4332' },
-  addBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
-  addBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  topBar: { height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
+  topBarSide: { width: 38 },
+  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold', textAlign: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', shadowColor: '#1B4332', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
+  iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
+  filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
+  filterSquareActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
+  filterSquareText: { color: c.sectionLabel, fontSize: 22, fontWeight: '700', lineHeight: 24 },
+  filterSquareTextActive: { color: '#1B4332' },
+  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF6B35' },
   balanceSummary: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 10 },
   summaryChip: { flex: 1, backgroundColor: '#F0FDF4', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#BBF7D0' },
   summaryChipRed: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
   summaryLabel: { fontSize: 11, fontWeight: '600', color: '#16A34A', marginBottom: 2 },
   summaryValue: { fontSize: 16, fontWeight: '800', color: '#16A34A' },
-  searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, marginHorizontal: 20, paddingHorizontal: 12, marginBottom: 12 },
-  searchIcon: { fontSize: 16, marginRight: 8 },
+  searchWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 15, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12 },
+  searchIcon: { fontSize: 18, marginRight: 8, color: c.textMuted },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   requestsBanner: { marginHorizontal: 20, backgroundColor: '#FFFBEB', borderRadius: 16, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#FDE68A' },
   requestsLabel: { fontSize: 12, fontWeight: '700', color: '#92400E', marginBottom: 10 },
@@ -319,7 +323,7 @@ function createStyles(c: C) {
   acceptBtn: { backgroundColor: '#1B4332', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
   acceptBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
-  friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
+  friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   avatar: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   friendName: { fontSize: 14, fontWeight: '700', color: c.text },
