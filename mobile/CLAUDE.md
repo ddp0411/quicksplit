@@ -48,9 +48,17 @@ utils/                         upi.ts (UPI link/validate, ₹ format), helpers.t
 ```
 
 ## API base URL (`src/config/api.ts`)
+Driven by **`EXPO_PUBLIC_API_URL`** (inlined at build; set per profile in `eas.json`). Falls back
+to local dev when unset:
 - Android emulator → `http://10.0.2.2:9000/api/v1`
 - iOS simulator → `http://localhost:9000/api/v1`
-- **Physical device** → replace with your machine's LAN IP (e.g. `http://192.168.x.x:9000/api/v1`).
+- **Physical device** → set `EXPO_PUBLIC_API_URL` to your machine's LAN IP, e.g.
+  `EXPO_PUBLIC_API_URL=http://192.168.x.x:9000/api/v1`.
+
+Builds: `eas.json` has `development` / `preview` (internal) / `production` profiles. The `preview`
+and `production` profiles' `EXPO_PUBLIC_API_URL` are placeholders (`REPLACE_WITH_RAILWAY_URL`) until
+the backend is deployed. Bundle IDs (`com.quicksplit.app`) live in `app.json`; run `eas init` to
+populate `extra.eas.projectId`.
 
 ## Conventions
 - **Auth:** token persisted in AsyncStorage via Zustand. `App.tsx`'s `AuthBridge` injects the
@@ -61,13 +69,11 @@ utils/                         upi.ts (UPI link/validate, ₹ format), helpers.t
 - **Parity:** these screens mirror `../frontend/src/pages`. When changing a feature, mirror it
   on web too.
 
-## Active work (uncommitted) — navigation redesign
-Modified: `navigation/RootNavigator.tsx`, `screens/HomeScreen.tsx`, `screens/FriendsScreen.tsx`,
-`screens/GroupsScreen.tsx`. The "+" center action sheet (Add Expense / Scan Bill / Settle Up) is
-being centralized into the tab bar's center button in `RootNavigator` (using a `navigationRef`
-to route into the Home stack), and the per-screen FAB in `HomeScreen` is removed. Tab icons
-move from emoji to minimalist glyphs (⌂ ♙ ◇ ✦ ○). **Finish, typecheck, verify on a
-simulator, and commit this before starting anything else.**
+## Navigation redesign (done)
+The "+" action sheet (Add Expense / Scan Bill / Settle Up) is centralized into the tab bar's
+center button in `RootNavigator` (uses `navigationRef` to route into the Home stack); per-screen
+FABs are gone. Tab icons are minimalist glyphs (⌂ ♙ ◇ ✦ ○) on a floating rounded tab bar.
+Friends/Groups headers use a centered title + circular add button + search-row with filter-square.
 
 ## Stubs / not done
 `RemainingScreens.tsx` contains placeholder implementations for several account/premium/
