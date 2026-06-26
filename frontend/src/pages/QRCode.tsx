@@ -152,7 +152,7 @@ export const QRCodePage: React.FC = () => {
             >
               <div
                 className="flex h-16 w-16 items-center justify-center rounded-3xl text-xl font-extrabold text-white shadow-md"
-                style={{ background: '#0F9D94' }}
+                style={{ background: '#0F4B70' }}
               >
                 {initials}
               </div>
@@ -165,7 +165,7 @@ export const QRCodePage: React.FC = () => {
                   value={profileLink}
                   size={200}
                   bgColor="#ffffff"
-                  fgColor="#0F9D94"
+                  fgColor="#0F4B70"
                   level="M"
                   imageSettings={{ src: '', height: 0, width: 0, excavate: false }}
                 />

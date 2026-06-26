@@ -18,13 +18,13 @@ function createStyles(c: C) {
     logoSection: { alignItems: 'center', marginBottom: 28 },
     logoBox: {
       width: 56, height: 56, borderRadius: 16,
-      backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center',
       marginBottom: 14,
-      shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+      shadowColor: '#0466C8', shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
     },
-    logoText: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', fontFamily: 'PlayfairDisplay_700Bold' },
-    heading: { fontSize: 28, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
+    logoText: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold' },
+    heading: { fontSize: 28, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
     subheading: { marginTop: 4, fontSize: 14, color: c.textSub },
     errorBox: {
       backgroundColor: '#FFF1F2', borderColor: '#FECACA', borderWidth: 1,
@@ -51,20 +51,20 @@ function createStyles(c: C) {
       borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center',
       marginTop: 2,
     },
-    checkboxChecked: { backgroundColor: '#1B4332', borderColor: '#1B4332' },
+    checkboxChecked: { backgroundColor: '#0F4B70', borderColor: '#0F4B70' },
     termsText: { flex: 1, fontSize: 13, color: c.textSub, lineHeight: 20 },
-    termsLink: { color: '#1B4332', fontWeight: '700' },
+    termsLink: { color: '#0F4B70', fontWeight: '700' },
     submitBtn: {
-      backgroundColor: '#FF6B35', borderRadius: 16,
+      backgroundColor: '#0466C8', borderRadius: 16,
       paddingVertical: 16, alignItems: 'center',
-      shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+      shadowColor: '#0466C8', shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
     },
     disabled: { opacity: 0.6 },
     submitText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
     footerText: { fontSize: 14, color: c.textSub },
-    footerLink: { fontSize: 14, fontWeight: '700', color: '#1B4332' },
+    footerLink: { fontSize: 14, fontWeight: '700', color: '#0F4B70' },
   });
 }
 

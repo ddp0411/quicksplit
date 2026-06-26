@@ -32,7 +32,7 @@ function createStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
-    title: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
+    title: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     profileCard: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 16, marginBottom: 12, marginTop: 8 },
     avatar: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
@@ -42,11 +42,11 @@ function createStyles(c: C) {
     upiId: { fontSize: 11, color: c.textMuted, marginTop: 2 },
     editBtn: { backgroundColor: c.pillBg, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
     editBtnText: { fontSize: 13, fontWeight: '700', color: c.sectionLabel },
-    proBanner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#1B4332', borderRadius: 16, padding: 16, marginBottom: 16 },
+    proBanner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#0F4B70', borderRadius: 16, padding: 16, marginBottom: 16 },
     proEmoji: { fontSize: 24 },
     proTitle: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
     proSub: { fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 2 },
-    proBadge: { backgroundColor: '#FF6B35', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+    proBadge: { backgroundColor: '#0466C8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
     proBadgeText: { color: '#FFFFFF', fontSize: 11, fontWeight: '800' },
     section: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, marginBottom: 12, overflow: 'hidden' },
     sectionLabel: { fontSize: 11, fontWeight: '700', color: c.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
@@ -74,7 +74,7 @@ export const AccountScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={s.scroll}>
         <View style={s.profileCard}>
-          <View style={[s.avatar, { backgroundColor: user?.avatar_color ?? '#1B4332' }]}>
+          <View style={[s.avatar, { backgroundColor: user?.avatar_color ?? '#0F4B70' }]}>
             <Text style={s.avatarText}>{avatarInitials(user?.name ?? 'U')}</Text>
           </View>
           <View style={{ flex: 1 }}>

@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from api import views
 
 urlpatterns = [
@@ -6,6 +7,10 @@ urlpatterns = [
     path("auth/register", views.RegisterView.as_view(), name="auth-register"),
     path("auth/login", views.LoginView.as_view(), name="auth-login"),
     path("auth/me", views.MeView.as_view(), name="auth-me"),
+    # Refresh: POST {"refresh": <token>} → {"access", "refresh"} (rotated).
+    path("auth/refresh", TokenRefreshView.as_view(), name="auth-refresh"),
+    # Logout: POST {"refresh": <token>} → blacklists it (hard revoke).
+    path("auth/logout", TokenBlacklistView.as_view(), name="auth-logout"),
 
     # OCR
     path("ocr/upload", views.OCRUploadView.as_view(), name="ocr-upload"),

@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, TextInput,
   StyleSheet, RefreshControl, Alert,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { friendsAPI, type Friend } from '../services/api/friendsAPI';
@@ -49,8 +49,8 @@ function SwipeActions({
 }) {
   const s = createSwipeStyles(c);
   const actions = [
-    { label: '➕', sublabel: 'Add', onPress: onAdd, bg: '#1B4332' },
-    { label: '💸', sublabel: 'Settle', onPress: onSettle, bg: '#FF6B35' },
+    { label: '➕', sublabel: 'Add', onPress: onAdd, bg: '#0F4B70' },
+    { label: '💸', sublabel: 'Settle', onPress: onSettle, bg: '#0466C8' },
     { label: '🔔', sublabel: 'Remind', onPress: onRemind, bg: '#D97706' },
     { label: '✕', sublabel: 'Remove', onPress: onRemove, bg: '#DC2626' },
   ];
@@ -104,6 +104,15 @@ export const FriendsScreen: React.FC = () => {
     queryKey: ['balances'],
     queryFn: balancesAPI.getOverallBalance,
   });
+
+  // Refresh on focus so settlements/new expenses made elsewhere show up here.
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      queryClient.invalidateQueries({ queryKey: ['friend-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['balances'] });
+    }, [queryClient])
+  );
 
   const acceptMutation = useMutation({
     mutationFn: (id: number) => friendsAPI.acceptRequest(id),
@@ -165,7 +174,7 @@ export const FriendsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <FilterIcon color={filter !== 'all' ? '#1B4332' : colors.sectionLabel} size={20} />
+          <FilterIcon color={filter !== 'all' ? '#0F4B70' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -193,7 +202,7 @@ export const FriendsScreen: React.FC = () => {
           <Text style={s.requestsLabel}>Pending requests ({(requests as any[]).length})</Text>
           {(requests as any[]).map((req: any) => (
             <View key={req.id} style={s.requestRow}>
-              <View style={[s.avatar, { backgroundColor: req.from_user?.avatar_color ?? '#1B4332' }]}>
+              <View style={[s.avatar, { backgroundColor: req.from_user?.avatar_color ?? '#0F4B70' }]}>
                 <Text style={s.avatarText}>{avatarInitials(req.from_user?.name ?? 'U')}</Text>
               </View>
               <View style={{ flex: 1 }}>
@@ -217,7 +226,7 @@ export const FriendsScreen: React.FC = () => {
           data={filtered}
           keyExtractor={(item) => String(item.friendship_id)}
           contentContainerStyle={s.list}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#1B4332" />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#0F4B70" />}
           ListEmptyComponent={
             <EmptyState
               icon={search || filter !== 'all' ? '🔍' : '👥'}
@@ -301,17 +310,17 @@ function createStyles(c: C) {
   safe: { flex: 1, backgroundColor: c.bg },
   topBar: { height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
   topBarSide: { width: 38 },
-  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold', textAlign: 'center' },
-  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', shadowColor: '#1B4332', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
+  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', textAlign: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center', shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
   iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
   filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
-  filterSquareActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
+  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
   filterSquareText: { color: c.sectionLabel, fontSize: 22, fontWeight: '700', lineHeight: 24 },
-  filterSquareTextActive: { color: '#1B4332' },
-  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF6B35' },
+  filterSquareTextActive: { color: '#0F4B70' },
+  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#0466C8' },
   balanceSummary: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 10 },
-  summaryChip: { flex: 1, backgroundColor: '#F0FDF4', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#BBF7D0' },
+  summaryChip: { flex: 1, backgroundColor: '#E8F3FA', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#C4DFEF' },
   summaryChipRed: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
   summaryLabel: { fontSize: 11, fontWeight: '600', color: '#16A34A', marginBottom: 2 },
   summaryValue: { fontSize: 16, fontWeight: '800', color: '#16A34A' },
@@ -323,7 +332,7 @@ function createStyles(c: C) {
   requestRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   reqName: { fontSize: 14, fontWeight: '600', color: c.text },
   reqEmail: { fontSize: 12, color: c.textSub },
-  acceptBtn: { backgroundColor: '#1B4332', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
+  acceptBtn: { backgroundColor: '#0F4B70', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
   acceptBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
   friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
@@ -335,7 +344,7 @@ function createStyles(c: C) {
   settledText: { fontSize: 11, fontWeight: '700', color: c.textSub },
   owedText: { fontSize: 12, fontWeight: '700', color: '#16A34A' },
   oweText: { fontSize: 12, fontWeight: '700', color: '#DC2626' },
-  actionChipGreen: { backgroundColor: '#F0FDF4', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#BBF7D0' },
+  actionChipGreen: { backgroundColor: '#E8F3FA', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#C4DFEF' },
   actionChipGreenText: { fontSize: 10, fontWeight: '700', color: '#16A34A' },
   actionChipRed: { backgroundColor: '#FEF2F2', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#FECACA' },
   actionChipRedText: { fontSize: 10, fontWeight: '700', color: '#DC2626' },
@@ -343,7 +352,7 @@ function createStyles(c: C) {
   emptyEmoji: { fontSize: 48, marginBottom: 16 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
   emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center', maxWidth: 260, marginBottom: 20 },
-  emptyBtn: { backgroundColor: '#FF6B35', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtn: { backgroundColor: '#0466C8', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }

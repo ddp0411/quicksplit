@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { activityAPI, type ActivityItem } from '../services/api/activityAPI';
@@ -45,6 +45,12 @@ export const ActivityScreen: React.FC = () => {
     queryFn: () => activityAPI.getFeed(50),
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
@@ -59,7 +65,7 @@ export const ActivityScreen: React.FC = () => {
         data={feed as ActivityItem[]}
         keyExtractor={item => item.id}
         contentContainerStyle={s.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#1B4332" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#0F4B70" />}
         ListEmptyComponent={
           !isLoading ? (
             <View style={s.empty}>

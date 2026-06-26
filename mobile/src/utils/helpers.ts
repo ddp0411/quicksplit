@@ -7,13 +7,13 @@ export const truncateText = (text: string, maxLength: number): string => {
   return text.substring(0, maxLength) + '...';
 };
 
+// Date-only display (e.g. "24 Jun 2026"). No time — expense `date` fields are
+// date-only, and rendering a time turned UTC-midnight into a spurious "5:30 am" in IST.
 export const formatDate = (date: string | Date): string => {
   return new Intl.DateTimeFormat('en-IN', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   }).format(new Date(date));
 };
 

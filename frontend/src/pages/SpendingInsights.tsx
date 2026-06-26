@@ -7,7 +7,7 @@ import { formatCurrency } from '@/utils/upi';
 
 const catMeta = Object.fromEntries(EXPENSE_CATEGORIES.map(c => [c.value, c]));
 
-const COLORS = ['#0F9D94', '#2BB673', '#F4A300', '#E74C3C', '#8B5CF6', '#F59E0B', '#3B82F6', '#EC4899', '#14B8A6', '#6366F1'];
+const COLORS = ['#0F4B70', '#2BB673', '#F4A300', '#E74C3C', '#8B5CF6', '#F59E0B', '#3B82F6', '#EC4899', '#14B8A6', '#6366F1'];
 
 const filters = ['This month', 'Last month', 'All time'];
 

@@ -45,6 +45,7 @@ def token_response(user) -> dict:
     refresh = RefreshToken.for_user(user)
     return {
         "access_token": str(refresh.access_token),
+        "refresh_token": str(refresh),
         "token_type": "bearer",
         "user": UserResponseSerializer(user).data,
     }
@@ -608,6 +609,7 @@ class ExpenseListView(APIView):
 
     def get(self, request):
         group_id = request.query_params.get("group_id")
+        with_user = request.query_params.get("with_user")
         limit = min(int(request.query_params.get("limit", 50)), 200)
         offset = int(request.query_params.get("offset", 0))
 
@@ -621,6 +623,12 @@ class ExpenseListView(APIView):
             paid_ids = Expense.objects.filter(paid_by=request.user).values_list("id", flat=True)
             share_ids = ExpenseShare.objects.filter(user=request.user).values_list("expense_id", flat=True)
             qs = Expense.objects.filter(Q(id__in=paid_ids) | Q(id__in=share_ids)).distinct()
+
+            # Restrict to expenses shared with a specific other user (friend detail view).
+            if with_user:
+                other_paid = Expense.objects.filter(paid_by_id=with_user).values_list("id", flat=True)
+                other_share = ExpenseShare.objects.filter(user_id=with_user).values_list("expense_id", flat=True)
+                qs = qs.filter(Q(id__in=other_paid) | Q(id__in=other_share))
 
         qs = qs.select_related("paid_by", "group").order_by("-date", "-created_at")[offset: offset + limit]
 

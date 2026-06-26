@@ -4,15 +4,12 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import {
   useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
-import {
-  PlayfairDisplay_700Bold,
-  PlayfairDisplay_800ExtraBold,
-} from '@expo-google-fonts/playfair-display';
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -29,21 +26,20 @@ function ToastLayer() {
 }
 
 function AuthBridge() {
-  const { token, logout } = useUserStore();
+  const { token, refreshToken, setTokens, logout } = useUserStore();
   useEffect(() => {
-    setAuthHandlers(() => token, logout);
-  }, [token, logout]);
+    setAuthHandlers(() => token, () => refreshToken, setTokens, logout);
+  }, [token, refreshToken, setTokens, logout]);
   return null;
 }
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    PlayfairDisplay_700Bold,
-    PlayfairDisplay_800ExtraBold,
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
 
   if (!fontsLoaded) return null;
@@ -53,7 +49,7 @@ export default function App() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <AuthBridge />
-          <View style={{ flex: 1, backgroundColor: '#FFFDF9' }}>
+          <View style={{ flex: 1, backgroundColor: '#F5F2F3' }}>
             <StatusBar style="dark" />
             <ToastLayer />
             <RootNavigator />

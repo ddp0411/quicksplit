@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   ScrollView, RefreshControl, TextInput, KeyboardAvoidingView,
   Platform, Modal, Alert, Share,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,11 +19,11 @@ import { useTheme } from '../theme/useTheme';
 type C = ReturnType<typeof useTheme>['colors'];
 
 const CATEGORY_MAP: Record<string, { emoji: string; gradientColors: string[] }> = {
-  home:   { emoji: '🏠', gradientColors: ['#064E3B', '#1B4332'] },
+  home:   { emoji: '🏠', gradientColors: ['#0A3858', '#0F4B70'] },
   trip:   { emoji: '✈️', gradientColors: ['#1E1B4B', '#3730A3'] },
   couple: { emoji: '💑', gradientColors: ['#831843', '#BE185D'] },
   work:   { emoji: '💼', gradientColors: ['#78350F', '#B45309'] },
-  other:  { emoji: '🎉', gradientColors: ['#1B4332', '#065F46'] },
+  other:  { emoji: '🎉', gradientColors: ['#0F4B70', '#0A3858'] },
 };
 
 function avatarInitials(name: string) {
@@ -77,6 +77,16 @@ export const GroupDetailScreen: React.FC = () => {
     refetchInterval: 10000,
   });
 
+  // Refresh group + balances + expense list whenever the screen regains focus
+  // (e.g. returning from AddExpense or SettleUp launched against this group).
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ['group', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['group-balances', groupId] });
+      queryClient.invalidateQueries({ queryKey: ['expenses', { group_id: groupId }] });
+    }, [queryClient, groupId])
+  );
+
   const sendMessageMutation = useMutation({
     mutationFn: (content: string) => groupsAPI.sendGroupMessage(groupId, content),
     onSuccess: () => {
@@ -115,6 +125,23 @@ export const GroupDetailScreen: React.FC = () => {
     } catch { /* dismissed */ }
   };
 
+  // Settle what the current user owes in this group. Uses the simplified debt graph
+  // to pre-fill who to pay and how much; passes groupId so the settlement is scoped.
+  const handleSettle = () => {
+    const debts = (balances as any)?.simplified_debts ?? [];
+    const myDebt = debts.find((d: any) => d.from_user?.id === user?.id);
+    if (myDebt) {
+      navigation.navigate('SettleUp', {
+        userId: myDebt.to_user.id,
+        friendName: myDebt.to_user.name,
+        amount: myDebt.amount,
+        groupId,
+      });
+    } else {
+      toast('You have no outstanding balance to settle in this group', 'success');
+    }
+  };
+
   const handleRemoveMember = (member: any) => {
     if (!isAdmin) { toast('Only admins can remove members', 'error'); return; }
     Alert.alert('Remove member', `Remove ${member.user.name} from this group?`, [
@@ -141,7 +168,7 @@ export const GroupDetailScreen: React.FC = () => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.actionsRow}>
           {[
             { emoji: '➕', label: 'Add', onPress: () => navigation.navigate('AddExpense', { groupId }) },
-            { emoji: '💸', label: 'Settle', onPress: () => navigation.navigate('SettleUp') },
+            { emoji: '💸', label: 'Settle', onPress: handleSettle },
             { emoji: '📊', label: 'Insights', onPress: () => navigation.navigate('GroupInsights', { groupId }) },
             { emoji: '💬', label: 'Chat', onPress: () => setActiveTab('chat') },
             { emoji: '🔗', label: 'Invite', onPress: handleInvite },
@@ -158,7 +185,7 @@ export const GroupDetailScreen: React.FC = () => {
           <View style={s.analyticsCard}>
             {[
               { value: formatCurrency((balances as any).total_expenses), label: 'Total spent' },
-              { value: String((group as any)?.member_count ?? 0), label: 'Members' },
+              { value: String((group as any)?.members?.length ?? 0), label: 'Members' },
               { value: String((expenses as ExpenseListItem[]).length), label: 'Expenses' },
             ].map((item, i) => (
               <React.Fragment key={item.label}>
@@ -183,7 +210,7 @@ export const GroupDetailScreen: React.FC = () => {
           >
             <Text style={[s.tabLabel, activeTab === tab && s.tabLabelActive]}>
               {tab === 'expenses' ? 'Expenses'
-                : tab === 'members' ? `Members (${(group as any)?.member_count ?? 0})`
+                : tab === 'members' ? `Members (${(group as any)?.members?.length ?? 0})`
                 : 'Chat 💬'}
             </Text>
           </TouchableOpacity>
@@ -194,7 +221,7 @@ export const GroupDetailScreen: React.FC = () => {
       {activeTab === 'expenses' && (
         <ScrollView
           contentContainerStyle={s.scroll}
-          refreshControl={<RefreshControl refreshing={loadingGroup} onRefresh={refetchGroup} tintColor="#1B4332" />}
+          refreshControl={<RefreshControl refreshing={loadingGroup} onRefresh={refetchGroup} tintColor="#0F4B70" />}
         >
           {balances && (balances as any).simplified_debts?.length > 0 && (
             <View style={s.section}>
@@ -374,7 +401,7 @@ function createStyles(c: C) {
   heroTop: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
   backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   backText: { fontSize: 18, color: '#FFFFFF' },
-  heroName: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', fontFamily: 'PlayfairDisplay_700Bold' },
+  heroName: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', fontFamily: 'PlusJakartaSans_700Bold' },
   heroCategory: { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2, textTransform: 'capitalize' },
   actionsRow: { paddingLeft: 16, marginBottom: 12 },
   actionBtn: { alignItems: 'center', marginRight: 12, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, minWidth: 64 },
@@ -387,14 +414,14 @@ function createStyles(c: C) {
   analyticDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.2)', marginVertical: 4 },
   tabBar: { flexDirection: 'row', backgroundColor: c.card, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  tabBtnActive: { borderBottomColor: '#1B4332' },
+  tabBtnActive: { borderBottomColor: '#0F4B70' },
   tabLabel: { fontSize: 12, fontWeight: '600', color: c.textMuted },
-  tabLabelActive: { color: '#1B4332' },
+  tabLabelActive: { color: '#0F4B70' },
   scroll: { paddingBottom: 100 },
   section: { paddingHorizontal: 20, paddingTop: 20 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   sectionTitle: { fontSize: 13, fontWeight: '700', color: c.textSub, textTransform: 'uppercase', letterSpacing: 0.5 },
-  addMemberBtn: { backgroundColor: '#FF6B35', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
+  addMemberBtn: { backgroundColor: '#0466C8', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 },
   addMemberText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   debtRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFBEB', borderRadius: 12, borderWidth: 1, borderColor: '#FDE68A', padding: 12, marginBottom: 8 },
   debtAvatar: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
@@ -414,7 +441,7 @@ function createStyles(c: C) {
   memberAvatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   memberName: { fontSize: 14, fontWeight: '700', color: c.text },
   memberEmail: { fontSize: 12, color: c.textMuted, marginTop: 2 },
-  adminBadge: { backgroundColor: '#F0FDF4', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, marginRight: 8 },
+  adminBadge: { backgroundColor: '#E8F3FA', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, marginRight: 8 },
   adminText: { fontSize: 11, fontWeight: '700', color: '#16A34A' },
   removeBtn: { backgroundColor: '#FEF2F2', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   removeBtnText: { fontSize: 11, fontWeight: '700', color: '#DC2626' },
@@ -427,7 +454,7 @@ function createStyles(c: C) {
   bubbleAvatar: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   bubbleAvatarText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
   bubble: { maxWidth: '72%', borderRadius: 16, padding: 12 },
-  bubbleMe: { backgroundColor: '#1B4332', borderBottomRightRadius: 4 },
+  bubbleMe: { backgroundColor: '#0F4B70', borderBottomRightRadius: 4 },
   bubbleThem: { backgroundColor: c.card, borderWidth: 1, borderColor: c.cardBorder, borderBottomLeftRadius: 4 },
   bubbleSender: { fontSize: 11, fontWeight: '700', color: c.textSub, marginBottom: 2 },
   bubbleText: { fontSize: 14, color: c.text, lineHeight: 20 },
@@ -436,7 +463,7 @@ function createStyles(c: C) {
   bubbleTimeMe: { color: 'rgba(255,255,255,0.6)' },
   chatInput: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder, backgroundColor: c.card },
   chatTextInput: { flex: 1, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: c.text, maxHeight: 100 },
-  sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center' },
   sendBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
   fieldInput: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text, marginBottom: 16 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
@@ -446,7 +473,7 @@ function createStyles(c: C) {
   modalBtnRow: { flexDirection: 'row', gap: 10 },
   modalCancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   modalCancelText: { fontSize: 14, fontWeight: '700', color: c.sectionLabel },
-  modalConfirmBtn: { flex: 1, backgroundColor: '#1B4332', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  modalConfirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   modalConfirmText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   });
 }

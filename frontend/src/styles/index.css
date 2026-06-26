@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,19 +6,19 @@
 
 @layer base {
   :root {
-    --bg:        #FFFDF9;
+    --bg:        #F5F2F3;
     --card:      #FFFFFF;
-    --border:    #E7E5E4;
-    --text:      #111111;
-    --text-muted:#6B7280;
+    --border:    #C4DFEF;
+    --text:      #04192B;
+    --text-muted:#5C677D;
   }
 
   .dark {
-    --bg:        #0F1F17;
-    --card:      #1A2E22;
-    --border:    #2D4A38;
-    --text:      #F5F5F0;
-    --text-muted:#9CA3AF;
+    --bg:        #020D16;
+    --card:      #04192B;
+    --border:    #0A3858;
+    --text:      #F5F2F3;
+    --text-muted:#8BBFD9;
     color-scheme: dark;
   }
 
@@ -49,7 +49,7 @@
 }
 
 @layer components {
-  /* Primary CTA — orange accent (#FF6B35) */
+  /* Primary CTA — orange accent (#0466C8) */
   .btn-primary {
     @apply rounded-2xl bg-accent-500 px-6 py-3 font-semibold text-white shadow-button
            transition-all duration-200 hover:bg-accent-600 active:scale-[0.98]
