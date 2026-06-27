@@ -55,7 +55,7 @@ export const BudgetDashboard: React.FC = () => {
             <circle cx="44" cy="44" r="38" fill="none" stroke="var(--border)" strokeWidth="10" />
             <circle
               cx="44" cy="44" r="38" fill="none"
-              stroke={pct > 80 ? '#F4A300' : '#0F9D94'}
+              stroke={pct > 80 ? '#F4A300' : '#0F4B70'}
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 38}`}

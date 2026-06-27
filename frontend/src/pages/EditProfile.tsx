@@ -7,7 +7,7 @@ import { useUserStore } from '@/state/userStore';
 import { getAPIErrorMessage } from '@/services/api/errorMessage';
 
 const AVATAR_COLORS = [
-  '#0F9D94', '#2BB673', '#E74C3C', '#F4A300',
+  '#0F4B70', '#2BB673', '#E74C3C', '#F4A300',
   '#8B5CF6', '#3B82F6', '#EC4899', '#14B8A6',
 ];
 

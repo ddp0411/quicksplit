@@ -14,6 +14,7 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
   user: {
     id: string;
@@ -48,5 +49,10 @@ export const authAPI = {
   getCurrentUser: async () => {
     const response = await axiosClient.get('/auth/me');
     return response.data;
+  },
+
+  // Best-effort server-side revoke (blacklists the refresh token).
+  logout: async (refreshToken: string) => {
+    await axiosClient.post('/auth/logout', { refresh: refreshToken });
   },
 };

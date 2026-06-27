@@ -92,7 +92,7 @@ export interface CreateExpenseRequest {
 }
 
 export const expensesAPI = {
-  getExpenses: async (params?: { group_id?: string; limit?: number; offset?: number }): Promise<ExpenseListItem[]> => {
+  getExpenses: async (params?: { group_id?: string; with_user?: string; limit?: number; offset?: number }): Promise<ExpenseListItem[]> => {
     const res = await axiosClient.get<ExpenseListItem[]>('/expenses/', { params });
     return res.data;
   },

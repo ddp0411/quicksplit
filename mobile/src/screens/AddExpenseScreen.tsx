@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { expensesAPI, EXPENSE_CATEGORIES, type ExpenseCategory } from '../services/api/expensesAPI';
+import { getAPIErrorMessage } from '../services/api/errorMessage';
 import { groupsAPI } from '../services/api/groupsAPI';
 import { friendsAPI } from '../services/api/friendsAPI';
 import { useUserStore } from '../state/userStore';
@@ -126,7 +127,7 @@ function createDateStyles(c: C) {
     btnRow: { flexDirection: 'row', gap: 10 },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontSize: 14, fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#1B4332', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -165,7 +166,7 @@ function UserPickerModal({
               const sel = localSelected.includes(u.id);
               return (
                 <TouchableOpacity style={up.row} onPress={() => toggle(u.id)} activeOpacity={0.7}>
-                  <View style={[up.avatar, { backgroundColor: u.avatar_color || '#1B4332' }]}>
+                  <View style={[up.avatar, { backgroundColor: u.avatar_color || '#0F4B70' }]}>
                     <Text style={up.avatarText}>{avatarInitials(u.name)}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
@@ -214,12 +215,12 @@ function createPickerStyles(c: C) {
     name: { fontSize: 14, fontWeight: '700', color: c.text },
     email: { fontSize: 12, color: c.textMuted, marginTop: 1 },
     check: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: c.cardBorder, alignItems: 'center', justifyContent: 'center' },
-    checkActive: { backgroundColor: '#1B4332', borderColor: '#1B4332' },
+    checkActive: { backgroundColor: '#0F4B70', borderColor: '#0F4B70' },
     checkMark: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
     btnRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontSize: 14, fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#1B4332', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -235,6 +236,7 @@ export const AddExpenseScreen: React.FC = () => {
   const s = createStyles(colors);
 
   const preselectedGroupId: string | undefined = params?.groupId;
+  const preselectedUserId: string | undefined = params?.userId; // from a friend's "Add" action
   const today = new Date().toISOString().split('T')[0];
 
   const [description, setDescription] = useState('');
@@ -252,9 +254,13 @@ export const AddExpenseScreen: React.FC = () => {
 
   const [paidBy, setPaidBy] = useState<UserMini>({
     id: user!.id, name: user!.name, email: user!.email,
-    avatar_color: user!.avatar_color ?? '#1B4332',
+    avatar_color: user!.avatar_color ?? '#0F4B70',
   });
-  const [participants, setParticipants] = useState<string[]>([user!.id]);
+  const [participants, setParticipants] = useState<string[]>(
+    preselectedUserId && preselectedUserId !== user!.id
+      ? [user!.id, preselectedUserId]
+      : [user!.id]
+  );
   const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({});
   const [percentages, setPercentages] = useState<Record<string, string>>({});
   const [shares, setShares] = useState<Record<string, string>>({});
@@ -282,7 +288,7 @@ export const AddExpenseScreen: React.FC = () => {
     const friendUsers: UserMini[] = (friendsData as any[]).map((f: any) => f.user);
     const allIds = new Set(friendUsers.map((u) => u.id));
     if (!allIds.has(user!.id)) {
-      friendUsers.unshift({ id: user!.id, name: user!.name, email: user!.email, avatar_color: user!.avatar_color ?? '#1B4332' });
+      friendUsers.unshift({ id: user!.id, name: user!.name, email: user!.email, avatar_color: user!.avatar_color ?? '#0F4B70' });
     }
     return friendUsers;
   }, [groupId, groupDetail, friendsData, user]);
@@ -322,13 +328,18 @@ export const AddExpenseScreen: React.FC = () => {
       return expensesAPI.createExpense(payload);
     },
     onSuccess: () => {
+      // Refresh every surface that reflects this expense. Home/Friends/Group balances
+      // all read these keys; missing any one leaves the new expense invisible until refresh.
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['balances'] });
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['group-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
       toast('Expense added!', 'success');
       navigation.goBack();
     },
-    onError: () => toast('Failed to add expense', 'error'),
+    onError: (err) => toast(getAPIErrorMessage(err, 'Failed to add expense'), 'error'),
   });
 
   const handleSubmit = () => {
@@ -445,7 +456,7 @@ export const AddExpenseScreen: React.FC = () => {
               onPress={() => setShowPaidByPicker(true)}
               disabled={availableUsers.length <= 1}
             >
-              <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#1B4332' }]}>
+              <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#0F4B70' }]}>
                 <Text style={s.miniAvatarText}>{avatarInitials(paidBy.name)}</Text>
               </View>
               <Text style={[s.selectorText, { flex: 1, marginLeft: 8 }]}>{paidBy.name}</Text>
@@ -552,7 +563,7 @@ export const AddExpenseScreen: React.FC = () => {
               <Switch
                 value={isRecurring}
                 onValueChange={setIsRecurring}
-                trackColor={{ false: colors.cardBorder, true: '#1B4332' }}
+                trackColor={{ false: colors.cardBorder, true: '#0F4B70' }}
                 thumbColor="#FFFFFF"
               />
             </View>
@@ -613,15 +624,15 @@ function createStyles(c: C) {
     backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     backText: { fontSize: 18, color: c.text },
     title: { fontSize: 17, fontWeight: '700', color: c.text },
-    saveBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+    saveBtn: { backgroundColor: '#0466C8', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
     saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
     scroll: { paddingHorizontal: 20, paddingBottom: 120 },
-    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1B4332', borderRadius: 20, padding: 24, marginBottom: 6 },
+    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, marginBottom: 6 },
     currencySymbol: { fontSize: 32, fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginRight: 4 },
     amountInput: { fontSize: 48, fontWeight: '800', color: '#FFFFFF', minWidth: 120, textAlign: 'center' },
-    perPersonHint: { textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#FF6B35', marginBottom: 16 },
+    perPersonHint: { textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#0466C8', marginBottom: 16 },
     scanBtn: { backgroundColor: c.pillBg, borderRadius: 14, paddingVertical: 12, alignItems: 'center', marginBottom: 16, borderWidth: 1.5, borderColor: c.cardBorder, borderStyle: 'dashed' },
-    scanBtnText: { fontSize: 13, fontWeight: '700', color: '#FF6B35' },
+    scanBtnText: { fontSize: 13, fontWeight: '700', color: '#0466C8' },
     field: { marginBottom: 16 },
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     fieldInput: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },
@@ -635,16 +646,16 @@ function createStyles(c: C) {
     miniAvatar: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
     miniAvatarText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
     chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#BBF7D0' },
-    chipText: { fontSize: 13, fontWeight: '600', color: '#166534' },
+    chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#C4DFEF' },
+    chipText: { fontSize: 13, fontWeight: '600', color: '#0F4B70' },
     chipX: { fontSize: 16, color: '#16A34A', fontWeight: '700' },
     addChip: { backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: c.cardBorder },
     addChipText: { fontSize: 13, color: c.textSub, fontWeight: '600' },
     splitRow: { flexDirection: 'row', gap: 8 },
     splitOption: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
-    splitOptionActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
+    splitOptionActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
     splitOptionText: { fontSize: 14, fontWeight: '600', color: c.textSub },
-    splitOptionTextActive: { color: '#1B4332' },
+    splitOptionTextActive: { color: '#0F4B70' },
     splitInputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
     splitInputLabel: { fontSize: 14, color: c.sectionLabel, flex: 1 },
     splitInput: { backgroundColor: c.inputBg, borderRadius: 10, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14, color: c.text, width: 100, textAlign: 'right' },

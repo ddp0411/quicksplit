@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsAPI } from '../services/api/groupsAPI';
+import { getAPIErrorMessage } from '../services/api/errorMessage';
 import { useToastStore } from '../state/toastStore';
 import { useTheme } from '../theme/useTheme';
 
@@ -65,7 +66,7 @@ export const CreateGroupScreen: React.FC = () => {
       toast('Group created!', 'success');
       navigation.replace('GroupDetail', { groupId: (group as any).id });
     },
-    onError: () => toast('Failed to create group', 'error'),
+    onError: (err) => toast(getAPIErrorMessage(err, 'Failed to create group'), 'error'),
   });
 
   const addEmail = () => {
@@ -255,13 +256,13 @@ function createStyles(c: C) {
   stepRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 20 },
   stepItem: { alignItems: 'center' },
   stepDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
-  stepDotActive: { backgroundColor: '#1B4332' },
+  stepDotActive: { backgroundColor: '#0F4B70' },
   stepNum: { fontSize: 13, fontWeight: '700', color: c.textMuted },
   stepNumActive: { color: '#FFFFFF' },
   stepLabel: { fontSize: 11, color: c.textMuted, fontWeight: '600' },
-  stepLabelActive: { color: '#1B4332' },
+  stepLabelActive: { color: '#0F4B70' },
   stepLine: { flex: 1, height: 2, backgroundColor: c.cardBorder, marginHorizontal: 4, marginBottom: 18 },
-  stepLineActive: { backgroundColor: '#1B4332' },
+  stepLineActive: { backgroundColor: '#0F4B70' },
   scroll: { paddingHorizontal: 20, paddingBottom: 120 },
   stepHint: { fontSize: 14, color: c.textSub, marginBottom: 20, lineHeight: 20 },
   field: { marginBottom: 20 },
@@ -269,30 +270,30 @@ function createStyles(c: C) {
   fieldInput: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   catItem: { flex: 1, minWidth: '28%', backgroundColor: c.card, borderRadius: 14, borderWidth: 1.5, borderColor: c.cardBorder, paddingVertical: 14, alignItems: 'center', gap: 6 },
-  catItemActive: { borderColor: '#1B4332', backgroundColor: '#F0FDF4' },
+  catItemActive: { borderColor: '#0F4B70', backgroundColor: '#E8F3FA' },
   catEmoji: { fontSize: 24 },
   catLabel: { fontSize: 12, fontWeight: '600', color: c.textSub },
-  catLabelActive: { color: '#1B4332' },
+  catLabelActive: { color: '#0F4B70' },
   emailRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  addBtn: { backgroundColor: '#1B4332', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12, justifyContent: 'center' },
+  addBtn: { backgroundColor: '#0F4B70', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12, justifyContent: 'center' },
   addBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   emptyNote: { backgroundColor: c.pillBg, borderRadius: 14, padding: 16 },
   emptyNoteText: { fontSize: 14, color: c.textMuted, textAlign: 'center', lineHeight: 20 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#BBF7D0' },
-  chipText: { fontSize: 13, color: '#166534', fontWeight: '500' },
+  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#C4DFEF' },
+  chipText: { fontSize: 13, color: '#0F4B70', fontWeight: '500' },
   chipX: { fontSize: 16, color: '#16A34A', fontWeight: '700' },
   methodCard: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.card, borderRadius: 16, borderWidth: 1.5, borderColor: c.cardBorder, padding: 16, marginBottom: 10 },
-  methodCardActive: { borderColor: '#1B4332', backgroundColor: '#F0FDF4' },
+  methodCardActive: { borderColor: '#0F4B70', backgroundColor: '#E8F3FA' },
   methodEmoji: { fontSize: 24 },
   methodLabel: { fontSize: 15, fontWeight: '700', color: c.text, marginBottom: 2 },
-  methodLabelActive: { color: '#1B4332' },
+  methodLabelActive: { color: '#0F4B70' },
   methodDesc: { fontSize: 12, color: c.textSub },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: '#D1D5DB', alignItems: 'center', justifyContent: 'center' },
-  radioActive: { borderColor: '#1B4332' },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#1B4332' },
+  radioActive: { borderColor: '#0F4B70' },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#0F4B70' },
   footer: { paddingHorizontal: 20, paddingBottom: 32, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
-  nextBtn: { backgroundColor: '#FF6B35', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+  nextBtn: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
   nextBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }

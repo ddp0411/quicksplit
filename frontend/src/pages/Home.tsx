@@ -115,7 +115,7 @@ export const Home: React.FC = () => {
       <div className="mx-auto max-w-lg space-y-4 pb-24">
 
         {/* Hero — greeting + daily quote */}
-        <div className="rounded-3xl p-6 shadow-green" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #163829 100%)' }}>
+        <div className="rounded-3xl p-6 shadow-green" style={{ background: 'linear-gradient(135deg, #0F4B70 0%, #0A3858 100%)' }}>
           <div className="mb-4 flex items-start justify-between">
             <p className="font-display text-xl font-extrabold text-white">
               {user ? getGreeting(user.name) : 'Welcome 👋'}
@@ -131,7 +131,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Balance hero card — dark forest green, moodboard style */}
-        <div className="rounded-3xl p-5 shadow-green" style={{ background: '#1B4332' }}>
+        <div className="rounded-3xl p-5 shadow-green" style={{ background: '#0F4B70' }}>
           {balanceLoading ? (
             <div className="space-y-2">
               <div className="h-3 w-24 animate-pulse rounded bg-white/20" />
@@ -376,7 +376,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* AI insight */}
-        <div className="rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #1B4332 0%, #163829 100%)' }}>
+        <div className="rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #0F4B70 0%, #0A3858 100%)' }}>
           <div className="mb-3 flex items-center gap-2">
             <SparklesIcon className="h-4 w-4 text-white/80" />
             <p className="text-xs font-bold uppercase tracking-wide text-white/80">AI Insight</p>

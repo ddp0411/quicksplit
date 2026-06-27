@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { createNavigationContainerRef, NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
@@ -29,6 +29,7 @@ import {
   SecuritySettingsScreen, ProUpgradeScreen, ReferralScreen, ImportSplitwiseScreen,
   PermissionSetupScreen,
 } from '../screens/stubs';
+import { MonthlyExpensesScreen } from '../screens/MonthlyExpensesScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -38,11 +39,17 @@ const TAB_ICONS: Record<string, TabIconName> = {
   Home: 'Home',
   Friends: 'Friends',
   Groups: 'Groups',
-  AIAssistant: 'AI',
+  Personal: 'Personal',
 };
 
-const TAB_ACTIVE = '#FF6B35';
-const TAB_INACTIVE = '#9CA3AF';
+const TAB_ACTIVE = '#0466C8';
+const TAB_INACTIVE = '#8BBFD9';
+
+// The root screen of each tab's stack. The floating tab bar should only show on these;
+// on any pushed (deep) screen it must hide so it doesn't cover that screen's bottom CTA.
+const ROOT_STACK_SCREENS = [
+  'HomeMain', 'FriendsMain', 'GroupsMain', 'PersonalMain', 'AccountMain', 'Action',
+];
 
 function PlaceholderScreen() {
   return null;
@@ -52,22 +59,44 @@ function MainTabs() {
   const { colors } = useTheme();
   const [showActions, setShowActions] = useState(false);
 
+  // Track the deepest active route so the floating AI button only shows on the main
+  // tab screens (it must hide on pushed screens so it doesn't cover their CTAs).
+  const [activeRoute, setActiveRoute] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    const unsubscribe = navigationRef.addListener('state', () => {
+      setActiveRoute((navigationRef as any).getCurrentRoute()?.name);
+    });
+    return unsubscribe;
+  }, []);
+  const onRootScreen = !activeRoute || ROOT_STACK_SCREENS.includes(activeRoute);
+
+  const openAIChat = () => {
+    if (navigationRef.isReady()) {
+      (navigationRef as any).navigate('Personal', { screen: 'AIChat' });
+    }
+  };
+
   const actionItems = [
-    { icon: '+', title: 'Add Expense', subtitle: 'Split a bill with friends', tab: 'Home', screen: 'AddExpense', color: '#FF6B35' },
+    { icon: '+', title: 'Add Expense', subtitle: 'Split a bill with friends', tab: 'Home', screen: 'AddExpense', color: '#0466C8' },
     { icon: '▣', title: 'Scan Bill', subtitle: 'Capture a receipt instantly', tab: 'Home', screen: 'Scan', color: '#F59E0B' },
-    { icon: '₹', title: 'Settle Up', subtitle: 'Record a payment', tab: 'Home', screen: 'SettleUp', color: '#1B4332' },
+    { icon: '₹', title: 'Settle Up', subtitle: 'Record a payment', tab: 'Home', screen: 'SettleUp', color: '#0F4B70' },
   ];
 
   return (
     <>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
+        screenOptions={({ route }) => {
+          const focused = getFocusedRouteNameFromRoute(route);
+          const onRootScreen = !focused || ROOT_STACK_SCREENS.includes(focused);
+          return {
           headerShown: false,
           tabBarShowLabel: route.name !== 'Action',
-          tabBarStyle: [
-            styles.tabBar,
-            { backgroundColor: colors.card, borderColor: colors.cardBorder },
-          ],
+          tabBarStyle: onRootScreen
+            ? [
+                styles.tabBar,
+                { backgroundColor: colors.card, borderColor: colors.cardBorder },
+              ]
+            : { display: 'none' },
           tabBarActiveTintColor: TAB_ACTIVE,
           tabBarInactiveTintColor: TAB_INACTIVE,
           tabBarLabelStyle: styles.tabLabel,
@@ -86,16 +115,17 @@ function MainTabs() {
               </TouchableOpacity>
             )
             : undefined,
-        })}
+          };
+        }}
       >
         <Tab.Screen name="Home" component={HomeStack} />
         <Tab.Screen name="Friends" component={FriendsStack} />
         <Tab.Screen name="Action" component={PlaceholderScreen} />
         <Tab.Screen name="Groups" component={GroupsStack} />
         <Tab.Screen
-          name="AIAssistant"
+          name="Personal"
           component={PersonalStack}
-          options={{ tabBarLabel: 'AI Assistant' }}
+          options={{ tabBarLabel: 'Personal' }}
         />
         {/* Account is reachable from the Home hero avatar, not the tab bar (matches the UI images). */}
         <Tab.Screen
@@ -153,6 +183,19 @@ function MainTabs() {
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
+
+      {/* Floating AI assistant button — sits above the bottom bar, main screens only. */}
+      {onRootScreen && (
+        <TouchableOpacity
+          style={styles.aiFab}
+          activeOpacity={0.9}
+          onPress={openAIChat}
+          accessibilityRole="button"
+          accessibilityLabel="Open AI assistant"
+        >
+          <TabBarIcon name="AI" color="#FFFFFF" size={22} />
+        </TouchableOpacity>
+      )}
     </>
   );
 }
@@ -186,6 +229,10 @@ function FriendsStack() {
       <Stack.Screen name="FriendsMain" component={FriendsScreen} />
       <Stack.Screen name="FriendDetail" component={FriendDetailScreen} />
       <Stack.Screen name="AddFriend" component={AddFriendScreen} />
+      {/* Shared screens registered per-stack so Friends actions stay in this tab. */}
+      <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
+      <Stack.Screen name="SettleUp" component={SettleUpScreen} />
+      <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
     </Stack.Navigator>
   );
 }
@@ -198,6 +245,10 @@ function GroupsStack() {
       <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
       <Stack.Screen name="GroupInsights" component={GroupInsightsScreen} />
       <Stack.Screen name="ImportGroup" component={ImportGroupScreen} />
+      {/* Shared screens registered per-stack so group Add/Settle stay in this tab. */}
+      <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
+      <Stack.Screen name="SettleUp" component={SettleUpScreen} />
+      <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
     </Stack.Navigator>
   );
 }
@@ -205,7 +256,11 @@ function GroupsStack() {
 function PersonalStack() {
   return (
     <Stack.Navigator screenOptions={STACK_OPTIONS}>
-      <Stack.Screen name="PersonalMain" component={PersonalScreen} />
+      {/* The Personal tab now opens the monthly expenses view; the old finance hub
+          (Budget / Subscriptions / Insights / AI) is reachable via its "Tools" button. */}
+      <Stack.Screen name="PersonalMain" component={MonthlyExpensesScreen} />
+      <Stack.Screen name="PersonalHub" component={PersonalScreen} />
+      <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
       <Stack.Screen name="AIChat" component={AIChatScreen} />
       <Stack.Screen name="BudgetDashboard" component={BudgetDashboardScreen} />
       <Stack.Screen name="SubscriptionTracker" component={SubscriptionTrackerScreen} />
@@ -253,6 +308,22 @@ export function RootNavigator() {
 }
 
 const styles = StyleSheet.create({
+  aiFab: {
+    position: 'absolute',
+    right: 22,
+    bottom: 100,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#0F4B70',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0F4B70',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 12,
+  },
   tabBar: {
     position: 'absolute',
     left: 14,
@@ -280,12 +351,12 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#0466C8',
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
     marginTop: -21,
-    shadowColor: '#FF6B35',
+    shadowColor: '#0466C8',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
@@ -320,7 +391,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 22,
     fontWeight: '800',
-    fontFamily: 'PlayfairDisplay_700Bold',
+    fontFamily: 'PlusJakartaSans_700Bold',
     textAlign: 'center',
   },
   sheetSubtitle: {

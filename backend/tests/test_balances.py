@@ -109,3 +109,25 @@ def test_group_balances_require_membership():
     # Esha is not a member → 404, not the balances payload.
     resp = b_client.get(f"/api/v1/groups/{group_id}/balances/")
     assert resp.status_code == 404
+
+
+@pytest.mark.django_db
+def test_expenses_with_user_filter():
+    """GET /expenses/?with_user=<friend> returns only expenses shared with that friend."""
+    a_client, a_id = register("9876500006", "f@example.com", "Farah")
+    _, b_id = register("9876500007", "g@example.com", "Gita")
+    _, c_id = register("9876500008", "h@example.com", "Hari")
+
+    e_ab = create_equal_expense(a_client, a_id, [a_id, b_id])
+    assert e_ab.status_code == 201, e_ab.data
+    e_ac = create_equal_expense(a_client, a_id, [a_id, c_id])
+    assert e_ac.status_code == 201, e_ac.data
+
+    # Unfiltered: Farah sees both of her expenses.
+    all_exp = a_client.get("/api/v1/expenses/").data
+    assert len(all_exp) == 2
+
+    # Filtered to Gita: only the expense shared with her.
+    with_b = a_client.get(f"/api/v1/expenses/?with_user={b_id}").data
+    assert len(with_b) == 1
+    assert with_b[0]["id"] == e_ab.data["id"]

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
   StyleSheet, RefreshControl, ScrollView, TextInput,
@@ -6,7 +6,7 @@ import {
 import { useTheme } from '../theme/useTheme';
 
 type C = ReturnType<typeof useTheme>['colors'];
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsAPI, type Group } from '../services/api/groupsAPI';
@@ -22,7 +22,7 @@ const CATEGORY: Record<string, { emoji: string; color: string }> = {
   couple: { emoji: '💑', color: '#EF4444' },
   work:   { emoji: '💼', color: '#64748B' },
   event:  { emoji: '📅', color: '#8B5CF6' },
-  other:  { emoji: '🎉', color: '#1B4332' },
+  other:  { emoji: '🎉', color: '#0F4B70' },
 };
 
 const FILTER_OPTIONS: FilterOption[] = [
@@ -77,6 +77,13 @@ export const GroupsScreen: React.FC = () => {
     queryFn: groupsAPI.getGroups,
   });
 
+  // Refresh on focus so a newly created group / updated balances appear immediately.
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
   const filtered = useMemo(() => {
     let list = groups as Group[];
     const q = search.toLowerCase();
@@ -115,7 +122,7 @@ export const GroupsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <FilterIcon color={filter !== 'all' ? '#1B4332' : colors.sectionLabel} size={20} />
+          <FilterIcon color={filter !== 'all' ? '#0F4B70' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -143,7 +150,7 @@ export const GroupsScreen: React.FC = () => {
           data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={s.list}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#1B4332" />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#0F4B70" />}
           ListEmptyComponent={
             !isLoading ? (
               <EmptyState
@@ -204,24 +211,24 @@ function createStyles(c: C) {
   safe: { flex: 1, backgroundColor: c.bg },
   topBar: { height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
   topBarSide: { width: 38 },
-  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold', textAlign: 'center' },
-  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center', shadowColor: '#1B4332', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
+  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', textAlign: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center', shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
   iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
   searchWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 15, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12 },
   searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
-  filterSquareActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
+  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
   filterSquareText: { color: c.sectionLabel, fontSize: 22, fontWeight: '700', lineHeight: 24 },
-  filterSquareTextActive: { color: '#1B4332' },
-  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF6B35' },
+  filterSquareTextActive: { color: '#0F4B70' },
+  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#0466C8' },
   pillsRow: { paddingLeft: 20, marginBottom: 12 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8, marginRight: 8, borderWidth: 1, borderColor: 'transparent' },
-  pillActive: { backgroundColor: '#F0FDF4', borderColor: '#1B4332' },
+  pillActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
   pillEmoji: { fontSize: 14 },
   pillLabel: { fontSize: 12, fontWeight: '600', color: c.textSub },
-  pillLabelActive: { color: '#1B4332' },
+  pillLabelActive: { color: '#0F4B70' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   catBadge: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
@@ -235,7 +242,7 @@ function createStyles(c: C) {
   memberCount: { fontSize: 12, color: c.textSub },
   settledChip: { backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   settledText: { fontSize: 11, fontWeight: '700', color: c.textSub },
-  owedChip: { backgroundColor: '#F0FDF4', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+  owedChip: { backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   owedText: { fontSize: 11, fontWeight: '700', color: '#16A34A' },
   oweChip: { backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
   oweText: { fontSize: 11, fontWeight: '700', color: '#DC2626' },
@@ -243,7 +250,7 @@ function createStyles(c: C) {
   emptyEmoji: { fontSize: 52, marginBottom: 16 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
   emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center', maxWidth: 260, marginBottom: 24 },
-  emptyBtn: { backgroundColor: '#FF6B35', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtn: { backgroundColor: '#0466C8', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }

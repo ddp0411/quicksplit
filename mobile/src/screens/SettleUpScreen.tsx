@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Linking, Alert,
@@ -7,6 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { balancesAPI } from '../services/api/balancesAPI';
+import { getAPIErrorMessage } from '../services/api/errorMessage';
 import { useToastStore } from '../state/toastStore';
 import { useTheme } from '../theme/useTheme';
 import { formatCurrency } from '../utils/upi';
@@ -35,6 +36,8 @@ export const SettleUpScreen: React.FC = () => {
 
   const userId: string = params?.userId;
   const friendName: string = params?.friendName ?? 'Friend';
+  const groupId: string | undefined = params?.groupId;
+  const presetAmount: number | undefined = params?.amount;
 
   const { data: balanceData } = useQuery({
     queryKey: ['balances'],
@@ -43,9 +46,23 @@ export const SettleUpScreen: React.FC = () => {
 
   const friendBalance = (balanceData as any)?.balances?.find((b: any) => b.user.id === userId);
   const balance = friendBalance?.balance ?? 0;
-  const friend = friendBalance?.user;
+  // Fall back to the params (group members aren't always in the overall balances list).
+  const friend = friendBalance?.user ?? (userId
+    ? { id: userId, name: friendName, avatar_color: '#0F4B70', upi_id: undefined }
+    : undefined);
 
-  const [amount, setAmount] = useState(Math.abs(balance).toFixed(2));
+  const [amount, setAmount] = useState(
+    presetAmount != null ? String(presetAmount) : ''
+  );
+  // Prefill the amount from the loaded balance once (when no explicit amount was passed).
+  const didInitAmount = useRef(presetAmount != null);
+  useEffect(() => {
+    if (didInitAmount.current) return;
+    if (friendBalance) {
+      setAmount(Math.abs(friendBalance.balance).toFixed(2));
+      didInitAmount.current = true;
+    }
+  }, [friendBalance]);
   const [notes, setNotes] = useState('');
   const [upiTxnId, setUpiTxnId] = useState('');
   const [activeMethod, setActiveMethod] = useState('gpay');
@@ -55,6 +72,7 @@ export const SettleUpScreen: React.FC = () => {
     mutationFn: () => balancesAPI.createSettlement({
       to_user_id: userId,
       amount: parseFloat(amount),
+      group_id: groupId || undefined,
       notes: notes.trim() || undefined,
       upi_transaction_id: upiTxnId.trim() || undefined,
     }),
@@ -62,9 +80,12 @@ export const SettleUpScreen: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['balances'] });
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['friends'] });
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['group-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
       setSettled(data);
     },
-    onError: () => toast('Failed to record settlement', 'error'),
+    onError: (err) => toast(getAPIErrorMessage(err, 'Failed to record settlement'), 'error'),
   });
 
   const amt = parseFloat(amount);
@@ -123,7 +144,7 @@ export const SettleUpScreen: React.FC = () => {
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
           {/* Friend card */}
           <View style={s.friendCard}>
-            <View style={[s.avatar, { backgroundColor: friend?.avatar_color ?? '#1B4332' }]}>
+            <View style={[s.avatar, { backgroundColor: friend?.avatar_color ?? '#0F4B70' }]}>
               <Text style={s.avatarText}>{avatarInitials(friendName)}</Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -251,26 +272,26 @@ function createStyles(c: C) {
     fieldRow: { flexDirection: 'row', marginBottom: 0 },
     methodTabs: { flexDirection: 'row', gap: 8, paddingBottom: 4 },
     methodTab: { alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, borderWidth: 1.5, borderColor: c.cardBorder, backgroundColor: c.card, minWidth: 70 },
-    methodTabActive: { borderColor: '#1B4332', backgroundColor: '#F0FDF4' },
+    methodTabActive: { borderColor: '#0F4B70', backgroundColor: '#E8F3FA' },
     methodEmoji: { fontSize: 20, marginBottom: 4 },
     methodLabel: { fontSize: 11, fontWeight: '600', color: c.textSub },
-    methodLabelActive: { color: '#1B4332' },
-    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1B4332', borderRadius: 20, padding: 24, marginBottom: 14 },
+    methodLabelActive: { color: '#0F4B70' },
+    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, marginBottom: 14 },
     currencySymbol: { fontSize: 32, fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginRight: 4 },
     amountInput: { fontSize: 48, fontWeight: '800', color: '#FFFFFF', minWidth: 120, textAlign: 'center' },
     openAppBtn: { backgroundColor: c.successBg, borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 14, borderWidth: 1, borderColor: c.successBorder },
-    openAppText: { fontSize: 15, fontWeight: '700', color: '#1B4332' },
+    openAppText: { fontSize: 15, fontWeight: '700', color: '#0F4B70' },
     noUpiNote: { backgroundColor: c.warningBg, borderRadius: 12, padding: 12, marginBottom: 14, borderWidth: 1, borderColor: c.warningBorder },
     noUpiText: { fontSize: 13, color: c.warningText, fontWeight: '600' },
-    submitBtn: { backgroundColor: '#1B4332', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 4 },
+    submitBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 4 },
     submitBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
     // Success
     successWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
     successIcon: { marginBottom: 16 },
-    successTitle: { fontSize: 24, fontWeight: '800', color: c.text, marginBottom: 8, fontFamily: 'PlayfairDisplay_700Bold' },
+    successTitle: { fontSize: 24, fontWeight: '800', color: c.text, marginBottom: 8, fontFamily: 'PlusJakartaSans_700Bold' },
     successSub: { fontSize: 15, color: c.textSub, textAlign: 'center', marginBottom: 24 },
     qrImage: { width: 200, height: 200, marginBottom: 24 },
-    doneBtn: { backgroundColor: '#1B4332', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 48, alignItems: 'center' },
+    doneBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 16, paddingHorizontal: 48, alignItems: 'center' },
     doneBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }

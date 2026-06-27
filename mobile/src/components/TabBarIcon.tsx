@@ -6,7 +6,7 @@ import Svg, { Path, Circle } from 'react-native-svg';
  * (house / person / people / sparkle). Built with react-native-svg so there's
  * no extra icon-font dependency. Color is driven by the focused state.
  */
-export type TabIconName = 'Home' | 'Friends' | 'Groups' | 'AI';
+export type TabIconName = 'Home' | 'Friends' | 'Groups' | 'AI' | 'Personal';
 
 export function TabBarIcon({
   name,
@@ -57,6 +57,14 @@ export function TabBarIcon({
             d="M12 3 L13.7 10.3 L21 12 L13.7 13.7 L12 21 L10.3 13.7 L3 12 L10.3 10.3 Z"
             {...common}
           />
+        </Svg>
+      );
+    case 'Personal':
+      // Receipt / expenses glyph — the personal monthly-spend tab.
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24">
+          <Path d="M6 3 h12 v18 l-2-1.3 -2 1.3 -2-1.3 -2 1.3 -2-1.3 -2 1.3 Z" {...common} />
+          <Path d="M9 8 h6 M9 12 h6" {...common} />
         </Svg>
       );
     default:

@@ -143,7 +143,7 @@ function createStyles(c: C) {
   backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
   backText: { fontSize: 18, color: c.text },
   title: { fontSize: 17, fontWeight: '700', color: c.text },
-  saveBtn: { backgroundColor: '#FF6B35', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+  saveBtn: { backgroundColor: '#0466C8', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
   saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   scroll: { paddingHorizontal: 20, paddingBottom: 100 },
   avatarSection: { alignItems: 'center', paddingVertical: 24 },

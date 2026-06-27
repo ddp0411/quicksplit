@@ -18,13 +18,13 @@ function createStyles(c: C) {
     logoSection: { alignItems: 'center', marginBottom: 32 },
     logoBox: {
       width: 56, height: 56, borderRadius: 16,
-      backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center',
       marginBottom: 16,
-      shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+      shadowColor: '#0466C8', shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
     },
-    logoText: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', fontFamily: 'PlayfairDisplay_700Bold' },
-    heading: { fontSize: 28, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
+    logoText: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold' },
+    heading: { fontSize: 28, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
     subheading: { marginTop: 4, fontSize: 14, color: c.textSub },
     errorBox: {
       backgroundColor: '#FFF1F2', borderColor: '#FECACA', borderWidth: 1,
@@ -34,7 +34,7 @@ function createStyles(c: C) {
     fieldGroup: { marginBottom: 16 },
     label: { fontSize: 14, fontWeight: '600', color: c.text, marginBottom: 6 },
     labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-    forgotLink: { fontSize: 12, fontWeight: '700', color: '#1B4332' },
+    forgotLink: { fontSize: 12, fontWeight: '700', color: '#0F4B70' },
     input: {
       borderWidth: 1.5, borderColor: c.inputBorder, borderRadius: 16,
       paddingHorizontal: 16, paddingVertical: 14, fontSize: 15,
@@ -47,16 +47,16 @@ function createStyles(c: C) {
     },
     eyeBtn: { padding: 8 },
     submitBtn: {
-      backgroundColor: '#FF6B35', borderRadius: 16,
+      backgroundColor: '#0466C8', borderRadius: 16,
       paddingVertical: 16, alignItems: 'center', marginTop: 8,
-      shadowColor: '#FF6B35', shadowOffset: { width: 0, height: 8 },
+      shadowColor: '#0466C8', shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.35, shadowRadius: 20, elevation: 8,
     },
     disabled: { opacity: 0.6 },
     submitText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 28 },
     footerText: { fontSize: 14, color: c.textSub },
-    footerLink: { fontSize: 14, fontWeight: '700', color: '#1B4332' },
+    footerLink: { fontSize: 14, fontWeight: '700', color: '#0F4B70' },
     passwordInputText: { flex: 1, fontSize: 15, paddingVertical: 14, paddingLeft: 16, color: c.text },
   });
 }

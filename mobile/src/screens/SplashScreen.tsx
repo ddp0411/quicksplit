@@ -30,14 +30,14 @@ export const SplashScreen: React.FC = () => {
 };
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1B4332', alignItems: 'center', justifyContent: 'center' },
+  container: { flex: 1, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center' },
   inner: { alignItems: 'center' },
   logoBox: {
     width: 80, height: 80, borderRadius: 24,
     backgroundColor: 'rgba(255,255,255,0.15)', borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center', justifyContent: 'center', marginBottom: 20,
   },
-  logoText: { color: '#FFFFFF', fontSize: 36, fontWeight: '800', fontFamily: 'PlayfairDisplay_700Bold' },
-  appName: { color: '#FFFFFF', fontSize: 32, fontWeight: '800', fontFamily: 'PlayfairDisplay_700Bold' },
+  logoText: { color: '#FFFFFF', fontSize: 36, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold' },
+  appName: { color: '#FFFFFF', fontSize: 32, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold' },
   tagline: { color: 'rgba(255,255,255,0.65)', fontSize: 14, marginTop: 8, fontWeight: '500' },
 });

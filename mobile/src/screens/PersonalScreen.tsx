@@ -12,7 +12,7 @@ type C = ReturnType<typeof useTheme>['colors'];
 
 const CARDS = [
   { screen: 'AIChat', emoji: '🤖', title: 'AI Assistant', subtitle: 'Ask anything about your expenses', bg: '#EFF6FF', border: '#BFDBFE', accent: '#3B82F6' },
-  { screen: 'BudgetDashboard', emoji: '📊', title: 'Budget Dashboard', subtitle: 'Track spending against your budget', bg: '#F0FDF4', border: '#BBF7D0', accent: '#22C55E' },
+  { screen: 'BudgetDashboard', emoji: '📊', title: 'Budget Dashboard', subtitle: 'Track spending against your budget', bg: '#E8F3FA', border: '#C4DFEF', accent: '#22C55E' },
   { screen: 'SubscriptionTracker', emoji: '🔄', title: 'Subscriptions', subtitle: 'Manage recurring payments', bg: '#FFF7ED', border: '#FED7AA', accent: '#F97316' },
   { screen: 'SpendingInsights', emoji: '✨', title: 'Spending Insights', subtitle: 'See where your money goes', bg: '#FAF5FF', border: '#E9D5FF', accent: '#A855F7' },
 ];
@@ -29,7 +29,7 @@ function MiniBarChart({ data, maxHeight = 40 }: { data: number[]; maxHeight?: nu
             key={i}
             style={{
               flex: 1, height: h, borderRadius: 4,
-              backgroundColor: isToday ? '#FF6B35' : 'rgba(255,255,255,0.5)',
+              backgroundColor: isToday ? '#0466C8' : 'rgba(255,255,255,0.5)',
             }}
           />
         );
@@ -41,14 +41,16 @@ function MiniBarChart({ data, maxHeight = 40 }: { data: number[]; maxHeight?: nu
 function createStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
-    header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16 },
-    greeting: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlayfairDisplay_700Bold' },
-    sub: { fontSize: 14, color: c.textSub, marginTop: 2 },
+    header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16 },
+    backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    backText: { fontSize: 18, color: c.text },
+    greeting: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+    sub: { fontSize: 13, color: c.textSub, marginTop: 2 },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    sparkCard: { backgroundColor: '#1B4332', borderRadius: 20, padding: 20, marginBottom: 20 },
+    sparkCard: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 20, marginBottom: 20 },
     sparkHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
     sparkLabel: { fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: '700', letterSpacing: 1 },
-    sparkTotal: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginTop: 4, fontFamily: 'PlayfairDisplay_700Bold' },
+    sparkTotal: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginTop: 4, fontFamily: 'PlusJakartaSans_700Bold' },
     sparkDays: { fontSize: 11, color: 'rgba(255,255,255,0.55)', textAlign: 'right' },
     sparkDayLabels: { flexDirection: 'row', gap: 4, marginTop: 6 },
     sparkDayLabel: { flex: 1, textAlign: 'center', fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
@@ -56,8 +58,9 @@ function createStyles(c: C) {
     card: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: 18, borderWidth: 1.5, padding: 18 },
     iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
     cardEmoji: { fontSize: 26 },
-    cardTitle: { fontSize: 16, fontWeight: '700', color: c.text },
-    cardSub: { fontSize: 13, color: c.textSub, marginTop: 2 },
+    // Cards have hard-coded light backgrounds, so fix the text dark for contrast in both themes.
+    cardTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
+    cardSub: { fontSize: 13, color: '#6B7280', marginTop: 2 },
     arrow: { fontSize: 20, fontWeight: '700' },
   });
 }
@@ -86,7 +89,7 @@ export const PersonalScreen: React.FC = () => {
     }
     const spend: number[] = days.map((day) =>
       (activity as any[])
-        .filter((a: any) => a.type === 'expense_added' && a.created_at?.startsWith(day))
+        .filter((a: any) => a.type === 'expense' && a.created_at?.startsWith(day))
         .reduce((sum: number, a: any) => sum + (parseFloat(a.amount) || 0), 0)
     );
     return { dailySpend: spend, totalThisWeek: spend.reduce((a, b) => a + b, 0), dayLabels: labels };
@@ -95,8 +98,13 @@ export const PersonalScreen: React.FC = () => {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
-        <Text style={s.greeting}>Personal Finance</Text>
-        <Text style={s.sub}>Tools to help {firstName} spend smarter</Text>
+        <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()}>
+          <Text style={s.backText}>←</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <Text style={s.greeting}>Personal Finance</Text>
+          <Text style={s.sub}>Tools to help {firstName} spend smarter</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={s.scroll}>

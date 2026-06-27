@@ -8,37 +8,48 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary: Forest Green — brand identity, nav, hero sections, avatars
+        // Primary: Atlantic Blue — brand identity, nav, hero sections, avatars.
+        // 600 is the main brand shade (most used); 900 anchors dark heroes/footers.
         primary: {
-          50:  '#f0fdf6',
-          100: '#d1fae5',
-          200: '#a3e9c8',
-          300: '#6bcba4',
-          400: '#3aad81',
-          500: '#2d7a57',
-          600: '#1B4332',
-          700: '#163829',
-          800: '#112d21',
-          900: '#0d221a',
+          50:  '#E8F3FA',
+          100: '#C4DFEF',
+          200: '#8BBFD9',
+          300: '#4D96BE',
+          400: '#2170A0',
+          500: '#14587F',
+          600: '#0F4B70',
+          700: '#0A3858',
+          800: '#072741',
+          900: '#04192B',
         },
-        // Accent: Orange — primary CTA buttons ("Split Bill", "Add Expense", "Settle Up")
+        // Accent: Bright Blue — primary CTA buttons (Split Bill / Add Expense / Settle Up).
         accent: {
-          50:  '#fff7f3',
-          100: '#ffede4',
-          200: '#ffc9ae',
-          300: '#ffa07a',
-          400: '#ff7a4d',
-          500: '#FF6B35',
-          600: '#e55a25',
-          700: '#cc4d1f',
-          800: '#a83d18',
-          900: '#8a3012',
+          50:  '#E8F1FF',
+          100: '#C9DDF7',
+          200: '#93BBEF',
+          300: '#5D98E6',
+          400: '#2A77D6',
+          500: '#0466C8',
+          600: '#0353A4',
+          700: '#023E7D',
+          800: '#002855',
+          900: '#001845',
         },
-        ink: '#111111',
+        // Soft Sky Blue — highlights, active chips, AI accents.
+        sky: {
+          50:  '#F0FEFF',
+          100: '#C4F8FF',
+          200: '#8EEEF8',
+          300: '#52E0F0',
+          400: '#1FCCE0',
+          500: '#0AAFC2',
+          600: '#0789A0',
+        },
+        ink: '#04192B',
         positive: '#22C55E',
         negative: '#EF4444',
         warning:  '#F59E0B',
-        info:     '#2D7A57',
+        info:     '#0466C8',
       },
       borderRadius: {
         '2xl': '1rem',
@@ -47,12 +58,12 @@ export default {
       boxShadow: {
         soft:   '0 4px 24px rgba(0, 0, 0, 0.06)',
         card:   '0 2px 12px rgba(0, 0, 0, 0.08)',
-        button: '0 8px 20px rgba(255, 107, 53, 0.35)',
-        green:  '0 8px 20px rgba(27, 67, 50, 0.25)',
+        button: '0 8px 20px rgba(4, 102, 200, 0.35)',
+        green:  '0 8px 20px rgba(15, 75, 112, 0.25)',
       },
       fontFamily: {
-        sans:    ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Playfair Display', 'ui-serif', 'Georgia', 'serif'],
+        sans:    ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       animation: {
         'spin-slow':   'spin 3s linear infinite',

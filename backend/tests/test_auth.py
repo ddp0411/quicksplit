@@ -89,6 +89,34 @@ def test_login_with_phone_and_current_user(api_client):
 
 
 @pytest.mark.django_db
+def test_refresh_and_logout_flow(api_client):
+    """Register returns a refresh token; /auth/refresh issues a new access token;
+    /auth/logout blacklists the refresh token so it can't be reused."""
+    reg = api_client.post(
+        "/api/v1/auth/register",
+        {"phone_number": "9333333333", "email": "refresh@example.com",
+         "password": "testpassword123", "name": "Refresh User"},
+        format="json",
+    )
+    assert reg.status_code == 201
+    refresh = reg.data["refresh_token"]
+    assert refresh
+
+    # Refresh yields a fresh, working access token.
+    r = api_client.post("/api/v1/auth/refresh", {"refresh": refresh}, format="json")
+    assert r.status_code == 200, r.data
+    new_access = r.data["access"]
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {new_access}")
+    assert api_client.get("/api/v1/auth/me").status_code == 200
+
+    # Rotation issues a new refresh token; log it out (blacklist) and confirm it's dead.
+    rotated = r.data.get("refresh", refresh)
+    api_client.credentials()
+    assert api_client.post("/api/v1/auth/logout", {"refresh": rotated}, format="json").status_code == 200
+    assert api_client.post("/api/v1/auth/refresh", {"refresh": rotated}, format="json").status_code == 401
+
+
+@pytest.mark.django_db
 def test_login_with_email(api_client):
     api_client.post(
         "/api/v1/auth/register",

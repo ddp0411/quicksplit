@@ -105,6 +105,7 @@ class LoginSerializer(serializers.Serializer):
 
 class TokenResponseSerializer(serializers.Serializer):
     access_token = serializers.CharField()
+    refresh_token = serializers.CharField()
     token_type = serializers.CharField()
     user = UserResponseSerializer()
 

@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type BalanceFilter = 'None' | 'Outstanding' | 'You owe' | 'Owe you';
 
-const AVATAR_COLORS = ['#1B4332', '#FF6B35', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6', '#0EA5E9', '#EC4899'];
+const AVATAR_COLORS = ['#0F4B70', '#0466C8', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6', '#0EA5E9', '#EC4899'];
 
 function avatarColorFromIndex(groupId: string, idx: number): string {
   const seed = groupId.charCodeAt(idx % groupId.length) + idx * 7;

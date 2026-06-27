@@ -43,7 +43,7 @@ export const FilterSheet: React.FC<FilterSheetProps> = ({
                 type="button"
                 onClick={() => { onChange(opt.value); onClose(); }}
                 className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition hover:bg-primary-50 dark:hover:bg-primary-900/20"
-                style={{ color: value === opt.value ? '#0F9D94' : 'var(--text)' }}
+                style={{ color: value === opt.value ? '#0F4B70' : 'var(--text)' }}
               >
                 {opt.label}
                 {value === opt.value && <CheckIcon className="h-4 w-4 text-primary-600" />}

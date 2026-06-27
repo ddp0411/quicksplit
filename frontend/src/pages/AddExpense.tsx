@@ -70,7 +70,7 @@ export const AddExpense: React.FC = () => {
   });
 
   useEffect(() => {
-    const base: Participant[] = user ? [{ user_id: user.id, name: user.name, avatar_color: '#0F9D94' }] : [];
+    const base: Participant[] = user ? [{ user_id: user.id, name: user.name, avatar_color: '#0F4B70' }] : [];
     if (groupId && group) {
       const members = group.members
         .filter(m => m.user.id !== user?.id)

@@ -1,50 +1,57 @@
 import { useColorScheme } from 'react-native';
 import { useThemeStore } from '../state/themeStore';
 
+// ─── Atlantic Blue brand (V3) ────────────────────────────────────────────────
+// Primary  Atlantic Blue   #0F4B70  — headers, primary buttons, deep surfaces
+// CTA      Bright Blue     #0466C8  — FAB, settle/pay actions, active tab
+// Accent   Soft Sky Blue   #C4F8FF  — highlights, AI tint, active chips
+// Canvas   White Convolvulus #F5F2F3 — every screen background
+// Positive amounts stay green (money owed to you); negative stays red.
+
 const LIGHT = {
-  bg: '#FFFDF9',
+  bg: '#F5F2F3',
   card: '#FFFFFF',
-  cardBorder: '#E7E5E4',
-  text: '#111827',
-  textSub: '#6B7280',
-  textMuted: '#9CA3AF',
-  primary: '#1B4332',
-  accent: '#FF6B35',
+  cardBorder: '#C4DFEF',
+  text: '#04192B',
+  textSub: '#33415C',
+  textMuted: '#7D8597',
+  primary: '#0F4B70',
+  accent: '#0466C8',
   inputBg: '#FFFFFF',
-  inputBorder: '#E7E5E4',
-  sectionLabel: '#374151',
-  pillBg: '#F3F4F6',
-  successBg: '#F0FDF4',
-  successBorder: '#BBF7D0',
-  successText: '#16A34A',
-  errorBg: '#FEF2F2',
+  inputBorder: '#C4DFEF',
+  sectionLabel: '#33415C',
+  pillBg: '#EBF4FA',
+  successBg: '#D1FAE5',
+  successBorder: '#A7F3D0',
+  successText: '#059669',
+  errorBg: '#FEE2E2',
   errorText: '#DC2626',
-  warningBg: '#FFFBEB',
+  warningBg: '#FEF3C7',
   warningBorder: '#FDE68A',
   warningText: '#92400E',
 };
 
 const DARK: typeof LIGHT = {
-  bg: '#0F1F17',
-  card: '#1A2E22',
-  cardBorder: '#2D4A38',
-  text: '#F9FAFB',
-  textSub: '#9CA3AF',
-  textMuted: '#6B7280',
-  primary: '#22C55E',
-  accent: '#FF6B35',
-  inputBg: '#1A2E22',
-  inputBorder: '#2D4A38',
-  sectionLabel: '#D1D5DB',
-  pillBg: '#1A2E22',
-  successBg: '#14532D',
-  successBorder: '#166534',
-  successText: '#4ADE80',
-  errorBg: '#450A0A',
-  errorText: '#FCA5A5',
-  warningBg: '#422006',
+  bg: '#020D16',
+  card: '#04192B',
+  cardBorder: '#0A3858',
+  text: '#F5F2F3',
+  textSub: '#8BBFD9',
+  textMuted: '#4D96BE',
+  primary: '#C4F8FF',
+  accent: '#52E0F0',
+  inputBg: '#04192B',
+  inputBorder: '#0A3858',
+  sectionLabel: '#8BBFD9',
+  pillBg: '#072741',
+  successBg: '#022C22',
+  successBorder: '#0A3858',
+  successText: '#34D399',
+  errorBg: '#2A0A0A',
+  errorText: '#F87171',
+  warningBg: '#1C0D00',
   warningBorder: '#713F12',
-  warningText: '#FDE68A',
+  warningText: '#FCD34D',
 };
 
 export function useTheme() {

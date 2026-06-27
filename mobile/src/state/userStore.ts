@@ -14,8 +14,10 @@ interface User {
 interface UserState {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
-  setUser: (user: User, token: string) => void;
+  setUser: (user: User, token: string, refreshToken?: string) => void;
+  setTokens: (token: string, refreshToken?: string) => void;
   logout: () => void;
 }
 
@@ -24,9 +26,13 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
-      setUser: (user, token) => set({ user, token, isAuthenticated: true }),
-      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      setUser: (user, token, refreshToken) =>
+        set((s) => ({ user, token, refreshToken: refreshToken ?? s.refreshToken, isAuthenticated: true })),
+      setTokens: (token, refreshToken) =>
+        set((s) => ({ token, refreshToken: refreshToken ?? s.refreshToken })),
+      logout: () => set({ user: null, token: null, refreshToken: null, isAuthenticated: false }),
     }),
     {
       name: 'user-storage',
