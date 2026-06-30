@@ -172,14 +172,14 @@ function createStyles(c: C) {
   aiWrap: { alignSelf: 'flex-start' },
   aiAvatar: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#E8F3FA', alignItems: 'center', justifyContent: 'center' },
   bubbleText: { borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, lineHeight: 20 },
-  userBubbleText: { backgroundColor: '#0F4B70', color: '#FFFFFF' },
+  userBubbleText: { backgroundColor: '#00658E', color: '#FFFFFF' },
   aiBubbleText: { backgroundColor: c.card, color: c.text, borderWidth: 1, borderColor: c.cardBorder },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingVertical: 10 },
   chip: { backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: '#C4DFEF' },
-  chipText: { fontSize: 13, color: '#0F4B70', fontWeight: '600' },
+  chipText: { fontSize: 13, color: '#00658E', fontWeight: '600' },
   inputBar: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder, backgroundColor: c.card },
   input: { flex: 1, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15, color: c.text, maxHeight: 100 },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#00658E', alignItems: 'center', justifyContent: 'center' },
   sendBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
   });
 }

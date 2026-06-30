@@ -81,11 +81,11 @@ export const FriendDetailScreen: React.FC = () => {
 
       <ScrollView
         contentContainerStyle={st.scroll}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#0F4B70" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#00658E" />}
       >
         {/* Profile hero */}
         <View style={st.hero}>
-          <View style={[st.avatar, { backgroundColor: friend?.avatar_color ?? '#0F4B70' }]}>
+          <View style={[st.avatar, { backgroundColor: friend?.avatar_color ?? '#00658E' }]}>
             <Text style={st.avatarText}>{avatarInitials(friend?.name ?? 'U')}</Text>
           </View>
           <Text style={st.friendName}>{friend?.name ?? '…'}</Text>
@@ -203,7 +203,7 @@ function createStyles(c: C) {
   hero: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
   avatar: { width: 72, height: 72, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   avatarText: { color: '#FFFFFF', fontSize: 26, fontWeight: '700' },
-  friendName: { fontSize: 20, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+  friendName: { fontSize: 20, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold' },
   friendEmail: { fontSize: 13, color: c.textSub, marginTop: 2, marginBottom: 14 },
   settledBadge: { backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 6, borderWidth: 1, borderColor: '#C4DFEF' },
   settledText: { fontSize: 13, fontWeight: '700', color: '#16A34A' },
@@ -211,13 +211,13 @@ function createStyles(c: C) {
   owedText: { fontSize: 13, fontWeight: '700', color: '#16A34A' },
   oweBadge: { backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 6, borderWidth: 1, borderColor: '#FECACA' },
   oweText: { fontSize: 13, fontWeight: '700', color: '#DC2626' },
-  settleBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 28, paddingVertical: 12, marginTop: 14 },
+  settleBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 28, paddingVertical: 12, marginTop: 14 },
   settleBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   tabBar: { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder, backgroundColor: c.card },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  tabBtnActive: { borderBottomColor: '#0F4B70' },
+  tabBtnActive: { borderBottomColor: '#00658E' },
   tabLabel: { fontSize: 13, fontWeight: '600', color: c.textMuted },
-  tabLabelActive: { color: '#0F4B70' },
+  tabLabelActive: { color: '#00658E' },
   section: { paddingHorizontal: 20, paddingTop: 20 },
   expRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 12, marginBottom: 8 },
   expIcon: { width: 40, height: 40, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },

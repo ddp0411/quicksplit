@@ -65,7 +65,7 @@ export const ActivityScreen: React.FC = () => {
         data={feed as ActivityItem[]}
         keyExtractor={item => item.id}
         contentContainerStyle={s.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#0F4B70" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#00658E" />}
         ListEmptyComponent={
           !isLoading ? (
             <View style={s.empty}>

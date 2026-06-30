@@ -33,7 +33,7 @@ function createStyles(c: C) {
     name: { fontSize: 14, fontWeight: '700', color: c.text },
     label: { fontSize: 12, marginTop: 2 },
     amount: { fontSize: 16, fontWeight: '800' },
-    settleBtn: { backgroundColor: '#0F4B70', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+    settleBtn: { backgroundColor: '#00658E', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
     settleBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
     empty: { alignItems: 'center', paddingTop: 60 },
     emptyEmoji: { fontSize: 48, marginBottom: 12 },
@@ -119,7 +119,7 @@ export const BalancesScreen: React.FC = () => {
         data={[...owedToYou, ...youOwe]}
         keyExtractor={item => item.user.id}
         contentContainerStyle={s.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#0F4B70" />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#00658E" />}
         ListHeaderComponent={
           <>{owedToYou.length > 0 && <Text style={s.sectionTitle}>Owed to you ({owedToYou.length})</Text>}</>
         }

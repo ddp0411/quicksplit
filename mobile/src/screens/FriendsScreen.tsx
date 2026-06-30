@@ -49,8 +49,8 @@ function SwipeActions({
 }) {
   const s = createSwipeStyles(c);
   const actions = [
-    { label: '➕', sublabel: 'Add', onPress: onAdd, bg: '#0F4B70' },
-    { label: '💸', sublabel: 'Settle', onPress: onSettle, bg: '#0466C8' },
+    { label: '➕', sublabel: 'Add', onPress: onAdd, bg: '#00658E' },
+    { label: '💸', sublabel: 'Settle', onPress: onSettle, bg: '#00658E' },
     { label: '🔔', sublabel: 'Remind', onPress: onRemind, bg: '#D97706' },
     { label: '✕', sublabel: 'Remove', onPress: onRemove, bg: '#DC2626' },
   ];
@@ -174,7 +174,7 @@ export const FriendsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <FilterIcon color={filter !== 'all' ? '#0F4B70' : colors.sectionLabel} size={20} />
+          <FilterIcon color={filter !== 'all' ? '#00658E' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -202,7 +202,7 @@ export const FriendsScreen: React.FC = () => {
           <Text style={s.requestsLabel}>Pending requests ({(requests as any[]).length})</Text>
           {(requests as any[]).map((req: any) => (
             <View key={req.id} style={s.requestRow}>
-              <View style={[s.avatar, { backgroundColor: req.from_user?.avatar_color ?? '#0F4B70' }]}>
+              <View style={[s.avatar, { backgroundColor: req.from_user?.avatar_color ?? '#00658E' }]}>
                 <Text style={s.avatarText}>{avatarInitials(req.from_user?.name ?? 'U')}</Text>
               </View>
               <View style={{ flex: 1 }}>
@@ -226,7 +226,7 @@ export const FriendsScreen: React.FC = () => {
           data={filtered}
           keyExtractor={(item) => String(item.friendship_id)}
           contentContainerStyle={s.list}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#0F4B70" />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#00658E" />}
           ListEmptyComponent={
             <EmptyState
               icon={search || filter !== 'all' ? '🔍' : '👥'}
@@ -310,15 +310,15 @@ function createStyles(c: C) {
   safe: { flex: 1, backgroundColor: c.bg },
   topBar: { height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
   topBarSide: { width: 38 },
-  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', textAlign: 'center' },
-  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center', shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
+  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold', textAlign: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#00658E', alignItems: 'center', justifyContent: 'center', shadowColor: '#00658E', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
   iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
   filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
-  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
+  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#00658E' },
   filterSquareText: { color: c.sectionLabel, fontSize: 22, fontWeight: '700', lineHeight: 24 },
-  filterSquareTextActive: { color: '#0F4B70' },
-  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#0466C8' },
+  filterSquareTextActive: { color: '#00658E' },
+  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#00658E' },
   balanceSummary: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 10 },
   summaryChip: { flex: 1, backgroundColor: '#E8F3FA', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#C4DFEF' },
   summaryChipRed: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
@@ -332,7 +332,7 @@ function createStyles(c: C) {
   requestRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   reqName: { fontSize: 14, fontWeight: '600', color: c.text },
   reqEmail: { fontSize: 12, color: c.textSub },
-  acceptBtn: { backgroundColor: '#0F4B70', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
+  acceptBtn: { backgroundColor: '#00658E', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 6 },
   acceptBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
   friendRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
@@ -352,7 +352,7 @@ function createStyles(c: C) {
   emptyEmoji: { fontSize: 48, marginBottom: 16 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
   emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center', maxWidth: 260, marginBottom: 20 },
-  emptyBtn: { backgroundColor: '#0466C8', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }

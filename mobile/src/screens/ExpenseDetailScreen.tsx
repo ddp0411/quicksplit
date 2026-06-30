@@ -265,7 +265,7 @@ export const ExpenseDetailScreen: React.FC = () => {
               ) : (
                 (comments as any[]).map((c: any) => (
                   <View key={c.id} style={s.commentRow}>
-                    <View style={[s.avatar, { backgroundColor: c.user?.avatar_color ?? '#0F4B70' }]}>
+                    <View style={[s.avatar, { backgroundColor: c.user?.avatar_color ?? '#00658E' }]}>
                       <Text style={s.avatarText}>{avatarInitials(c.user?.name ?? 'U')}</Text>
                     </View>
                     <View style={s.commentBubble}>
@@ -318,9 +318,9 @@ function createStyles(c: C) {
   scroll: { paddingBottom: 20 },
   hero: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.cardBorder },
   heroIcon: { width: 68, height: 68, borderRadius: 20, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  heroDesc: { fontSize: 20, fontWeight: '800', color: c.text, textAlign: 'center', fontFamily: 'PlusJakartaSans_700Bold' },
-  heroAmount: { fontSize: 32, fontWeight: '800', color: '#0F4B70', marginTop: 6 },
-  perPerson: { fontSize: 14, fontWeight: '700', color: '#0466C8', marginTop: 2 },
+  heroDesc: { fontSize: 20, fontWeight: '800', color: c.text, textAlign: 'center', fontFamily: 'Inter_700Bold' },
+  heroAmount: { fontSize: 32, fontWeight: '800', color: '#00658E', marginTop: 6 },
+  perPerson: { fontSize: 14, fontWeight: '700', color: '#00658E', marginTop: 2 },
   heroMeta: { fontSize: 13, color: c.textSub, marginTop: 4 },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10, justifyContent: 'center' },
   badge: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
@@ -329,7 +329,7 @@ function createStyles(c: C) {
   badgeOverdue: { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FECACA' },
   badgeOverdueText: { fontSize: 12, fontWeight: '700', color: '#DC2626' },
   groupPill: { backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4, borderWidth: 1, borderColor: '#C4DFEF' },
-  groupPillText: { fontSize: 12, color: '#0F4B70', fontWeight: '600' },
+  groupPillText: { fontSize: 12, color: '#00658E', fontWeight: '600' },
 
   reactionsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   reactionBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: 'transparent' },
@@ -351,7 +351,7 @@ function createStyles(c: C) {
   receiptEmoji: { fontSize: 24, marginTop: 2 },
   receiptText: { flex: 1, fontSize: 13, color: c.sectionLabel, lineHeight: 18 },
   attachBtn: { backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 14, alignItems: 'center', borderWidth: 1.5, borderColor: c.cardBorder, borderStyle: 'dashed' },
-  attachBtnText: { fontSize: 14, fontWeight: '700', color: '#0466C8' },
+  attachBtnText: { fontSize: 14, fontWeight: '700', color: '#00658E' },
 
   notes: { fontSize: 14, color: c.sectionLabel, backgroundColor: c.pillBg, borderRadius: 12, padding: 14 },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.pillBg },
@@ -361,13 +361,13 @@ function createStyles(c: C) {
   noComments: { fontSize: 14, color: c.textMuted, textAlign: 'center', paddingVertical: 20 },
   commentRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 12 },
   commentBubble: { flex: 1, backgroundColor: c.card, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: c.cardBorder },
-  commentName: { fontSize: 12, fontWeight: '700', color: '#0F4B70', marginBottom: 3 },
+  commentName: { fontSize: 12, fontWeight: '700', color: '#00658E', marginBottom: 3 },
   commentText: { fontSize: 13, color: c.sectionLabel, lineHeight: 18 },
   commentTime: { fontSize: 10, color: c.textMuted, marginTop: 4 },
 
   commentInputWrap: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, paddingHorizontal: 16, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder, backgroundColor: c.bg },
   commentInput: { flex: 1, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: c.text, maxHeight: 80 },
-  sendBtn: { backgroundColor: '#0466C8', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10 },
+  sendBtn: { backgroundColor: '#00658E', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10 },
   sendBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }

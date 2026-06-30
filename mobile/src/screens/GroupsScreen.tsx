@@ -22,7 +22,7 @@ const CATEGORY: Record<string, { emoji: string; color: string }> = {
   couple: { emoji: '💑', color: '#EF4444' },
   work:   { emoji: '💼', color: '#64748B' },
   event:  { emoji: '📅', color: '#8B5CF6' },
-  other:  { emoji: '🎉', color: '#0F4B70' },
+  other:  { emoji: '🎉', color: '#00658E' },
 };
 
 const FILTER_OPTIONS: FilterOption[] = [
@@ -122,7 +122,7 @@ export const GroupsScreen: React.FC = () => {
           onPress={() => setShowFilter(true)}
           activeOpacity={0.8}
         >
-          <FilterIcon color={filter !== 'all' ? '#0F4B70' : colors.sectionLabel} size={20} />
+          <FilterIcon color={filter !== 'all' ? '#00658E' : colors.sectionLabel} size={20} />
           {filter !== 'all' && <View style={s.filterDot} />}
         </TouchableOpacity>
       </View>
@@ -150,7 +150,7 @@ export const GroupsScreen: React.FC = () => {
           data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={s.list}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#0F4B70" />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor="#00658E" />}
           ListEmptyComponent={
             !isLoading ? (
               <EmptyState
@@ -211,24 +211,24 @@ function createStyles(c: C) {
   safe: { flex: 1, backgroundColor: c.bg },
   topBar: { height: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
   topBarSide: { width: 38 },
-  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', textAlign: 'center' },
-  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center', shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
+  title: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold', textAlign: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#00658E', alignItems: 'center', justifyContent: 'center', shadowColor: '#00658E', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.24, shadowRadius: 10, elevation: 5 },
   iconBtnText: { color: '#FFFFFF', fontSize: 24, lineHeight: 26, fontWeight: '300' },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, marginTop: 8, marginBottom: 12 },
   searchWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 15, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12 },
   searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
   filterSquare: { width: 48, height: 46, borderRadius: 15, backgroundColor: c.inputBg, borderWidth: 1, borderColor: c.inputBorder, alignItems: 'center', justifyContent: 'center' },
-  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
+  filterSquareActive: { backgroundColor: '#E8F3FA', borderColor: '#00658E' },
   filterSquareText: { color: c.sectionLabel, fontSize: 22, fontWeight: '700', lineHeight: 24 },
-  filterSquareTextActive: { color: '#0F4B70' },
-  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#0466C8' },
+  filterSquareTextActive: { color: '#00658E' },
+  filterDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#00658E' },
   pillsRow: { paddingLeft: 20, marginBottom: 12 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8, marginRight: 8, borderWidth: 1, borderColor: 'transparent' },
-  pillActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
+  pillActive: { backgroundColor: '#E8F3FA', borderColor: '#00658E' },
   pillEmoji: { fontSize: 14 },
   pillLabel: { fontSize: 12, fontWeight: '600', color: c.textSub },
-  pillLabelActive: { color: '#0F4B70' },
+  pillLabelActive: { color: '#00658E' },
   list: { paddingHorizontal: 20, paddingBottom: 100 },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   catBadge: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
@@ -250,7 +250,7 @@ function createStyles(c: C) {
   emptyEmoji: { fontSize: 52, marginBottom: 16 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: c.text, marginBottom: 6 },
   emptySub: { fontSize: 14, color: c.textSub, textAlign: 'center', maxWidth: 260, marginBottom: 24 },
-  emptyBtn: { backgroundColor: '#0466C8', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  emptyBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   emptyBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }

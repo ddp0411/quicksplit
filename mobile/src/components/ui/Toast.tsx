@@ -10,10 +10,10 @@ export interface ToastItem {
 }
 
 const STYLES: Record<ToastType, { bg: string; icon: string; text: string; border: string }> = {
-  success: { bg: '#E8F3FA', border: '#C4DFEF', icon: '✅', text: '#0F4B70' },
+  success: { bg: '#E8F3FA', border: '#C4DFEF', icon: '✅', text: '#00658E' },
   warning: { bg: '#fffbeb', border: '#fde68a', icon: '⚠️', text: '#92400e' },
   error:   { bg: '#fef2f2', border: '#fecaca', icon: '✕',  text: '#991b1b' },
-  info:    { bg: '#ecfdf5', border: '#a7f3d0', icon: 'ℹ️', text: '#0A3858' },
+  info:    { bg: '#ecfdf5', border: '#a7f3d0', icon: 'ℹ️', text: '#004C6C' },
 };
 
 function Toast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: string) => void }) {

@@ -9,6 +9,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 
 import { useUserStore } from '../state/userStore';
 import { useToastStore } from '../state/toastStore';
@@ -34,19 +35,8 @@ const AI_INSIGHTS = [
   'Keep splitting! Every shared expense tracked saves arguments later 🤝',
 ];
 
-const QUOTES = [
-  { text: "A budget is telling your money where to go instead of wondering where it went.", author: "Dave Ramsey" },
-  { text: "Beware of little expenses; a small leak will sink a great ship.", author: "Benjamin Franklin" },
-  { text: "Split the bill, share the memory.", author: "QuickSplit" },
-  { text: "Travel is the only thing you buy that makes you richer.", author: "Anonymous" },
-  { text: "Friends who split bills together, stay together.", author: "QuickSplit" },
-];
-
 const CATEGORY_EMOJI: Record<string, string> = {
   home: '🏠', trip: '✈️', couple: '💑', work: '💼', event: '📅', other: '🎉',
-};
-const CATEGORY_BG: Record<string, string> = {
-  home: '#0EA5E9', trip: '#F59E0B', couple: '#EF4444', work: '#64748B', event: '#8B5CF6', other: '#0F4B70',
 };
 
 function avatarInitials(name: string) {
@@ -81,10 +71,9 @@ export const HomeScreen: React.FC = () => {
   };
 
   const todayInsight = useMemo(() => AI_INSIGHTS[new Date().getDate() % AI_INSIGHTS.length], []);
-  const todayQuote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
 
-  // NOTE: balance uses the shared ['balances'] key (was ['balance-overview']) so that
-  // writes elsewhere (AddExpense / SettleUp) that invalidate ['balances'] also refresh Home.
+  // NOTE: balance uses the shared ['balances'] key so writes elsewhere (AddExpense /
+  // SettleUp) that invalidate ['balances'] also refresh Home.
   const { data: balance, isLoading: balanceLoading, refetch: refetchBalance } = useQuery({
     queryKey: ['balances'],
     queryFn: balancesAPI.getOverallBalance,
@@ -110,8 +99,6 @@ export const HomeScreen: React.FC = () => {
     queryFn: () => expensesAPI.getExpenses({ limit: 200 }),
   });
 
-  // Refetch everything whenever Home regains focus (e.g. after adding an expense or
-  // settling up and navigating back). Without this the cards show stale data.
   useFocusEffect(
     useCallback(() => {
       refetchBalance();
@@ -150,135 +137,114 @@ export const HomeScreen: React.FC = () => {
     [friends],
   );
 
+  const net = balance?.net_balance ?? 0;
+  const owed = balance?.total_owed_to_you ?? 0;
+  const owe = balance?.total_you_owe ?? 0;
+
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView style={s.safe} edges={['top']}>
       <ScrollView contentContainerStyle={s.container} showsVerticalScrollIndicator={false}>
 
-        {/* Hero greeting card */}
-        <LinearGradient
-          colors={['#0F4B70', '#0A3858']}
-          style={s.heroCard}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        >
-          <View style={s.heroTop}>
-            <Text style={s.heroGreeting}>
-              {user ? getGreeting(user.name) : 'Welcome 👋'}
-            </Text>
+        {/* Top app bar */}
+        <View style={s.appBar}>
+          <View style={s.appBarLeft}>
             <TouchableOpacity
-              style={s.heroAvatar}
+              style={s.appAvatar}
               activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel="Open account"
               onPress={() => navigation.navigate('Account')}
             >
-              <Text style={s.heroAvatarText}>
-                {user?.name ? avatarInitials(user.name) : 'U'}
-              </Text>
+              <Text style={s.appAvatarText}>{user?.name ? avatarInitials(user.name) : 'U'}</Text>
             </TouchableOpacity>
+            <Text style={s.brand}>QuickSplit</Text>
           </View>
-          <View style={s.quoteBlock}>
-            <Text style={s.quoteText}>"{todayQuote.text}"</Text>
-            <Text style={s.quoteAuthor}>— {todayQuote.author}</Text>
-          </View>
-        </LinearGradient>
+          <TouchableOpacity style={s.bellBtn} activeOpacity={0.7} onPress={() => navigation.navigate('Activity')}>
+            <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+              <Path d="M6 9 a6 6 0 0 1 12 0 c0 5 2 6 2 6 H4 s2-1 2-6" stroke={colors.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <Path d="M10 20 a2 2 0 0 0 4 0" stroke={colors.primary} strokeWidth="1.8" strokeLinecap="round" />
+            </Svg>
+          </TouchableOpacity>
+        </View>
 
-        {/* Balance hero card */}
-        <View style={s.balanceCard}>
+        <Text style={s.greeting}>{user ? getGreeting(user.name) : 'Welcome 👋'}</Text>
+
+        {/* Total Balance card */}
+        <LinearGradient
+          colors={[colors.primarySoft, colors.card]}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          style={s.balanceCard}
+        >
           {balanceLoading ? (
             <View style={{ gap: 10 }}>
-              <SkeletonRow width="50%" height={12} />
-              <SkeletonRow width="70%" height={28} />
-              <SkeletonRow width="100%" height={12} />
+              <SkeletonRow width="40%" height={12} />
+              <SkeletonRow width="65%" height={34} />
             </View>
           ) : (
             <>
-              <View style={s.balanceTop}>
-                <View>
-                  <Text style={s.balanceLabel}>
-                    {(balance?.total_owed_to_you ?? 0) > 0
-                      ? 'YOU ARE OWED'
-                      : (balance?.total_you_owe ?? 0) > 0
-                        ? 'YOU OWE'
-                        : 'ALL SETTLED UP'}
-                  </Text>
-                  <Text style={s.balanceAmount}>
-                    {(balance?.total_owed_to_you ?? 0) > 0
-                      ? formatCurrency(balance?.total_owed_to_you ?? 0)
-                      : (balance?.total_you_owe ?? 0) > 0
-                        ? formatCurrency(balance?.total_you_owe ?? 0)
-                        : '₹0.00'}
+              <Text style={s.balanceLabel}>TOTAL BALANCE</Text>
+              <Text style={s.balanceAmount}>{net >= 0 ? '' : '-'}{formatCurrency(Math.abs(net))}</Text>
+              <View style={s.trendRow}>
+                <View style={[s.trendPill, { backgroundColor: net >= 0 ? colors.successBg : colors.errorBg }]}>
+                  <Text style={[s.trendPillText, { color: net >= 0 ? colors.successText : colors.errorText }]}>
+                    {net >= 0 ? "▲ you're ahead" : '▼ you owe overall'}
                   </Text>
                 </View>
-                <View
-                  style={[
-                    s.balanceDot,
-                    {
-                      backgroundColor:
-                        (balance?.net_balance ?? 0) > 0
-                          ? '#22C55E'
-                          : (balance?.net_balance ?? 0) < 0
-                            ? '#EF4444'
-                            : '#9CA3AF',
-                    },
-                  ]}
-                />
-              </View>
-              <View style={s.balanceSubrow}>
-                <View style={s.balanceStat}>
-                  <Text style={s.balanceStatLabel}>Owe you</Text>
-                  <Text style={[s.balanceStatVal, { color: '#22C55E' }]}>
-                    {formatCurrency(balance?.total_owed_to_you ?? 0)}
-                  </Text>
-                </View>
-                <View style={s.divider} />
-                <View style={s.balanceStat}>
-                  <Text style={s.balanceStatLabel}>You owe</Text>
-                  <Text style={[s.balanceStatVal, { color: '#EF4444' }]}>
-                    {formatCurrency(balance?.total_you_owe ?? 0)}
-                  </Text>
-                </View>
-                <View style={s.divider} />
-                <View style={s.balanceStat}>
-                  <Text style={s.balanceStatLabel}>Net</Text>
-                  <Text style={[s.balanceStatVal, { color: (balance?.net_balance ?? 0) >= 0 ? '#22C55E' : '#EF4444' }]}>
-                    {(balance?.net_balance ?? 0) >= 0 ? '+' : ''}{formatCurrency(balance?.net_balance ?? 0)}
-                  </Text>
-                </View>
-                {(balance?.total_you_owe ?? 0) > 0 && (
-                  <TouchableOpacity
-                    style={s.settleBtn}
-                    onPress={() => navigation.navigate('SettleUp')}
-                  >
-                    <Text style={s.settleBtnText}>Settle up →</Text>
-                  </TouchableOpacity>
-                )}
+                <Text style={s.trendSub}>
+                  {Math.abs(net) < 0.01 ? 'all settled up' : net >= 0 ? 'net owed to you' : 'net you owe'}
+                </Text>
               </View>
             </>
           )}
-        </View>
+        </LinearGradient>
 
-        {/* Quick actions. `tab` routes cross-stack screens (AddFriend lives in the
-            Friends stack); the rest live in the Home stack and navigate directly. */}
-        <View style={s.quickActions}>
-          {[
-            { emoji: '➕', label: 'Add', bg: '#0466C8', screen: 'AddExpense' },
-            { emoji: '📷', label: 'Scan', bg: '#0F4B70', screen: 'Scan' },
-            { emoji: '💸', label: 'Settle', bg: '#0AAFC2', screen: 'SettleUp' },
-            { emoji: '👤', label: 'Friend', bg: '#2170A0', screen: 'AddFriend', tab: 'Friends' },
-          ].map(({ emoji, label, bg, screen, tab }) => (
-            <TouchableOpacity
-              key={label}
-              style={[s.quickBtn, { backgroundColor: bg }]}
-              onPress={() => tab
-                ? navigation.navigate(tab, { screen })
-                : navigation.navigate(screen)}
-              activeOpacity={0.85}
-            >
-              <Text style={{ fontSize: 22 }}>{emoji}</Text>
-              <Text style={s.quickLabel}>{label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* You are owed card */}
+        <TouchableOpacity
+          style={s.splitCard}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('Friends')}
+        >
+          <View style={s.splitTop}>
+            <View style={[s.iconTile, { backgroundColor: colors.pillBg }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M7 17 L17 7 M9 7 H17 V15" stroke={colors.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </View>
+            <Text style={s.chevron}>›</Text>
+          </View>
+          <Text style={s.splitLabel}>YOU ARE OWED</Text>
+          <Text style={[s.splitAmount, { color: colors.successText }]}>{formatCurrency(owed)}</Text>
+          {owedToMe.length > 0 && (
+            <View style={s.avatarStack}>
+              {owedToMe.map((f: any, i: number) => (
+                <View key={f.friendship_id} style={[s.stackAvatar, { backgroundColor: f.user.avatar_color, marginLeft: i === 0 ? 0 : -8, borderColor: colors.card }]}>
+                  <Text style={s.stackAvatarText}>{avatarInitials(f.user.name)}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </TouchableOpacity>
+
+        {/* You owe card */}
+        <TouchableOpacity
+          style={s.splitCard}
+          activeOpacity={0.85}
+          onPress={() => owe > 0 ? navigation.navigate('SettleUp') : navigation.navigate('Friends')}
+        >
+          <View style={s.splitTop}>
+            <View style={[s.iconTile, { backgroundColor: colors.errorBg }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M17 7 L7 17 M15 17 H7 V9" stroke={colors.errorText} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </View>
+            <Text style={s.chevron}>›</Text>
+          </View>
+          <Text style={s.splitLabel}>YOU OWE</Text>
+          <Text style={[s.splitAmount, { color: colors.errorText }]}>{formatCurrency(owe)}</Text>
+          {owe > 0
+            ? <Text style={s.splitMeta}>Tap to settle up →</Text>
+            : <Text style={s.splitMeta}>You're all clear 🎉</Text>}
+        </TouchableOpacity>
 
         {/* AI Insight Card */}
         <TouchableOpacity
@@ -286,12 +252,14 @@ export const HomeScreen: React.FC = () => {
           onPress={() => navigation.navigate('Personal', { screen: 'AIChat' })}
           activeOpacity={0.85}
         >
-          <View style={s.insightLeft}>
-            <Text style={s.insightEmoji}>🤖</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={s.insightLabel}>AI INSIGHT</Text>
-              <Text style={s.insightText} numberOfLines={2}>{todayInsight}</Text>
-            </View>
+          <View style={s.insightIcon}>
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <Path d="M12 3 L13.7 10.3 L21 12 L13.7 13.7 L12 21 L10.3 13.7 L3 12 L10.3 10.3 Z" fill={colors.primary} />
+            </Svg>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.insightLabel}>AI INSIGHT</Text>
+            <Text style={s.insightText} numberOfLines={2}>{todayInsight}</Text>
           </View>
           <Text style={s.insightCta}>Chat →</Text>
         </TouchableOpacity>
@@ -303,7 +271,11 @@ export const HomeScreen: React.FC = () => {
           activeOpacity={0.85}
         >
           <View style={s.spendLeft}>
-            <Text style={s.spendEmoji}>📈</Text>
+            <View style={[s.iconTile, { backgroundColor: colors.tertiaryContainer }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M4 19 V5 M4 19 H20 M7 14.5 L11 10 L14 13 L19 7" stroke={colors.tertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </View>
             <View>
               <Text style={s.spendLabel}>THIS MONTH'S SPENDING</Text>
               <Text style={s.spendAmount}>{formatCurrency(monthSpend)}</Text>
@@ -312,54 +284,53 @@ export const HomeScreen: React.FC = () => {
           <Text style={s.spendCta}>Insights →</Text>
         </TouchableOpacity>
 
-        {/* Your Groups */}
+        {/* Active Groups */}
         <View style={s.section}>
           <View style={s.sectionHeader}>
-            <Text style={s.sectionTitle}>Your Groups</Text>
+            <Text style={s.sectionTitle}>Active Groups</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Groups')}>
-              <Text style={s.seeAll}>See all →</Text>
+              <Text style={s.seeAll}>VIEW ALL</Text>
             </TouchableOpacity>
           </View>
           {groupsLoading ? (
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              {[1, 2, 3].map((i) => <SkeletonCard key={i} height={110} />)}
+            <View style={{ gap: 12 }}>
+              {[1, 2].map((i) => <SkeletonCard key={i} height={72} />)}
             </View>
           ) : topGroups.length === 0 ? (
             <View style={s.emptyCard}>
               <Text style={s.emptyText}>No groups yet</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Groups', { screen: 'CreateGroup' })}>
-                <Text style={s.seeAll}>+ Create</Text>
+                <Text style={s.seeAll}>+ CREATE</Text>
               </TouchableOpacity>
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }}
-              contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
-              {topGroups.map((group: any) => {
+            <View style={s.listCard}>
+              {topGroups.map((group: any, i: number) => {
                 const settled = Math.abs(group.your_balance) < 0.01;
                 const emoji = CATEGORY_EMOJI[group.category] ?? '📁';
-                const bgColor = CATEGORY_BG[group.category] ?? '#0F4B70';
                 return (
                   <TouchableOpacity
                     key={group.id}
-                    style={s.groupCard}
+                    style={[s.groupRow, i > 0 && s.rowBorder]}
                     onPress={() => navigation.navigate('Groups', { screen: 'GroupDetail', params: { groupId: group.id } })}
-                    activeOpacity={0.85}
+                    activeOpacity={0.8}
                   >
-                    <View style={[s.groupIcon, { backgroundColor: bgColor }]}>
+                    <View style={[s.iconTile, { backgroundColor: colors.pillBg }]}>
                       <Text style={{ fontSize: 18 }}>{emoji}</Text>
                     </View>
-                    <Text style={s.groupName} numberOfLines={1}>{group.name}</Text>
-                    {settled ? (
-                      <View style={s.badge}><Text style={s.badgeSettled}>Settled</Text></View>
-                    ) : group.your_balance > 0 ? (
-                      <View style={s.badge}><Text style={s.badgeOwed}>owed {formatCurrency(group.your_balance)}</Text></View>
-                    ) : (
-                      <View style={s.badge}><Text style={s.badgeOwe}>owe {formatCurrency(Math.abs(group.your_balance))}</Text></View>
-                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.groupName} numberOfLines={1}>{group.name}</Text>
+                      <View style={s.track}>
+                        <View style={[s.trackFill, { width: settled ? '100%' : '55%', backgroundColor: settled ? colors.successText : colors.primary }]} />
+                      </View>
+                    </View>
+                    <Text style={[s.groupAmt, { color: settled ? colors.textMuted : group.your_balance > 0 ? colors.successText : colors.errorText }]}>
+                      {settled ? 'Settled' : `${group.your_balance > 0 ? '+' : '-'}${formatCurrency(Math.abs(group.your_balance))}`}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
+            </View>
           )}
         </View>
 
@@ -369,19 +340,19 @@ export const HomeScreen: React.FC = () => {
             <View style={s.sectionHeader}>
               <Text style={s.sectionTitle}>Who owes you</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Friends')}>
-                <Text style={s.seeAll}>See all →</Text>
+                <Text style={s.seeAll}>SEE ALL</Text>
               </TouchableOpacity>
             </View>
             <View style={s.listCard}>
               {owedToMe.map((f: any, i: number) => (
-                <View key={f.friendship_id} style={[s.listRow, i > 0 && s.listRowBorder]}>
+                <View key={f.friendship_id} style={[s.listRow, i > 0 && s.rowBorder]}>
                   <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
                     <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
                   </View>
                   <Text style={s.listName} numberOfLines={1}>{f.user.name}</Text>
-                  <Text style={s.positiveAmt}>{formatCurrency(f.balance)}</Text>
-                  <TouchableOpacity style={s.remindBtn} onPress={() => sendReminder(f)}>
-                    <Text style={s.remindBtnText}>🔔 Remind</Text>
+                  <Text style={[s.amtStrong, { color: colors.successText }]}>{formatCurrency(f.balance)}</Text>
+                  <TouchableOpacity style={[s.remindBtn, { backgroundColor: colors.warningBg, borderColor: colors.warningBorder }]} onPress={() => sendReminder(f)}>
+                    <Text style={[s.remindBtnText, { color: colors.warningText }]}>🔔 Remind</Text>
                   </TouchableOpacity>
                 </View>
               ))}
@@ -395,19 +366,19 @@ export const HomeScreen: React.FC = () => {
             <View style={s.sectionHeader}>
               <Text style={s.sectionTitle}>You owe</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Friends')}>
-                <Text style={s.seeAll}>See all →</Text>
+                <Text style={s.seeAll}>SEE ALL</Text>
               </TouchableOpacity>
             </View>
             <View style={s.listCard}>
               {iOwe.map((f: any, i: number) => (
-                <View key={f.friendship_id} style={[s.listRow, i > 0 && s.listRowBorder]}>
+                <View key={f.friendship_id} style={[s.listRow, i > 0 && s.rowBorder]}>
                   <View style={[s.avatar, { backgroundColor: f.user.avatar_color }]}>
                     <Text style={s.avatarText}>{avatarInitials(f.user.name)}</Text>
                   </View>
                   <Text style={s.listName} numberOfLines={1}>{f.user.name}</Text>
-                  <Text style={s.negativeAmt}>{formatCurrency(Math.abs(f.balance))}</Text>
+                  <Text style={[s.amtStrong, { color: colors.errorText }]}>{formatCurrency(Math.abs(f.balance))}</Text>
                   <TouchableOpacity
-                    style={s.settleSmallBtn}
+                    style={[s.settleSmallBtn, { backgroundColor: colors.primary }]}
                     onPress={() => navigation.navigate('SettleUp', { userId: f.user.id })}
                   >
                     <Text style={s.settleSmallText}>Settle →</Text>
@@ -420,17 +391,17 @@ export const HomeScreen: React.FC = () => {
 
         {/* Recent Activity */}
         {!activityLoading && (activity as any[]).length > 0 && (
-          <View style={[s.section, { marginBottom: 32 }]}>
+          <View style={[s.section, { marginBottom: 24 }]}>
             <View style={s.sectionHeader}>
               <Text style={s.sectionTitle}>Recent Activity</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Activity')}>
-                <Text style={s.seeAll}>See all →</Text>
+                <Text style={s.seeAll}>SEE ALL</Text>
               </TouchableOpacity>
             </View>
             <View style={s.listCard}>
               {(activity as any[]).slice(0, 5).map((item: any, i: number) => (
-                <View key={item.id ?? i} style={[s.listRow, i > 0 && s.listRowBorder]}>
-                  <View style={s.activityIcon}>
+                <View key={item.id ?? i} style={[s.listRow, i > 0 && s.rowBorder]}>
+                  <View style={[s.iconTile, { backgroundColor: colors.pillBg }]}>
                     <Text style={{ fontSize: 16 }}>
                       {item.type === 'expense' ? '💸' : item.type === 'settlement' ? '✅' : '🔔'}
                     </Text>
@@ -446,86 +417,95 @@ export const HomeScreen: React.FC = () => {
         )}
 
       </ScrollView>
-
     </SafeAreaView>
   );
 };
 
 function createStyles(c: C) {
   return StyleSheet.create({
-  safe: { flex: 1, backgroundColor: c.bg },
-  container: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 100 },
+    safe: { flex: 1, backgroundColor: c.bg },
+    container: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 120 },
 
-  heroCard: { borderRadius: 24, padding: 20, marginBottom: 12, shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 8 },
-  heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
-  heroGreeting: { color: '#FFFFFF', fontSize: 18, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold' },
-  heroAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-  heroAvatarText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  quoteBlock: { borderLeftWidth: 2, borderLeftColor: 'rgba(255,255,255,0.35)', paddingLeft: 12 },
-  quoteText: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontStyle: 'italic', lineHeight: 20 },
-  quoteAuthor: { color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: '600', marginTop: 4 },
+    appBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 },
+    appBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    appAvatar: { width: 38, height: 38, borderRadius: 19, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center' },
+    appAvatarText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    brand: { fontSize: 22, fontWeight: '700', fontFamily: 'Inter_700Bold', color: c.primary, letterSpacing: -0.4 },
+    bellBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
 
-  balanceCard: { backgroundColor: '#0F4B70', borderRadius: 24, padding: 20, marginBottom: 12, shadowColor: '#0F4B70', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.25, shadowRadius: 20, elevation: 8 },
-  balanceTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
-  balanceLabel: { color: 'rgba(255,255,255,0.55)', fontSize: 10, fontWeight: '700', letterSpacing: 1.5 },
-  balanceAmount: { color: '#FFFFFF', fontSize: 30, fontWeight: '800', fontFamily: 'PlusJakartaSans_700Bold', marginTop: 4 },
-  balanceDot: { width: 12, height: 12, borderRadius: 6, marginTop: 6, borderWidth: 2, borderColor: 'rgba(255,255,255,0.35)' },
-  balanceSubrow: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-  balanceStat: { alignItems: 'flex-start' },
-  balanceStatLabel: { color: 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: '600' },
-  balanceStatVal: { fontSize: 13, fontWeight: '800', marginTop: 2 },
-  divider: { width: 1, height: 24, backgroundColor: 'rgba(255,255,255,0.1)' },
-  settleBtn: { marginLeft: 'auto' as any, backgroundColor: '#0466C8', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, shadowColor: '#0466C8', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 10, elevation: 4 },
-  settleBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+    greeting: { fontSize: 14, color: c.textSub, fontFamily: 'Inter_500Medium', marginTop: 4, marginBottom: 14 },
 
-  quickActions: { flexDirection: 'row', gap: 8, marginBottom: 20 },
-  quickBtn: { flex: 1, borderRadius: 16, paddingVertical: 14, alignItems: 'center', gap: 4 },
-  quickLabel: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
+    balanceCard: {
+      borderRadius: 22, padding: 22, borderWidth: 1, borderColor: c.cardBorder, marginBottom: 14,
+      shadowColor: '#1A3A52', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.06, shadowRadius: 18, elevation: 3,
+    },
+    balanceLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, color: c.textSub, fontFamily: 'Inter_700Bold' },
+    balanceAmount: { fontSize: 44, fontWeight: '700', fontFamily: 'Inter_700Bold', color: c.primary, letterSpacing: -1.5, marginTop: 6 },
+    trendRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
+    trendPill: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
+    trendPillText: { fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    trendSub: { fontSize: 13, color: c.textMuted, fontFamily: 'Inter_400Regular' },
 
-  section: { marginBottom: 16 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: c.text },
-  seeAll: { fontSize: 12, fontWeight: '700', color: '#0F4B70' },
+    splitCard: {
+      backgroundColor: c.card, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: c.cardBorder, marginBottom: 14,
+      shadowColor: '#1A3A52', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.05, shadowRadius: 14, elevation: 2,
+    },
+    splitTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
+    chevron: { fontSize: 24, color: c.textMuted, fontWeight: '300' },
+    splitLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1, color: c.textSub, fontFamily: 'Inter_700Bold' },
+    splitAmount: { fontSize: 30, fontWeight: '700', fontFamily: 'Inter_700Bold', letterSpacing: -0.8, marginTop: 4, color: c.text },
+    splitMeta: { fontSize: 13, color: c.textMuted, marginTop: 8, fontFamily: 'Inter_400Regular' },
+    avatarStack: { flexDirection: 'row', marginTop: 12 },
+    stackAvatar: { width: 30, height: 30, borderRadius: 15, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+    stackAvatarText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700', fontFamily: 'Inter_700Bold' },
 
-  groupCard: { width: 140, borderWidth: 1.5, borderColor: c.cardBorder, borderRadius: 16, padding: 12, backgroundColor: c.card, gap: 8 },
-  groupIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  groupName: { fontSize: 12, fontWeight: '700', color: c.text },
-  badge: { alignSelf: 'flex-start' },
-  badgeSettled: { fontSize: 10, fontWeight: '700', color: '#6B7280', backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
-  badgeOwed: { fontSize: 10, fontWeight: '700', color: '#16A34A', backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
-  badgeOwe: { fontSize: 10, fontWeight: '700', color: '#DC2626', backgroundColor: '#FEF2F2', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 2 },
+    iconTile: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 
-  emptyCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: c.card, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: c.cardBorder },
-  emptyText: { fontSize: 14, color: c.textSub },
+    insightCard: {
+      flexDirection: 'row', alignItems: 'center', gap: 12,
+      backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 14,
+    },
+    insightIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
+    insightLabel: { fontSize: 10, fontWeight: '700', color: c.textMuted, letterSpacing: 1, marginBottom: 3, fontFamily: 'Inter_700Bold' },
+    insightText: { fontSize: 13, color: c.textSub, lineHeight: 18, fontFamily: 'Inter_400Regular' },
+    insightCta: { fontSize: 13, fontWeight: '700', color: c.primary, marginLeft: 4, fontFamily: 'Inter_700Bold' },
 
-  listCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, paddingHorizontal: 16 },
-  listRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 10 },
-  listRowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
-  avatar: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  listName: { flex: 1, fontSize: 14, fontWeight: '600', color: c.text },
-  positiveAmt: { fontSize: 14, fontWeight: '800', color: '#22C55E' },
-  negativeAmt: { fontSize: 14, fontWeight: '800', color: '#EF4444' },
-  settleSmallBtn: { backgroundColor: '#0466C8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
-  settleSmallText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
-  remindBtn: { backgroundColor: '#FFFBEB', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: '#FDE68A' },
-  remindBtnText: { fontSize: 10, fontWeight: '700', color: '#92400E' },
+    spendCard: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 18,
+    },
+    spendLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+    spendLabel: { fontSize: 10, fontWeight: '700', color: c.textMuted, letterSpacing: 1, marginBottom: 3, fontFamily: 'Inter_700Bold' },
+    spendAmount: { fontSize: 20, fontWeight: '700', color: c.text, fontFamily: 'Inter_700Bold' },
+    spendCta: { fontSize: 13, fontWeight: '700', color: c.primary, marginLeft: 8, fontFamily: 'Inter_700Bold' },
 
-  activityIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
-  activityTitle: { fontSize: 13, fontWeight: '600', color: c.text },
-  activityDate: { fontSize: 11, color: c.textMuted, marginTop: 2 },
-  insightCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 16 },
-  insightLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  insightEmoji: { fontSize: 24, width: 36, textAlign: 'center' },
-  insightLabel: { fontSize: 10, fontWeight: '800', color: c.textMuted, letterSpacing: 1, marginBottom: 3 },
-  insightText: { fontSize: 13, color: c.sectionLabel, lineHeight: 18 },
-  insightCta: { fontSize: 13, fontWeight: '700', color: '#0F4B70', marginLeft: 8 },
+    section: { marginBottom: 18 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+    sectionTitle: { fontSize: 18, fontWeight: '700', color: c.text, fontFamily: 'Inter_700Bold', letterSpacing: -0.3 },
+    seeAll: { fontSize: 11, fontWeight: '700', color: c.primary, letterSpacing: 0.5, fontFamily: 'Inter_700Bold' },
 
-  spendCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 16 },
-  spendLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  spendEmoji: { fontSize: 24, width: 36, textAlign: 'center' },
-  spendLabel: { fontSize: 10, fontWeight: '800', color: c.textMuted, letterSpacing: 1, marginBottom: 3 },
-  spendAmount: { fontSize: 18, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
-  spendCta: { fontSize: 13, fontWeight: '700', color: '#0F4B70', marginLeft: 8 },
+    listCard: { backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, paddingHorizontal: 14 },
+    groupRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
+    rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
+    groupName: { fontSize: 14, fontWeight: '600', color: c.text, fontFamily: 'Inter_600SemiBold', marginBottom: 8 },
+    groupAmt: { fontSize: 14, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    track: { height: 5, borderRadius: 3, backgroundColor: c.surfaceHigh, overflow: 'hidden' },
+    trackFill: { height: 5, borderRadius: 3 },
+
+    emptyCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: c.card, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: c.cardBorder },
+    emptyText: { fontSize: 14, color: c.textSub, fontFamily: 'Inter_400Regular' },
+
+    listRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 10 },
+    avatar: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    avatarText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    listName: { flex: 1, fontSize: 14, fontWeight: '600', color: c.text, fontFamily: 'Inter_600SemiBold' },
+    amtStrong: { fontSize: 14, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    settleSmallBtn: { borderRadius: 9, paddingHorizontal: 11, paddingVertical: 6 },
+    settleSmallText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+    remindBtn: { borderRadius: 9, paddingHorizontal: 9, paddingVertical: 5, borderWidth: 1 },
+    remindBtnText: { fontSize: 11, fontWeight: '700', fontFamily: 'Inter_700Bold' },
+
+    activityTitle: { fontSize: 13, fontWeight: '600', color: c.text, fontFamily: 'Inter_600SemiBold' },
+    activityDate: { fontSize: 11, color: c.textMuted, marginTop: 2, fontFamily: 'Inter_400Regular' },
   });
 }

@@ -26,6 +26,6 @@ const s = StyleSheet.create({
   emoji: { fontSize: 48, marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 8 },
   sub: { fontSize: 14, color: '#6B7280', marginBottom: 24 },
-  btn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  btn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   btnText: { color: '#FFFFFF', fontWeight: '700' },
 });

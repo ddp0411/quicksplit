@@ -100,7 +100,7 @@ export const AddFriendScreen: React.FC = () => {
               autoCapitalize="none"
               keyboardType="email-address"
             />
-            {isFetching && <ActivityIndicator size="small" color="#0F4B70" />}
+            {isFetching && <ActivityIndicator size="small" color="#00658E" />}
           </View>
 
           {query.trim().length > 0 && query.trim().length < 2 && (
@@ -195,7 +195,7 @@ function createStyles(c: C) {
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
   tabActive: { backgroundColor: c.card },
   tabLabel: { fontSize: 14, fontWeight: '600', color: c.textMuted },
-  tabLabelActive: { color: '#0F4B70' },
+  tabLabelActive: { color: '#00658E' },
   searchWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, marginHorizontal: 20, paddingHorizontal: 12, marginBottom: 8 },
   searchIcon: { fontSize: 16, marginRight: 8 },
   searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: c.text },
@@ -206,7 +206,7 @@ function createStyles(c: C) {
   avatarText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   userName: { fontSize: 14, fontWeight: '700', color: c.text },
   userEmail: { fontSize: 12, color: c.textSub, marginTop: 2 },
-  addBtn: { backgroundColor: '#0F4B70', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
+  addBtn: { backgroundColor: '#00658E', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnSent: { backgroundColor: '#E8F3FA', borderWidth: 1, borderColor: '#C4DFEF' },
   addBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   addBtnTextSent: { color: '#16A34A' },
@@ -214,12 +214,12 @@ function createStyles(c: C) {
   emptyText: { fontSize: 14, color: c.textMuted },
   permBox: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
   permText: { fontSize: 15, color: c.sectionLabel, textAlign: 'center', marginBottom: 20 },
-  permBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+  permBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
   permBtnText: { color: '#FFFFFF', fontWeight: '700' },
   scanOverlay: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scanFrame: { width: 240, height: 240, borderWidth: 2, borderColor: '#FFFFFF', borderRadius: 16, marginBottom: 20 },
   scanHint: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   rescanBtn: { marginTop: 16, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10 },
-  rescanText: { fontWeight: '700', color: '#0F4B70' },
+  rescanText: { fontWeight: '700', color: '#00658E' },
   });
 }

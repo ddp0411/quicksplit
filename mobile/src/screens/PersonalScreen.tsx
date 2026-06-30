@@ -29,7 +29,7 @@ function MiniBarChart({ data, maxHeight = 40 }: { data: number[]; maxHeight?: nu
             key={i}
             style={{
               flex: 1, height: h, borderRadius: 4,
-              backgroundColor: isToday ? '#0466C8' : 'rgba(255,255,255,0.5)',
+              backgroundColor: isToday ? '#00658E' : 'rgba(255,255,255,0.5)',
             }}
           />
         );
@@ -44,13 +44,13 @@ function createStyles(c: C) {
     header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16 },
     backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     backText: { fontSize: 18, color: c.text },
-    greeting: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+    greeting: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold' },
     sub: { fontSize: 13, color: c.textSub, marginTop: 2 },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    sparkCard: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 20, marginBottom: 20 },
+    sparkCard: { backgroundColor: '#00658E', borderRadius: 20, padding: 20, marginBottom: 20 },
     sparkHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
     sparkLabel: { fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: '700', letterSpacing: 1 },
-    sparkTotal: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginTop: 4, fontFamily: 'PlusJakartaSans_700Bold' },
+    sparkTotal: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginTop: 4, fontFamily: 'Inter_700Bold' },
     sparkDays: { fontSize: 11, color: 'rgba(255,255,255,0.55)', textAlign: 'right' },
     sparkDayLabels: { flexDirection: 'row', gap: 4, marginTop: 6 },
     sparkDayLabel: { flex: 1, textAlign: 'center', fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },

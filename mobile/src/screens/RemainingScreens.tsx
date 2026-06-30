@@ -182,10 +182,10 @@ function createBsStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    ringCard: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
+    ringCard: { backgroundColor: '#00658E', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
     ringOuter: { width: '100%', marginBottom: 12 },
     ringTrack: { height: 12, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 6, overflow: 'hidden' },
-    ringFill: { height: 12, backgroundColor: '#0466C8', borderRadius: 6 },
+    ringFill: { height: 12, backgroundColor: '#00658E', borderRadius: 6 },
     ringLabel: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
     ringSubLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 },
     budgetRow: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 16, marginBottom: 10 },
@@ -198,7 +198,7 @@ function createBsStyles(c: C) {
     barFill: { height: 8, borderRadius: 4 },
     budgetMeta: { fontSize: 12, color: c.textSub },
     deleteText: { fontSize: 12, color: '#DC2626', marginTop: 6 },
-    addBtn: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
+    addBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 14, alignItems: 'center' },
     addBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
     modalSheet: { backgroundColor: c.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 40 },
@@ -207,11 +207,11 @@ function createBsStyles(c: C) {
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     input: { backgroundColor: c.pillBg, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text, marginBottom: 16 },
     catChip: { backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8 },
-    catChipActive: { backgroundColor: c.successBg, borderWidth: 1, borderColor: '#0F4B70' },
+    catChipActive: { backgroundColor: c.successBg, borderWidth: 1, borderColor: '#00658E' },
     modalBtnRow: { flexDirection: 'row', gap: 10 },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#00658E', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -316,7 +316,7 @@ export const SubscriptionTrackerScreen: React.FC = () => {
                   style={[s.cycleBtn, form.cycle === c && s.cycleBtnActive]}
                   onPress={() => setForm((p) => ({ ...p, cycle: c }))}
                 >
-                  <Text style={[s.cycleBtnText, form.cycle === c && { color: '#0F4B70' }]}>{c}</Text>
+                  <Text style={[s.cycleBtnText, form.cycle === c && { color: '#00658E' }]}>{c}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -347,7 +347,7 @@ function createSsStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    hero: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
+    hero: { backgroundColor: '#00658E', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
     heroLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
     heroAmount: { fontSize: 36, fontWeight: '800', color: '#FFFFFF' },
     empty: { alignItems: 'center', paddingTop: 60 },
@@ -358,10 +358,10 @@ function createSsStyles(c: C) {
     subIcon: { width: 40, height: 40, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     subName: { fontSize: 14, fontWeight: '700', color: c.text },
     subMeta: { fontSize: 12, color: c.textMuted, marginTop: 2, textTransform: 'capitalize' },
-    subAmount: { fontSize: 14, fontWeight: '700', color: '#0F4B70' },
+    subAmount: { fontSize: 14, fontWeight: '700', color: '#00658E' },
     deleteBtn: { padding: 6 },
     deleteText: { fontSize: 14, color: c.textMuted },
-    addBtn: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
+    addBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
     addBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
     overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
     sheet: { backgroundColor: c.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 40 },
@@ -371,11 +371,11 @@ function createSsStyles(c: C) {
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     input: { backgroundColor: c.pillBg, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },
     cycleBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
-    cycleBtnActive: { backgroundColor: c.successBg, borderColor: '#0F4B70' },
+    cycleBtnActive: { backgroundColor: c.successBg, borderColor: '#00658E' },
     cycleBtnText: { fontSize: 14, fontWeight: '600', color: c.textSub, textTransform: 'capitalize' },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#00658E', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -477,23 +477,23 @@ function createSiStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    hero: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
+    hero: { backgroundColor: '#00658E', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
     heroLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
     heroAmount: { fontSize: 36, fontWeight: '800', color: '#FFFFFF' },
     filterRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
     filterChip: { flex: 1, backgroundColor: c.pillBg, borderRadius: 20, paddingVertical: 8, alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
-    filterChipActive: { backgroundColor: c.successBg, borderColor: '#0F4B70' },
+    filterChipActive: { backgroundColor: c.successBg, borderColor: '#00658E' },
     filterChipText: { fontSize: 12, fontWeight: '600', color: c.textSub },
-    filterChipTextActive: { color: '#0F4B70' },
+    filterChipTextActive: { color: '#00658E' },
     empty: { alignItems: 'center', paddingTop: 40 },
     emptyText: { fontSize: 15, color: c.textMuted },
     row: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
     rowEmoji: { fontSize: 24, marginTop: 2 },
     rowHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
     rowLabel: { fontSize: 14, fontWeight: '700', color: c.text },
-    rowPct: { fontSize: 13, fontWeight: '700', color: '#0F4B70' },
+    rowPct: { fontSize: 13, fontWeight: '700', color: '#00658E' },
     barTrack: { height: 6, backgroundColor: c.pillBg, borderRadius: 3, overflow: 'hidden', marginBottom: 4 },
-    barFill: { height: 6, backgroundColor: '#0466C8', borderRadius: 3 },
+    barFill: { height: 6, backgroundColor: '#00658E', borderRadius: 3 },
     rowAmount: { fontSize: 12, color: c.textSub },
   });
 }
@@ -607,7 +607,7 @@ function createGiStyles(c: C) {
   return StyleSheet.create({
     safe: { flex: 1, backgroundColor: c.bg },
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
-    hero: { backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
+    hero: { backgroundColor: '#00658E', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
     heroLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
     heroAmount: { fontSize: 36, fontWeight: '800', color: '#FFFFFF' },
     section: { marginBottom: 20 },
@@ -623,7 +623,7 @@ function createGiStyles(c: C) {
     catEmoji: { fontSize: 18, width: 24 },
     catLabel: { fontSize: 13, color: c.sectionLabel, width: 80 },
     catBar: { flex: 1, height: 6, backgroundColor: c.pillBg, borderRadius: 3, overflow: 'hidden' },
-    catBarFill: { height: 6, backgroundColor: '#0466C8', borderRadius: 3 },
+    catBarFill: { height: 6, backgroundColor: '#00658E', borderRadius: 3 },
     catAmount: { fontSize: 12, fontWeight: '700', color: c.text, minWidth: 70, textAlign: 'right' },
     debtRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: c.warningBg, borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: c.warningBorder },
     debtText: { fontSize: 14, color: c.sectionLabel },
@@ -676,14 +676,14 @@ function createApStyles(c: C) {
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     hint: { fontSize: 14, color: c.textSub, marginBottom: 20, lineHeight: 20 },
     row: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.card, borderRadius: 16, borderWidth: 1.5, borderColor: c.cardBorder, padding: 16, marginBottom: 10 },
-    rowActive: { borderColor: '#0F4B70', backgroundColor: c.successBg },
+    rowActive: { borderColor: '#00658E', backgroundColor: c.successBg },
     rowEmoji: { fontSize: 24 },
     rowLabel: { fontSize: 15, fontWeight: '700', color: c.text },
-    rowLabelActive: { color: '#0F4B70' },
+    rowLabelActive: { color: '#00658E' },
     rowDesc: { fontSize: 12, color: c.textMuted, marginTop: 2 },
     radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: c.cardBorder, alignItems: 'center', justifyContent: 'center' },
-    radioActive: { borderColor: '#0F4B70' },
-    radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#0F4B70' },
+    radioActive: { borderColor: '#00658E' },
+    radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#00658E' },
   });
 }
 
@@ -732,7 +732,7 @@ export const NotificationSettingsScreen: React.FC = () => {
             <Switch
               value={prefs[item.key]}
               onValueChange={() => toggle(item.key)}
-              trackColor={{ false: colors.cardBorder, true: '#0F4B70' }}
+              trackColor={{ false: colors.cardBorder, true: '#00658E' }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -752,7 +752,7 @@ function createNsStyles(c: C) {
     row: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 16, marginBottom: 10 },
     rowLabel: { fontSize: 15, fontWeight: '700', color: c.text, marginBottom: 2 },
     rowDesc: { fontSize: 12, color: c.textMuted },
-    saveBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
+    saveBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
     saveBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
   });
 }
@@ -801,7 +801,7 @@ export const SecuritySettingsScreen: React.FC = () => {
               <Text style={s.rowLabel}>Face ID / Fingerprint</Text>
               <Text style={s.rowDesc}>Use biometrics to unlock the app</Text>
             </View>
-            <Switch value={faceId} onValueChange={setFaceId} trackColor={{ false: colors.cardBorder, true: '#0F4B70' }} thumbColor="#FFFFFF" />
+            <Switch value={faceId} onValueChange={setFaceId} trackColor={{ false: colors.cardBorder, true: '#00658E' }} thumbColor="#FFFFFF" />
           </View>
         </View>
 
@@ -870,7 +870,7 @@ function createScStyles(c: C) {
     rowLabel: { fontSize: 15, fontWeight: '700', color: c.text, marginBottom: 2 },
     rowDesc: { fontSize: 12, color: c.textMuted },
     input: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text, marginBottom: 10 },
-    saveBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
+    saveBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
     saveBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
     sessionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 10 },
     sessionDevice: { fontSize: 14, fontWeight: '700', color: c.text, marginBottom: 4 },
@@ -885,9 +885,9 @@ function createScStyles(c: C) {
 // Pro Upgrade
 // ─────────────────────────────────────────────────────────────────────────────
 const PLANS = [
-  { id: 'yearly', label: 'Yearly', price: '₹999/yr', perMonth: '₹83/mo', badge: 'BEST VALUE', color: '#0466C8' },
-  { id: 'quarterly', label: 'Quarterly', price: '₹349/qtr', perMonth: '₹116/mo', badge: null, color: '#0F4B70' },
-  { id: 'monthly', label: 'Monthly', price: '₹149/mo', perMonth: '₹149/mo', badge: null, color: '#0F4B70' },
+  { id: 'yearly', label: 'Yearly', price: '₹999/yr', perMonth: '₹83/mo', badge: 'BEST VALUE', color: '#00658E' },
+  { id: 'quarterly', label: 'Quarterly', price: '₹349/qtr', perMonth: '₹116/mo', badge: null, color: '#00658E' },
+  { id: 'monthly', label: 'Monthly', price: '₹149/mo', perMonth: '₹149/mo', badge: null, color: '#00658E' },
 ];
 
 const PRO_FEATURES = ['✅ AI Chat Assistant', '✅ OCR Receipt Scanning', '✅ Budget Tracking', '✅ Spending Insights', '✅ Priority Support', '✅ Unlimited Groups'];
@@ -945,18 +945,18 @@ function createPrStyles(c: C) {
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     hero: { alignItems: 'center', paddingVertical: 24 },
     heroEmoji: { fontSize: 52, marginBottom: 12 },
-    heroTitle: { fontSize: 26, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+    heroTitle: { fontSize: 26, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold' },
     heroSub: { fontSize: 14, color: c.textSub, marginTop: 6 },
     featureCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 20 },
     featureItem: { fontSize: 14, color: c.sectionLabel, marginBottom: 8, lineHeight: 22 },
     planCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1.5, borderColor: c.cardBorder, padding: 16, marginBottom: 10, alignItems: 'center' },
-    planCardActive: { borderColor: '#0466C8', backgroundColor: '#FFF7F5' },
-    planBadge: { position: 'absolute', top: -10, backgroundColor: '#0466C8', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 3 },
+    planCardActive: { borderColor: '#00658E', backgroundColor: '#FFF7F5' },
+    planBadge: { position: 'absolute', top: -10, backgroundColor: '#00658E', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 3 },
     planBadgeText: { color: '#FFFFFF', fontSize: 10, fontWeight: '800' },
     planLabel: { fontSize: 16, fontWeight: '700', color: c.text, marginBottom: 4 },
     planPrice: { fontSize: 20, fontWeight: '800', color: c.text },
     planPerMonth: { fontSize: 12, color: c.textMuted },
-    cta: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+    cta: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
     ctaText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
     ctaSub: { textAlign: 'center', fontSize: 12, color: c.textMuted, marginTop: 10 },
   });
@@ -1048,21 +1048,21 @@ function createRfStyles(c: C) {
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     hero: { alignItems: 'center', paddingVertical: 24 },
     heroEmoji: { fontSize: 52, marginBottom: 12 },
-    heroTitle: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+    heroTitle: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold' },
     heroSub: { fontSize: 14, color: c.textSub, marginTop: 6 },
     progressCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 16 },
     progressLabel: { fontSize: 14, fontWeight: '700', color: c.sectionLabel, marginBottom: 10 },
     progressTrack: { flexDirection: 'row', gap: 8 },
     progressSegment: { flex: 1, height: 10, borderRadius: 5, backgroundColor: c.pillBg },
-    progressSegmentFilled: { backgroundColor: '#0F4B70' },
+    progressSegmentFilled: { backgroundColor: '#00658E' },
     progressDone: { fontSize: 14, color: c.successText, fontWeight: '700', marginTop: 10, textAlign: 'center' },
     codeCard: { backgroundColor: c.successBg, borderRadius: 16, borderWidth: 1, borderColor: c.successBorder, padding: 20, alignItems: 'center', marginBottom: 20 },
     codeLabel: { fontSize: 13, color: c.textSub, marginBottom: 8 },
-    code: { fontSize: 24, fontWeight: '800', color: '#0F4B70', letterSpacing: 2, marginBottom: 16 },
+    code: { fontSize: 24, fontWeight: '800', color: '#00658E', letterSpacing: 2, marginBottom: 16 },
     codeBtns: { flexDirection: 'row', gap: 10 },
     copyBtn: { flex: 1, backgroundColor: c.card, borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: c.successBorder },
-    copyBtnText: { fontWeight: '700', color: '#0F4B70' },
-    shareBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
+    copyBtnText: { fontWeight: '700', color: '#00658E' },
+    shareBtn: { flex: 1, backgroundColor: '#00658E', borderRadius: 12, paddingVertical: 10, alignItems: 'center' },
     shareBtnText: { fontWeight: '700', color: '#FFFFFF' },
     sectionTitle: { fontSize: 14, fontWeight: '700', color: c.sectionLabel, marginBottom: 12 },
     accordion: { backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 16, marginBottom: 8 },
@@ -1131,14 +1131,14 @@ function createImStyles(c: C) {
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     hero: { alignItems: 'center', paddingVertical: 24 },
     heroEmoji: { fontSize: 52, marginBottom: 12 },
-    heroTitle: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold' },
+    heroTitle: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold' },
     heroSub: { fontSize: 14, color: c.textSub, textAlign: 'center', marginTop: 6, maxWidth: 280 },
     stepsCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 20 },
     step: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
-    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center' },
+    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#00658E', alignItems: 'center', justifyContent: 'center' },
     stepNumText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
     stepText: { flex: 1, fontSize: 14, color: c.sectionLabel },
-    uploadBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+    uploadBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
     uploadBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }
@@ -1189,7 +1189,7 @@ export const QRCodeScreen: React.FC = () => {
         <ScrollView contentContainerStyle={s.scroll}>
           <View style={s.qrCard}>
             {upiValue ? (
-              <QRCode value={upiValue} size={220} color="#0F4B70" />
+              <QRCode value={upiValue} size={220} color="#00658E" />
             ) : (
               <View style={s.noUpiBox}>
                 <Text style={s.noUpiText}>Add your UPI ID in profile to generate your QR code</Text>
@@ -1256,26 +1256,26 @@ function createQrStyles(c: C) {
     tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
     tabActive: { backgroundColor: c.card },
     tabLabel: { fontSize: 14, fontWeight: '600', color: c.textMuted },
-    tabLabelActive: { color: '#0F4B70' },
+    tabLabelActive: { color: '#00658E' },
     scroll: { alignItems: 'center', paddingBottom: 100 },
     qrCard: { backgroundColor: c.card, borderRadius: 24, padding: 32, borderWidth: 1, borderColor: c.cardBorder, marginBottom: 16 },
     noUpiBox: { alignItems: 'center', padding: 20, width: 220 },
     noUpiText: { fontSize: 14, color: c.textSub, textAlign: 'center', marginBottom: 14 },
-    editBtn: { backgroundColor: '#0F4B70', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+    editBtn: { backgroundColor: '#00658E', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
     editBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
     upiLabel: { fontSize: 18, fontWeight: '800', color: c.text, marginBottom: 4 },
     upiValue: { fontSize: 14, color: c.textSub, marginBottom: 20 },
-    shareBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 32, paddingVertical: 12 },
+    shareBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 32, paddingVertical: 12 },
     shareBtnText: { color: '#FFFFFF', fontWeight: '700' },
     permBox: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
     permText: { fontSize: 15, color: c.sectionLabel, textAlign: 'center', marginBottom: 20 },
-    permBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+    permBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
     permBtnText: { color: '#FFFFFF', fontWeight: '700' },
     scanOverlay: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     scanFrame: { width: 240, height: 240, borderWidth: 2, borderColor: '#FFFFFF', borderRadius: 16, marginBottom: 20 },
     scanHint: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
     rescanBtn: { marginTop: 16, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10 },
-    rescanText: { fontWeight: '700', color: '#0F4B70' },
+    rescanText: { fontWeight: '700', color: '#00658E' },
   });
 }
 
@@ -1377,15 +1377,15 @@ function createScanStyles(c: C) {
     permEmoji: { fontSize: 64, marginBottom: 16 },
     permTitle: { fontSize: 20, fontWeight: '800', color: c.text, marginBottom: 8 },
     permSub: { fontSize: 14, color: c.textSub, textAlign: 'center', marginBottom: 24 },
-    permBtn: { backgroundColor: '#0F4B70', borderRadius: 14, paddingHorizontal: 28, paddingVertical: 14, marginBottom: 12 },
+    permBtn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 28, paddingVertical: 14, marginBottom: 12 },
     permBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
     galleryBtn: { paddingVertical: 12 },
-    galleryBtnText: { color: '#0F4B70', fontWeight: '600', fontSize: 14 },
+    galleryBtnText: { color: '#00658E', fontWeight: '600', fontSize: 14 },
     overlay: { flex: 1, alignItems: 'center', justifyContent: 'center' },
     frame: { width: 280, height: 200, borderWidth: 2, borderColor: '#FFFFFF', borderRadius: 12, marginBottom: 20 },
     hint: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', marginBottom: 20 },
     galleryPill: { backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10 },
-    galleryPillText: { fontWeight: '700', color: '#0F4B70' },
+    galleryPillText: { fontWeight: '700', color: '#00658E' },
   });
 }
 
@@ -1456,7 +1456,7 @@ function createSpStyles(c: C) {
     field: { marginBottom: 16 },
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     input: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },
-    nextBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
+    nextBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center' },
     nextBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }
@@ -1532,8 +1532,8 @@ function createRvStyles(c: C) {
     card: { backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 16, marginBottom: 10 },
     label: { fontSize: 12, fontWeight: '700', color: c.textMuted, textTransform: 'uppercase', marginBottom: 6 },
     value: { fontSize: 15, color: c.text, fontWeight: '600' },
-    valueAmount: { fontSize: 28, fontWeight: '800', color: '#0F4B70' },
-    confirmBtn: { backgroundColor: '#0F4B70', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 12 },
+    valueAmount: { fontSize: 28, fontWeight: '800', color: '#00658E' },
+    confirmBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 12 },
     confirmBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }
@@ -1636,22 +1636,22 @@ function createIgStyles(c: C) {
     scroll: { paddingHorizontal: 20, paddingBottom: 100 },
     hero: { alignItems: 'center', paddingVertical: 24 },
     heroEmoji: { fontSize: 52, marginBottom: 12 },
-    heroTitle: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', textAlign: 'center' },
+    heroTitle: { fontSize: 22, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold', textAlign: 'center' },
     heroSub: { fontSize: 14, color: c.textSub, textAlign: 'center', marginTop: 6, maxWidth: 280 },
     stepsCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, padding: 20, marginBottom: 16 },
     step: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingBottom: 16 },
     stepBorder: { borderBottomWidth: 1, borderBottomColor: c.cardBorder, marginBottom: 16 },
-    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#0F4B70', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    stepNum: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#00658E', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
     stepNumText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
     stepText: { flex: 1, fontSize: 14, color: c.sectionLabel, lineHeight: 20, paddingTop: 4 },
     formatNote: { backgroundColor: '#FFF7ED', borderRadius: 12, borderWidth: 1, borderColor: '#FED7AA', padding: 12, marginBottom: 20 },
     formatNoteText: { fontSize: 12, color: '#92400E', textAlign: 'center', lineHeight: 18 },
-    btn: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 12 },
+    btn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginBottom: 12 },
     btnDisabled: { opacity: 0.6 },
     btnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
     successWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
     successEmoji: { fontSize: 64, marginBottom: 20 },
-    successTitle: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'PlusJakartaSans_700Bold', marginBottom: 10, textAlign: 'center' },
+    successTitle: { fontSize: 24, fontWeight: '800', color: c.text, fontFamily: 'Inter_700Bold', marginBottom: 10, textAlign: 'center' },
     successSub: { fontSize: 15, color: c.textSub, textAlign: 'center', lineHeight: 22, marginBottom: 32 },
     secondaryBtn: { backgroundColor: c.pillBg, borderRadius: 16, paddingVertical: 14, paddingHorizontal: 32, alignItems: 'center' },
     secondaryBtnText: { color: c.text, fontSize: 15, fontWeight: '600' },
@@ -1718,7 +1718,7 @@ function createOhStyles(c: C) {
     iconBox: { width: 42, height: 42, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     rowTitle: { fontSize: 14, fontWeight: '700', color: c.text },
     rowMeta: { fontSize: 12, color: c.textMuted, marginTop: 2 },
-    rowAmount: { fontSize: 15, fontWeight: '800', color: '#0F4B70' },
+    rowAmount: { fontSize: 15, fontWeight: '800', color: '#00658E' },
   });
 }
 
@@ -1810,9 +1810,9 @@ function createPsStyles(c: C) {
     cardDesc: { fontSize: 12, color: c.textMuted, lineHeight: 16 },
     grantedBadge: { backgroundColor: c.successBg, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: c.successBorder },
     grantedText: { fontSize: 12, fontWeight: '700', color: c.successText },
-    allowBtn: { backgroundColor: '#0F4B70', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
+    allowBtn: { backgroundColor: '#00658E', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
     allowBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-    doneBtn: { backgroundColor: '#0466C8', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 10 },
+    doneBtn: { backgroundColor: '#00658E', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 10 },
     doneBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
   });
 }

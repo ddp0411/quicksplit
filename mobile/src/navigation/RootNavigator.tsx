@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createNavigationContainerRef, NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
+import Svg, { Path } from 'react-native-svg';
 import { useUserStore } from '../state/userStore';
 import { useTheme } from '../theme/useTheme';
 import { TabBarIcon, TabIconName } from '../components/TabBarIcon';
@@ -35,104 +37,126 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const navigationRef = createNavigationContainerRef();
 
-const TAB_ICONS: Record<string, TabIconName> = {
-  Home: 'Home',
-  Friends: 'Friends',
-  Groups: 'Groups',
-  Personal: 'Personal',
-};
-
-const TAB_ACTIVE = '#0466C8';
-const TAB_INACTIVE = '#8BBFD9';
-
-// The root screen of each tab's stack. The floating tab bar should only show on these;
-// on any pushed (deep) screen it must hide so it doesn't cover that screen's bottom CTA.
-const ROOT_STACK_SCREENS = [
-  'HomeMain', 'FriendsMain', 'GroupsMain', 'PersonalMain', 'AccountMain', 'Action',
+// The four icon tabs shown in the floating pill (Account opens from the Profile pill).
+const ICON_TABS: { route: string; icon: TabIconName }[] = [
+  { route: 'Home', icon: 'Home' },
+  { route: 'Friends', icon: 'Friends' },
+  { route: 'Groups', icon: 'Groups' },
+  { route: 'Personal', icon: 'Personal' },
 ];
 
-function PlaceholderScreen() {
-  return null;
+const TAB_INACTIVE = '#9AA0A6';
+
+// The root screen of each tab's stack. The floating bar only shows on these; on any
+// pushed (deep) screen it hides so it doesn't cover that screen's bottom CTA.
+const ROOT_STACK_SCREENS = [
+  'HomeMain', 'FriendsMain', 'GroupsMain', 'PersonalMain', 'AccountMain',
+];
+
+function initials(name?: string) {
+  if (!name) return 'U';
+  return name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+// ── Floating glass-pill tab bar (Ocean Breeze / Stitch UI) ───────────────────
+function FloatingTabBar({ state, navigation, onAdd }: BottomTabBarProps & { onAdd: () => void }) {
+  const { colors, isDark } = useTheme();
+  const { user } = useUserStore();
+
+  const activeTab = state.routes[state.index];
+  const leaf = getFocusedRouteNameFromRoute(activeTab) ?? `${activeTab.name}Main`;
+  if (!ROOT_STACK_SCREENS.includes(leaf)) return null;
+
+  const currentTab = activeTab.name;
+  const accountFocused = currentTab === 'Account';
+
+  return (
+    <View style={styles.barWrap} pointerEvents="box-none">
+      <View style={[styles.pill, { backgroundColor: colors.glass, borderColor: colors.glassBorder }]}>
+        <BlurView
+          intensity={isDark ? 40 : 55}
+          tint={isDark ? 'dark' : 'light'}
+          style={styles.pillBlur}
+        />
+        <View style={styles.iconRow}>
+          {ICON_TABS.map(({ route, icon }) => {
+            const focused = currentTab === route;
+            return (
+              <TouchableOpacity
+                key={route}
+                style={styles.iconBtn}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityState={{ selected: focused }}
+                onPress={() => navigation.navigate(route)}
+              >
+                <TabBarIcon name={icon} color={focused ? colors.primary : TAB_INACTIVE} size={24} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.profilePill,
+            { backgroundColor: accountFocused ? colors.primary : colors.surfaceHigh },
+          ]}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('Account')}
+        >
+          <View style={[styles.profileAvatar, { borderColor: colors.glassBorder }]}>
+            <Text style={styles.profileAvatarText}>{initials(user?.name)}</Text>
+          </View>
+          <Text
+            style={[styles.profileLabel, { color: accountFocused ? '#FFFFFF' : colors.text }]}
+          >
+            Profile
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.fab }]}
+        activeOpacity={0.85}
+        onPress={onAdd}
+        accessibilityRole="button"
+        accessibilityLabel="Quick action"
+      >
+        <Svg width={26} height={26} viewBox="0 0 24 24">
+          <Path
+            d="M12 5 V19 M5 12 H19"
+            stroke={isDark ? '#111418' : '#FFFFFF'}
+            strokeWidth={2.4}
+            strokeLinecap="round"
+          />
+        </Svg>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 function MainTabs() {
   const { colors } = useTheme();
   const [showActions, setShowActions] = useState(false);
 
-  // Track the deepest active route so the floating AI button only shows on the main
-  // tab screens (it must hide on pushed screens so it doesn't cover their CTAs).
-  const [activeRoute, setActiveRoute] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    const unsubscribe = navigationRef.addListener('state', () => {
-      setActiveRoute((navigationRef as any).getCurrentRoute()?.name);
-    });
-    return unsubscribe;
-  }, []);
-  const onRootScreen = !activeRoute || ROOT_STACK_SCREENS.includes(activeRoute);
-
-  const openAIChat = () => {
-    if (navigationRef.isReady()) {
-      (navigationRef as any).navigate('Personal', { screen: 'AIChat' });
-    }
-  };
-
   const actionItems = [
-    { icon: '+', title: 'Add Expense', subtitle: 'Split a bill with friends', tab: 'Home', screen: 'AddExpense', color: '#0466C8' },
-    { icon: '▣', title: 'Scan Bill', subtitle: 'Capture a receipt instantly', tab: 'Home', screen: 'Scan', color: '#F59E0B' },
-    { icon: '₹', title: 'Settle Up', subtitle: 'Record a payment', tab: 'Home', screen: 'SettleUp', color: '#0F4B70' },
+    { icon: '+', title: 'Add Expense', subtitle: 'Split a bill with friends', tab: 'Home', screen: 'AddExpense', color: colors.primary },
+    { icon: '▣', title: 'Scan Bill', subtitle: 'Capture a receipt instantly', tab: 'Home', screen: 'Scan', color: colors.tertiary },
+    { icon: '₹', title: 'Settle Up', subtitle: 'Record a payment', tab: 'Home', screen: 'SettleUp', color: colors.secondary },
   ];
 
   return (
     <>
       <Tab.Navigator
-        screenOptions={({ route }) => {
-          const focused = getFocusedRouteNameFromRoute(route);
-          const onRootScreen = !focused || ROOT_STACK_SCREENS.includes(focused);
-          return {
-          headerShown: false,
-          tabBarShowLabel: route.name !== 'Action',
-          tabBarStyle: onRootScreen
-            ? [
-                styles.tabBar,
-                { backgroundColor: colors.card, borderColor: colors.cardBorder },
-              ]
-            : { display: 'none' },
-          tabBarActiveTintColor: TAB_ACTIVE,
-          tabBarInactiveTintColor: TAB_INACTIVE,
-          tabBarLabelStyle: styles.tabLabel,
-          tabBarItemStyle: route.name === 'Action' ? styles.actionTabItem : styles.tabItem,
-          tabBarIcon: ({ focused }) => TAB_ICONS[route.name]
-            ? <TabBarIcon name={TAB_ICONS[route.name]} color={focused ? TAB_ACTIVE : TAB_INACTIVE} />
-            : null,
-          tabBarButton: route.name === 'Action'
-            ? () => (
-              <TouchableOpacity
-                style={styles.centerAction}
-                activeOpacity={0.9}
-                onPress={() => setShowActions(true)}
-              >
-                <Text style={styles.centerActionText}>+</Text>
-              </TouchableOpacity>
-            )
-            : undefined,
-          };
-        }}
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <FloatingTabBar {...props} onAdd={() => setShowActions(true)} />}
       >
         <Tab.Screen name="Home" component={HomeStack} />
         <Tab.Screen name="Friends" component={FriendsStack} />
-        <Tab.Screen name="Action" component={PlaceholderScreen} />
         <Tab.Screen name="Groups" component={GroupsStack} />
-        <Tab.Screen
-          name="Personal"
-          component={PersonalStack}
-          options={{ tabBarLabel: 'Personal' }}
-        />
-        {/* Account is reachable from the Home hero avatar, not the tab bar (matches the UI images). */}
-        <Tab.Screen
-          name="Account"
-          component={AccountStack}
-          options={{ tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }}
-        />
+        <Tab.Screen name="Personal" component={PersonalStack} />
+        {/* Account is reached from the Profile pill, not an icon tab. */}
+        <Tab.Screen name="Account" component={AccountStack} />
       </Tab.Navigator>
 
       <Modal
@@ -148,9 +172,9 @@ function MainTabs() {
         >
           <TouchableOpacity
             activeOpacity={1}
-            style={[styles.actionSheet, { backgroundColor: colors.bg }]}
+            style={[styles.actionSheet, { backgroundColor: colors.card }]}
           >
-            <View style={styles.sheetHandle} />
+            <View style={[styles.sheetHandle, { backgroundColor: colors.cardBorder }]} />
             <Text style={[styles.sheetTitle, { color: colors.text }]}>Quick action</Text>
             <Text style={[styles.sheetSubtitle, { color: colors.textSub }]}>
               Start the next split in one tap.
@@ -158,7 +182,7 @@ function MainTabs() {
             {actionItems.map((item) => (
               <TouchableOpacity
                 key={item.title}
-                style={[styles.sheetRow, { borderColor: colors.cardBorder }]}
+                style={[styles.sheetRow, { borderColor: colors.cardBorder, backgroundColor: colors.surfaceLow }]}
                 activeOpacity={0.82}
                 onPress={() => {
                   setShowActions(false);
@@ -183,19 +207,6 @@ function MainTabs() {
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
-
-      {/* Floating AI assistant button — sits above the bottom bar, main screens only. */}
-      {onRootScreen && (
-        <TouchableOpacity
-          style={styles.aiFab}
-          activeOpacity={0.9}
-          onPress={openAIChat}
-          accessibilityRole="button"
-          accessibilityLabel="Open AI assistant"
-        >
-          <TabBarIcon name="AI" color="#FFFFFF" size={22} />
-        </TouchableOpacity>
-      )}
     </>
   );
 }
@@ -308,65 +319,83 @@ export function RootNavigator() {
 }
 
 const styles = StyleSheet.create({
-  aiFab: {
+  barWrap: {
     position: 'absolute',
-    right: 22,
-    bottom: 100,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: '#0F4B70',
+    left: 16,
+    right: 16,
+    bottom: 22,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#0F4B70',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 12,
+    gap: 12,
   },
-  tabBar: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-    bottom: 14,
-    height: 72,
-    borderRadius: 26,
+  pill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 60,
+    borderRadius: 30,
     borderWidth: 1,
-    paddingBottom: 10,
-    paddingTop: 9,
+    paddingLeft: 18,
+    paddingRight: 6,
+    overflow: 'hidden',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
-    shadowRadius: 18,
+    shadowRadius: 24,
     elevation: 12,
   },
-  tabItem: { paddingTop: 1 },
-  actionTabItem: { width: 64 },
-  tabLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    marginTop: 1,
+  pillBlur: {
+    ...StyleSheet.absoluteFillObject,
   },
-  centerAction: {
+  iconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  iconBtn: {
+    paddingVertical: 6,
+  },
+  profilePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    borderRadius: 24,
+    paddingLeft: 6,
+    paddingRight: 13,
+    paddingVertical: 6,
+  },
+  profileAvatar: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 1,
+    backgroundColor: '#00658E',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
+  },
+  profileLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
+  },
+  fab: {
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#0466C8',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center',
-    marginTop: -21,
-    shadowColor: '#0466C8',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 14,
-  },
-  centerActionText: {
-    color: '#FFFFFF',
-    fontSize: 34,
-    lineHeight: 36,
-    fontWeight: '300',
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 12,
   },
   sheetOverlay: {
     flex: 1,
@@ -374,8 +403,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   actionSheet: {
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 36,
@@ -384,14 +413,13 @@ const styles = StyleSheet.create({
     width: 38,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D1D5DB',
     alignSelf: 'center',
     marginBottom: 18,
   },
   sheetTitle: {
     fontSize: 22,
-    fontWeight: '800',
-    fontFamily: 'PlusJakartaSans_700Bold',
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
     textAlign: 'center',
   },
   sheetSubtitle: {
@@ -409,7 +437,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 14,
     marginTop: 10,
-    backgroundColor: 'rgba(255,255,255,0.7)',
   },
   sheetIcon: {
     width: 46,
@@ -421,11 +448,12 @@ const styles = StyleSheet.create({
   sheetIconText: {
     color: '#FFFFFF',
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   sheetRowTitle: {
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '700',
+    fontFamily: 'Inter_700Bold',
   },
   sheetRowSub: {
     fontSize: 12,

@@ -60,11 +60,12 @@ export function TabBarIcon({
         </Svg>
       );
     case 'Personal':
-      // Receipt / expenses glyph — the personal monthly-spend tab.
+      // Insights / spending-trend glyph — the personal finance tab (matches the
+      // Stitch UI's "insights" line-chart icon).
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24">
-          <Path d="M6 3 h12 v18 l-2-1.3 -2 1.3 -2-1.3 -2 1.3 -2-1.3 -2 1.3 Z" {...common} />
-          <Path d="M9 8 h6 M9 12 h6" {...common} />
+          <Path d="M4 19 V5 M4 19 H20" {...common} />
+          <Path d="M7 14.5 L11 10 L14 13 L19 7" {...common} />
         </Svg>
       );
     default:

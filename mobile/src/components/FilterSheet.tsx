@@ -98,13 +98,13 @@ const s = StyleSheet.create({
     paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#F3F4F6',
   },
   rowLabel: { fontSize: 15, color: '#374151' },
-  rowLabelActive: { color: '#0F4B70', fontWeight: '700' },
+  rowLabelActive: { color: '#00658E', fontWeight: '700' },
   radio: {
     width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: '#D1D5DB',
     alignItems: 'center', justifyContent: 'center',
   },
-  radioActive: { borderColor: '#0F4B70' },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#0F4B70' },
+  radioActive: { borderColor: '#00658E' },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#00658E' },
   cancelBtn: {
     marginTop: 16, backgroundColor: '#F3F4F6', borderRadius: 14,
     paddingVertical: 14, alignItems: 'center',

@@ -127,7 +127,7 @@ function createDateStyles(c: C) {
     btnRow: { flexDirection: 'row', gap: 10 },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontSize: 14, fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#00658E', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -166,7 +166,7 @@ function UserPickerModal({
               const sel = localSelected.includes(u.id);
               return (
                 <TouchableOpacity style={up.row} onPress={() => toggle(u.id)} activeOpacity={0.7}>
-                  <View style={[up.avatar, { backgroundColor: u.avatar_color || '#0F4B70' }]}>
+                  <View style={[up.avatar, { backgroundColor: u.avatar_color || '#00658E' }]}>
                     <Text style={up.avatarText}>{avatarInitials(u.name)}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
@@ -215,12 +215,12 @@ function createPickerStyles(c: C) {
     name: { fontSize: 14, fontWeight: '700', color: c.text },
     email: { fontSize: 12, color: c.textMuted, marginTop: 1 },
     check: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: c.cardBorder, alignItems: 'center', justifyContent: 'center' },
-    checkActive: { backgroundColor: '#0F4B70', borderColor: '#0F4B70' },
+    checkActive: { backgroundColor: '#00658E', borderColor: '#00658E' },
     checkMark: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
     btnRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
     cancelBtn: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     cancelText: { fontSize: 14, fontWeight: '700', color: c.sectionLabel },
-    confirmBtn: { flex: 1, backgroundColor: '#0F4B70', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
+    confirmBtn: { flex: 1, backgroundColor: '#00658E', borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
     confirmText: { fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
   });
 }
@@ -254,7 +254,7 @@ export const AddExpenseScreen: React.FC = () => {
 
   const [paidBy, setPaidBy] = useState<UserMini>({
     id: user!.id, name: user!.name, email: user!.email,
-    avatar_color: user!.avatar_color ?? '#0F4B70',
+    avatar_color: user!.avatar_color ?? '#00658E',
   });
   const [participants, setParticipants] = useState<string[]>(
     preselectedUserId && preselectedUserId !== user!.id
@@ -288,7 +288,7 @@ export const AddExpenseScreen: React.FC = () => {
     const friendUsers: UserMini[] = (friendsData as any[]).map((f: any) => f.user);
     const allIds = new Set(friendUsers.map((u) => u.id));
     if (!allIds.has(user!.id)) {
-      friendUsers.unshift({ id: user!.id, name: user!.name, email: user!.email, avatar_color: user!.avatar_color ?? '#0F4B70' });
+      friendUsers.unshift({ id: user!.id, name: user!.name, email: user!.email, avatar_color: user!.avatar_color ?? '#00658E' });
     }
     return friendUsers;
   }, [groupId, groupDetail, friendsData, user]);
@@ -456,7 +456,7 @@ export const AddExpenseScreen: React.FC = () => {
               onPress={() => setShowPaidByPicker(true)}
               disabled={availableUsers.length <= 1}
             >
-              <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#0F4B70' }]}>
+              <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#00658E' }]}>
                 <Text style={s.miniAvatarText}>{avatarInitials(paidBy.name)}</Text>
               </View>
               <Text style={[s.selectorText, { flex: 1, marginLeft: 8 }]}>{paidBy.name}</Text>
@@ -563,7 +563,7 @@ export const AddExpenseScreen: React.FC = () => {
               <Switch
                 value={isRecurring}
                 onValueChange={setIsRecurring}
-                trackColor={{ false: colors.cardBorder, true: '#0F4B70' }}
+                trackColor={{ false: colors.cardBorder, true: '#00658E' }}
                 thumbColor="#FFFFFF"
               />
             </View>
@@ -624,15 +624,15 @@ function createStyles(c: C) {
     backBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: c.pillBg, alignItems: 'center', justifyContent: 'center' },
     backText: { fontSize: 18, color: c.text },
     title: { fontSize: 17, fontWeight: '700', color: c.text },
-    saveBtn: { backgroundColor: '#0466C8', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
+    saveBtn: { backgroundColor: '#00658E', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
     saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
     scroll: { paddingHorizontal: 20, paddingBottom: 120 },
-    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F4B70', borderRadius: 20, padding: 24, marginBottom: 6 },
+    amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00658E', borderRadius: 20, padding: 24, marginBottom: 6 },
     currencySymbol: { fontSize: 32, fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginRight: 4 },
     amountInput: { fontSize: 48, fontWeight: '800', color: '#FFFFFF', minWidth: 120, textAlign: 'center' },
-    perPersonHint: { textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#0466C8', marginBottom: 16 },
+    perPersonHint: { textAlign: 'center', fontSize: 13, fontWeight: '700', color: '#00658E', marginBottom: 16 },
     scanBtn: { backgroundColor: c.pillBg, borderRadius: 14, paddingVertical: 12, alignItems: 'center', marginBottom: 16, borderWidth: 1.5, borderColor: c.cardBorder, borderStyle: 'dashed' },
-    scanBtnText: { fontSize: 13, fontWeight: '700', color: '#0466C8' },
+    scanBtnText: { fontSize: 13, fontWeight: '700', color: '#00658E' },
     field: { marginBottom: 16 },
     fieldLabel: { fontSize: 13, fontWeight: '700', color: c.sectionLabel, marginBottom: 6 },
     fieldInput: { backgroundColor: c.inputBg, borderRadius: 14, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, color: c.text },
@@ -647,15 +647,15 @@ function createStyles(c: C) {
     miniAvatarText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700' },
     chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#E8F3FA', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#C4DFEF' },
-    chipText: { fontSize: 13, fontWeight: '600', color: '#0F4B70' },
+    chipText: { fontSize: 13, fontWeight: '600', color: '#00658E' },
     chipX: { fontSize: 16, color: '#16A34A', fontWeight: '700' },
     addChip: { backgroundColor: c.pillBg, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: c.cardBorder },
     addChipText: { fontSize: 13, color: c.textSub, fontWeight: '600' },
     splitRow: { flexDirection: 'row', gap: 8 },
     splitOption: { flex: 1, backgroundColor: c.pillBg, borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
-    splitOptionActive: { backgroundColor: '#E8F3FA', borderColor: '#0F4B70' },
+    splitOptionActive: { backgroundColor: '#E8F3FA', borderColor: '#00658E' },
     splitOptionText: { fontSize: 14, fontWeight: '600', color: c.textSub },
-    splitOptionTextActive: { color: '#0F4B70' },
+    splitOptionTextActive: { color: '#00658E' },
     splitInputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
     splitInputLabel: { fontSize: 14, color: c.sectionLabel, flex: 1 },
     splitInput: { backgroundColor: c.inputBg, borderRadius: 10, borderWidth: 1, borderColor: c.inputBorder, paddingHorizontal: 12, paddingVertical: 8, fontSize: 14, color: c.text, width: 100, textAlign: 'right' },

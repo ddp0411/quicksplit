@@ -42,9 +42,9 @@ function createStyles(c: C) {
       borderWidth: 1.5, borderColor: c.cardBorder,
     },
     icon: { fontSize: 36 },
-    title: { fontSize: 18, fontWeight: '800', color: c.text, textAlign: 'center', marginBottom: 6, fontFamily: 'PlusJakartaSans_700Bold' },
+    title: { fontSize: 18, fontWeight: '800', color: c.text, textAlign: 'center', marginBottom: 6, fontFamily: 'Inter_700Bold' },
     subtitle: { fontSize: 14, color: c.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 20, maxWidth: 240 },
-    btn: { backgroundColor: '#0466C8', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
+    btn: { backgroundColor: '#00658E', borderRadius: 14, paddingHorizontal: 24, paddingVertical: 12 },
     btnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
   });
 }
