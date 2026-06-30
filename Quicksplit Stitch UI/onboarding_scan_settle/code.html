@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>QuickSplit - Scan &amp; Settle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#4552c3",
+                    "on-primary-container": "#00577b",
+                    "surface": "#f9f9fc",
+                    "tertiary-fixed": "#dfe0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "on-secondary-fixed-variant": "#344a51",
+                    "inverse-on-surface": "#f0f0f3",
+                    "background": "#f9f9fc",
+                    "secondary-fixed": "#cfe7ee",
+                    "surface-container": "#eeeef0",
+                    "secondary-container": "#cce4ec",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#50666d",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e2e2e5",
+                    "on-primary-fixed-variant": "#004c6c",
+                    "surface-bright": "#f9f9fc",
+                    "surface-dim": "#dadadc",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary-container": "#7fcdff",
+                    "tertiary-container": "#bac0ff",
+                    "outline": "#70787f",
+                    "on-tertiary-fixed-variant": "#2b38aa",
+                    "on-tertiary-container": "#3744b4",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#85cfff",
+                    "inverse-surface": "#2f3133",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "on-secondary-fixed": "#071e24",
+                    "outline-variant": "#bfc7cf",
+                    "on-tertiary-fixed": "#000965",
+                    "on-surface": "#1a1c1e",
+                    "surface-tint": "#00658e",
+                    "primary": "#00658e",
+                    "on-primary-fixed": "#001e2e",
+                    "primary-fixed": "#c7e7ff",
+                    "on-surface-variant": "#40484e",
+                    "secondary": "#4c6269",
+                    "primary-fixed-dim": "#85cfff",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-container-highest": "#e2e2e5",
+                    "on-background": "#1a1c1e",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1200px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .scan-animation {
+            animation: scanLine 3s ease-in-out infinite;
+        }
+
+        @keyframes scanLine {
+            0%, 100% { top: 0%; opacity: 0; }
+            50% { top: 100%; opacity: 1; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation (Suppressed for Onboarding as per Filter Rule) -->
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile pt-12 pb-24 max-w-container-max mx-auto w-full relative">
+<!-- Background Atmospheric Element -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[442px] opacity-20 pointer-events-none">
+
+</div>
+<!-- Onboarding Visual Section -->
+<div class="relative w-full aspect-[4/5] max-h-[450px] mb-12 flex items-center justify-center fade-in-up" style="animation-delay: 0.1s;">
+<!-- Main Mockup Container -->
+<div class="relative w-64 h-[450px] bg-surface-container-highest rounded-[3rem] shadow-2xl border-[8px] border-on-surface overflow-hidden">
+<!-- Phone Screen Content -->
+<div class="absolute inset-0 bg-white p-4 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<div class="w-12 h-1 bg-surface-variant rounded-full"></div>
+</div>
+<!-- Scanning Viewport -->
+<div class="relative flex-grow bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover grayscale-[0.2]" data-alt="A close-up, high-angle shot of a paper restaurant receipt lying on a clean, light wood table. The lighting is bright and airy, typical of a modern light-mode interface. The receipt shows clearly printed line items and a total amount, and it is framed within a digital camera viewfinder overlay. The overall aesthetic is clean, professional, and tech-focused." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsHY5WYNcO4Rnin0EY6oEpa5QgA26Ckjxex-izsFwuIhiXqhkJf9qx6qbF17XPi1LyO2NA7rd-8Q42VufdoN3PNkpBhlOERPd1bLNqqtfVjvPym1OjjG7h7Yomy6K6XipTXu9w5_CxgpUUlsZ0x8aI86KTmkmLw7i7RtqT4yxwbXZDN-TU5LArsyjomwidZOFrfUBe96W1-X_cOoU03AdLWLXV6gdhT2q2wQstBhgrv3OgLER6NIvHpLHN-WzzgB_l6Cte1ph2zBk"/>
+<!-- Scanning Line Effect -->
+<div class="absolute left-0 w-full h-1 bg-primary/40 shadow-[0_0_15px_#00658e] scan-animation z-10"></div>
+<!-- Detected Regions Overlay -->
+<div class="absolute top-1/4 left-4 right-4 h-8 border border-primary/50 bg-primary/10 rounded-sm"></div>
+<div class="absolute top-[45%] left-4 right-4 h-8 border border-primary/50 bg-primary/10 rounded-sm"></div>
+</div>
+<!-- Bottom Notification/Feedback -->
+<div class="mt-4 p-3 bg-secondary-container rounded-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="flex-grow">
+<div class="h-2 w-16 bg-on-secondary-container/20 rounded-full mb-1"></div>
+<div class="h-1.5 w-24 bg-on-secondary-container/10 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Elements (Tactile Softness/Depth) -->
+<div class="absolute -right-4 top-1/4 glass-card p-4 rounded-2xl shadow-xl w-32 border border-white/50 animate-bounce transition-transform duration-1000" style="animation-duration: 4s;">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+<span class="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">UPI Active</span>
+</div>
+<div class="h-2 w-full bg-primary-container rounded-full"></div>
+</div>
+<div class="absolute -left-8 bottom-1/4 glass-card p-4 rounded-2xl shadow-xl w-36 border border-white/50" style="transform: rotate(-5deg);">
+<div class="flex items-center justify-between mb-2">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-base">auto_awesome</span>
+</div>
+<span class="text-[10px] font-bold text-tertiary">SMART OCR</span>
+</div>
+<p class="text-[10px] leading-tight text-on-surface-variant">Scanning items...</p>
+</div>
+</div>
+<!-- Copy Section -->
+<div class="text-center max-w-sm fade-in-up" style="animation-delay: 0.3s;">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4">
+                Scan &amp; Settle
+            </h1>
+<p class="text-on-surface-variant leading-relaxed px-4">
+                Snap a photo of any receipt and settle up instantly with integrated UPI payments.
+            </p>
+</div>
+<!-- Pagination & CTA -->
+<div class="mt-12 flex flex-col items-center gap-8 w-full fade-in-up" style="animation-delay: 0.5s;">
+<!-- Dots -->
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-6 h-2 rounded-full bg-primary"></div>
+</div>
+<!-- Buttons -->
+<div class="flex flex-col gap-unit w-full max-w-xs">
+<button class="w-full bg-primary-container text-on-primary-container font-label-bold text-label-bold py-4 rounded-xl shadow-md hover:brightness-95 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Get Started
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full text-on-surface-variant font-label-bold text-label-bold py-4 rounded-xl hover:bg-surface-variant/30 transition-colors">
+                    Skip
+                </button>
+</div>
+</div>
+</main>
+<!-- Interactive Elements Script -->
+<script>
+        // Subtle parallax or interaction if needed
+        document.addEventListener('mousemove', (e) => {
+            const amount = 10;
+            const x = (window.innerWidth / 2 - e.pageX) / amount;
+            const y = (window.innerHeight / 2 - e.pageY) / amount;
+            
+            const floatingElements = document.querySelectorAll('.glass-card');
+            floatingElements.forEach((el, index) => {
+                const factor = (index + 1) * 0.5;
+                el.style.transform = `translate(${x * factor}px, ${y * factor}px) ${index === 1 ? 'rotate(-5deg)' : ''}`;
+            });
+        });
+    </script>
+</body></html>

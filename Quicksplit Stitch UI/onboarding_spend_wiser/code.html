@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Spend Wiser - QuickSplit Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#4552c3",
+                    "on-primary-container": "#00577b",
+                    "surface": "#f9f9fc",
+                    "tertiary-fixed": "#dfe0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "on-secondary-fixed-variant": "#344a51",
+                    "inverse-on-surface": "#f0f0f3",
+                    "background": "#f9f9fc",
+                    "secondary-fixed": "#cfe7ee",
+                    "surface-container": "#eeeef0",
+                    "secondary-container": "#cce4ec",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#50666d",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e2e2e5",
+                    "on-primary-fixed-variant": "#004c6c",
+                    "surface-bright": "#f9f9fc",
+                    "surface-dim": "#dadadc",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary-container": "#7fcdff",
+                    "tertiary-container": "#bac0ff",
+                    "outline": "#70787f",
+                    "on-tertiary-fixed-variant": "#2b38aa",
+                    "on-tertiary-container": "#3744b4",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#85cfff",
+                    "inverse-surface": "#2f3133",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "on-secondary-fixed": "#071e24",
+                    "outline-variant": "#bfc7cf",
+                    "on-tertiary-fixed": "#000965",
+                    "on-surface": "#1a1c1e",
+                    "surface-tint": "#00658e",
+                    "primary": "#00658e",
+                    "on-primary-fixed": "#001e2e",
+                    "primary-fixed": "#c7e7ff",
+                    "on-surface-variant": "#40484e",
+                    "secondary": "#4c6269",
+                    "primary-fixed-dim": "#85cfff",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-container-highest": "#e2e2e5",
+                    "on-background": "#1a1c1e",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1200px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .chart-bar-animate {
+            animation: growVertical 1.2s ease-out forwards;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+        @keyframes growVertical {
+            to { transform: scaleY(1); }
+        }
+        .ai-pulse {
+            animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(127, 205, 255, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(127, 205, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(127, 205, 255, 0); }
+        }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden min-h-screen flex flex-col">
+<!-- Hero Background Animation -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-background"></div>
+</div>
+<!-- Onboarding Navigation (Top) -->
+<header class="flex justify-between items-center px-margin-mobile h-16 w-full fixed top-0 z-50">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">QuickSplit</div>
+<button class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors">SKIP</button>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-margin-mobile mt-16 mb-32">
+<!-- Interactive Visualization Area -->
+<div class="relative w-full max-w-[340px] aspect-square mb-12">
+<!-- Glass Background Circle -->
+<div class="absolute inset-0 bg-primary-container/20 rounded-full blur-3xl ai-pulse"></div>
+<!-- Main Spending Card (Floating) -->
+<div class="glass-panel rounded-[32px] p-6 shadow-xl relative z-10 floating">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-on-surface-variant font-label-bold text-label-bold">MONTHLY SPENDING</p>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">$2,840.00</h2>
+</div>
+<div class="bg-primary-container p-2 rounded-xl text-on-primary-container">
+<span class="material-symbols-outlined">trending_down</span>
+</div>
+</div>
+<!-- Simplified Chart -->
+<div class="flex items-end justify-between gap-2 h-24 mb-4">
+<div class="w-full bg-primary/20 rounded-t-lg chart-bar-animate" style="height: 40%; animation-delay: 0.1s;"></div>
+<div class="w-full bg-primary/20 rounded-t-lg chart-bar-animate" style="height: 70%; animation-delay: 0.2s;"></div>
+<div class="w-full bg-primary/20 rounded-t-lg chart-bar-animate" style="height: 55%; animation-delay: 0.3s;"></div>
+<div class="w-full bg-primary rounded-t-lg chart-bar-animate shadow-md shadow-primary/30" style="height: 90%; animation-delay: 0.4s;"></div>
+<div class="w-full bg-primary/20 rounded-t-lg chart-bar-animate" style="height: 35%; animation-delay: 0.5s;"></div>
+</div>
+<div class="flex justify-between text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">
+<span>Mon</span>
+<span>Tue</span>
+<span>Wed</span>
+<span class="text-primary font-bold">Thu</span>
+<span>Fri</span>
+</div>
+</div>
+<!-- AI Insight Chip 1 -->
+<div class="absolute -top-4 -right-4 glass-panel rounded-2xl px-4 py-3 shadow-lg z-20 flex items-center gap-3 animate-[floating_4s_ease-in-out_infinite_0.5s]">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-tertiary uppercase leading-none">AI INSIGHT</p>
+<p class="text-[12px] text-on-surface font-medium">Coffee spend is down 12%!</p>
+</div>
+</div>
+<!-- Category Chip 2 -->
+<div class="absolute -bottom-6 -left-2 glass-panel rounded-full px-4 py-2 shadow-md z-20 flex items-center gap-2 animate-[floating_5s_ease-in-out_infinite_1s]">
+<span class="material-symbols-outlined text-primary text-[18px]">restaurant</span>
+<span class="text-label-bold text-on-surface-variant">Dining: $420</span>
+</div>
+</div>
+<!-- Text Content -->
+<div class="text-center space-y-4 max-w-sm">
+<h1 class="font-headline-xl-mobile text-headline-xl-mobile font-bold text-on-surface tracking-tight">Spend Wiser</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Get AI-powered insights into your spending habits and stay in control of your budget with smart automation.
+            </p>
+</div>
+</main>
+<!-- Footer Actions (Bottom) -->
+<footer class="fixed bottom-0 left-0 w-full p-margin-mobile flex flex-col gap-4 z-50">
+<!-- Progress Indicators -->
+<div class="flex justify-center gap-2 mb-4">
+<div class="h-1.5 w-4 rounded-full bg-outline-variant"></div>
+<div class="h-1.5 w-8 rounded-full bg-primary"></div>
+<div class="h-1.5 w-4 rounded-full bg-outline-variant"></div>
+<div class="h-1.5 w-4 rounded-full bg-outline-variant"></div>
+</div>
+<button class="w-full bg-primary-container text-on-primary-container font-headline-lg-mobile text-headline-lg-mobile py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+            Continue
+        </button>
+<div class="flex justify-center">
+<p class="text-on-surface-variant font-label-bold text-label-bold">ALREADY HAVE AN ACCOUNT? <span class="text-primary cursor-pointer">LOG IN</span></p>
+</div>
+<!-- Home Indicator Mockup -->
+<div class="w-32 h-1 bg-on-surface/10 rounded-full self-center mt-4"></div>
+</footer>
+<script>
+        // Optional subtle interactive parallax for the cards
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 40;
+            const y = (window.innerHeight / 2 - e.pageY) / 40;
+            const floaters = document.querySelectorAll('.floating');
+            floaters.forEach(el => {
+                el.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+        });
+
+        // Simulating AI "finding" something
+        setTimeout(() => {
+            const insight = document.querySelector('.ai-pulse');
+            if (insight) {
+                insight.style.backgroundColor = 'rgba(127, 205, 255, 0.4)';
+                setTimeout(() => {
+                    insight.style.backgroundColor = 'rgba(127, 205, 255, 0.2)';
+                }, 500);
+            }
+        }, 2500);
+    </script>
+</body></html>

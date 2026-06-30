@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit - Onboarding</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#4552c3",
+                    "on-primary-container": "#00577b",
+                    "surface": "#f9f9fc",
+                    "tertiary-fixed": "#dfe0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "on-secondary-fixed-variant": "#344a51",
+                    "inverse-on-surface": "#f0f0f3",
+                    "background": "#f9f9fc",
+                    "secondary-fixed": "#cfe7ee",
+                    "surface-container": "#eeeef0",
+                    "secondary-container": "#cce4ec",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#50666d",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e2e2e5",
+                    "on-primary-fixed-variant": "#004c6c",
+                    "surface-bright": "#f9f9fc",
+                    "surface-dim": "#dadadc",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary-container": "#7fcdff",
+                    "tertiary-container": "#bac0ff",
+                    "outline": "#70787f",
+                    "on-tertiary-fixed-variant": "#2b38aa",
+                    "on-tertiary-container": "#3744b4",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#85cfff",
+                    "inverse-surface": "#2f3133",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "on-secondary-fixed": "#071e24",
+                    "outline-variant": "#bfc7cf",
+                    "on-tertiary-fixed": "#000965",
+                    "on-surface": "#1a1c1e",
+                    "surface-tint": "#00658e",
+                    "primary": "#00658e",
+                    "on-primary-fixed": "#001e2e",
+                    "primary-fixed": "#c7e7ff",
+                    "on-surface-variant": "#40484e",
+                    "secondary": "#4c6269",
+                    "primary-fixed-dim": "#85cfff",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-container-highest": "#e2e2e5",
+                    "on-background": "#1a1c1e",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1200px",
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center overflow-hidden">
+<!-- Hero Animation Background -->
+<div class="fixed inset-0 z-0 pointer-events-none opacity-40">
+
+</div>
+<!-- Main Canvas -->
+<main class="relative z-10 w-full max-w-[430px] h-screen flex flex-col justify-between px-margin-mobile py-12 md:py-16">
+<!-- Top Status Bar Mock (Visual Anchor) -->
+<div class="flex justify-between items-center w-full mb-8">
+<span class="font-bold text-primary font-headline-lg-mobile text-headline-lg-mobile tracking-tighter">QuickSplit</span>
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+</div>
+</div>
+<!-- Graphic Section -->
+<div class="flex-grow flex items-center justify-center float-animation">
+<div class="relative w-full aspect-square flex items-center justify-center">
+<!-- Outer Glass Circle -->
+<div class="absolute w-72 h-72 rounded-full glass-effect border border-white/40 shadow-xl"></div>
+<!-- Main Image -->
+<div class="relative z-10 w-64 h-64 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="A high-end, lifestyle photograph of a diverse group of four young professionals smiling and laughing while sharing a vibrant, gourmet meal at a brightly lit, modern restaurant. The lighting is soft and airy, emphasizing a light-mode aesthetic. The color palette features clean whites, soft blue accents, and warm wooden textures. The composition is artistic and celebratory, conveying a sense of friendship and ease." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTEJdghb8q4eOvluRfpHg_JXUEk2yqiQInfu7JzH0skIF9ge92cjLEnlRMtjTC0Tc3cAz_rf2R8ZmbeoLj9Glq_BO-iz1lJqizQMbXjw9L4jcw9ZeAGzxRP6vdFp55xi778gnVrU8oUf5hGFb79x3mi1cF_JdwDAw9AJ2xrdk_Rp1EXbQ7DQvcRL0M3rzsM0ept7G9ZuM1Vn6Fawz0pdSpdiTJB3o4WeLvLSlth5hrNn2C7_hprH3tct_SoQkbInuuQmXNz6tYyHk"/>
+</div>
+<!-- Floating Split Indicators (Tactile UI Elements) -->
+<div class="absolute -top-4 -right-4 bg-primary-container text-on-primary-container px-4 py-2 rounded-xl shadow-lg border border-white/20 fade-in" style="animation-delay: 0.3s;">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+<span class="font-label-bold text-label-bold">Split $120.00</span>
+</div>
+</div>
+<div class="absolute -bottom-2 -left-6 bg-surface-container-lowest text-primary px-4 py-2 rounded-xl shadow-lg border border-primary/10 fade-in" style="animation-delay: 0.5s;">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-bold text-label-bold">4 People</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Section -->
+<div class="space-y-6 text-center mb-4">
+<div class="space-y-3 fade-in" style="animation-delay: 0.7s;">
+<h1 class="font-headline-xl text-headline-lg-mobile lg:text-headline-xl text-on-surface leading-tight">
+                    Split Smarter
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[300px] mx-auto">
+                    Effortlessly track and divide shared expenses with friends and family.
+                </p>
+</div>
+<!-- Interaction Section -->
+<div class="pt-8 flex flex-col items-center gap-4 fade-in" style="animation-delay: 1s;">
+<!-- Primary Button -->
+<button class="group relative w-full h-14 bg-primary-container text-on-primary-container rounded-full font-label-bold text-body-md flex items-center justify-center overflow-hidden transition-all duration-300 active:scale-95 shadow-md hover:shadow-xl hover:bg-[#a3defe]">
+<span class="relative z-10 flex items-center gap-2 transition-transform duration-300 group-hover:translate-x-1">
+                        Next
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</span>
+<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+</button>
+<!-- Skip Text -->
+<button class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors py-2">
+                    Skip onboarding
+                </button>
+</div>
+</div>
+<!-- Footer / Decorative Element -->
+<div class="w-1/3 h-1 bg-surface-variant mx-auto rounded-full mt-4"></div>
+</main>
+<!-- Background Decoration: Subtle Gradient Glow -->
+<div class="fixed top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2"></div>
+<div class="fixed bottom-0 left-0 w-[400px] h-[400px] bg-tertiary/5 rounded-full blur-[100px] -z-10 -translate-x-1/2 translate-y-1/2"></div>
+<script>
+        // Micro-interaction for the next button scale
+        document.querySelector('button').addEventListener('mousedown', function() {
+            this.style.transform = 'scale(0.96)';
+        });
+        document.querySelector('button').addEventListener('mouseup', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        // Simple entry animation trigger
+        window.addEventListener('load', () => {
+            document.body.classList.add('ready');
+        });
+    </script>
+</body></html>
