@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001e2e",
+                        "on-surface": "#1a1c1e",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-container": "#50666d",
+                        "on-tertiary-fixed": "#000965",
+                        "primary-container": "#7fcdff",
+                        "outline-variant": "#bfc7cf",
+                        "secondary": "#4c6269",
+                        "surface-container-low": "#f3f3f6",
+                        "surface-bright": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#2b38aa",
+                        "tertiary": "#4552c3",
+                        "surface-tint": "#00658e",
+                        "secondary-fixed-dim": "#b3cad2",
+                        "primary": "#00658e",
+                        "surface-dim": "#dadadc",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#cce4ec",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#00577b",
+                        "on-primary-fixed-variant": "#004c6c",
+                        "surface-container-high": "#e8e8ea",
+                        "surface": "#f9f9fc",
+                        "primary-fixed-dim": "#85cfff",
+                        "on-background": "#1a1c1e",
+                        "on-tertiary-container": "#3744b4",
+                        "surface-container-highest": "#e2e2e5",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#bdc2ff",
+                        "inverse-primary": "#85cfff",
+                        "tertiary-container": "#bac0ff",
+                        "primary-fixed": "#c7e7ff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "secondary-fixed": "#cfe7ee",
+                        "on-surface-variant": "#40484e",
+                        "inverse-surface": "#2f3133",
+                        "outline": "#70787f",
+                        "background": "#f9f9fc",
+                        "on-secondary-fixed": "#071e24",
+                        "on-secondary-fixed-variant": "#344a51",
+                        "tertiary-fixed": "#dfe0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-desktop": "40px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .balance-gradient {
+            background: linear-gradient(180deg, rgba(127, 205, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 dark:bg-surface-container/60 backdrop-blur-xl shadow-sm h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container/30 border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young adult with a friendly expression. The lighting is soft and high-key, emphasizing a clean and modern aesthetic. The background is a soft blue-to-white gradient that matches the brand's premium financial application theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB52WU-9z2wrWl-QDIBxWF-GgTjfzSOVTcLp6DjhnAJvo2UGG3HBkxi5AIhYIA1amAh5BAEBBp0WLFCeGxXnCfwbf4W0ZwfF1IpbYEF3xOFz1HVtkU9i9R3DwOYRcGpazKQfzscBcnnKOWFC1ABWJDRUe9-m6Zx537M43olavJXdeK5v0yFVenLJCWHSU-6clgdkRbW3tah7ziZcsVWuGGyvBf0UGrlsGYU-F0kQeHQ1GT-OdXJpXTBEV7DnPoWfcXAQX-MeiCimeY"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">QuickSplit</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">notifications</span>
+</button>
+</header>
+<main class="pt-24 px-margin-mobile max-w-container-max mx-auto space-y-gutter">
+<!-- Summary Section (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Total Balance Card -->
+<div class="md:col-span-3 lg:col-span-1 p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm balance-gradient relative overflow-hidden group">
+<div class="flex flex-col gap-1 relative z-10">
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Total Balance</span>
+<span class="font-headline-xl text-headline-xl text-primary">$2,450.80</span>
+<div class="flex items-center gap-2 mt-2">
+<span class="flex items-center text-body-sm text-green-600 font-semibold bg-green-100 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                            +12.5%
+                        </span>
+<span class="text-body-sm text-on-surface-variant">vs last month</span>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl text-primary">account_balance_wallet</span>
+</div>
+</div>
+<!-- You are Owed -->
+<div class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm relative overflow-hidden active:scale-[0.98] transition-transform duration-200 cursor-pointer">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 rounded-lg bg-primary-container/20 text-primary">
+<span class="material-symbols-outlined">call_made</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/30">chevron_right</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">You are Owed</span>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-1">$840.00</div>
+<div class="flex -space-x-2 mt-4">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a cheerful colleague in a bright office environment, styled with professional yet approachable lighting. The soft blue and white tones reflect a modern tech company atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLOz1r-53cqxmqsZkot_0wTbzgI7XJQqFBSLKOLQ6bpRDWt_YuoHAexMz48ChLx0KR1Co4rAuvjwPgPK7SEoYL-A3y5srTn9xU0HWJGRperntgImSzAtMmhqiDgLjaIrrbUPRytcFhgATY9TM93VGfenbe-fGFx09AAjFi-bTo6_AP-TnYIl5nPd1nyWTJ_PJ_xYZVUqwEqDXkgO6kkemVajUMsK5p8Fe0IPmROTtJYhHxraH3fpS6gbqnkczbh8zLyHmOPdEutjQ"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a friend against a minimalist, clean light-colored background. High-quality lighting highlights clear details, fitting a high-end financial app persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSvsfoSiiIQpA1jXYxi4oOKAABzLX_yt7hs0djEXY0mxrbYOYUu7KTJUTptjjqEDOoh6jhAlTw8W1r44qGIDqjdN-fGc_M-z4cVg2WYmGpsgUik-38_KTb8XwWHtkVNH4h9fco_IKQJRUQ9r5SiFwtsqgszts2IUVwXC12j9KF3vcTlVOf9_8xY2tcXXaNCm2bwz4vloyKR3DMw8EV_jsKiUII6lNFWmHBRQVtwYxVZgAM7zAHQEu1nX_ABxWhfwsxiYraFhzc9uQ"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-variant flex items-center justify-center text-[10px] font-bold text-on-surface-variant">
+                        +3
+                    </div>
+</div>
+</div>
+<!-- You Owe -->
+<div class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm relative overflow-hidden active:scale-[0.98] transition-transform duration-200 cursor-pointer">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 rounded-lg bg-error-container/20 text-error">
+<span class="material-symbols-outlined">call_received</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant/30">chevron_right</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">You Owe</span>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mt-1">$320.50</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-body-sm text-on-surface-variant">Next payment in 2 days</span>
+</div>
+</div>
+</div>
+<!-- Middle Section: Insights & Actions -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Spending Insights -->
+<div class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Spending Insights</h2>
+<select class="bg-surface-container-low border-none rounded-lg text-body-sm text-on-surface-variant py-1 pl-3 pr-8 focus:ring-2 focus:ring-primary">
+<option>This Week</option>
+<option>This Month</option>
+</select>
+</div>
+<div class="flex items-center justify-between gap-8 h-48">
+<!-- Donut Chart Simulation -->
+<div class="relative w-36 h-36 flex-shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#e2e2e5" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#00658e" stroke-dasharray="70 100" stroke-linecap="round" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#4552c3" stroke-dasharray="25 100" stroke-dashoffset="-70" stroke-linecap="round" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#b3cad2" stroke-dasharray="5 100" stroke-dashoffset="-95" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-body-sm font-semibold text-on-surface-variant">Total</span>
+<span class="text-body-md font-bold text-on-surface">$1.2k</span>
+</div>
+</div>
+<div class="flex-grow space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-body-sm text-on-surface">Food &amp; Dining</span>
+</div>
+<span class="text-body-sm font-bold text-on-surface">$640</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-tertiary"></div>
+<span class="text-body-sm text-on-surface">Rent &amp; Utilities</span>
+</div>
+<span class="text-body-sm font-bold text-on-surface">$420</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary-fixed-dim"></div>
+<span class="text-body-sm text-on-surface">Travel</span>
+</div>
+<span class="text-body-sm font-bold text-on-surface">$140</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Groups / Split Points -->
+<div class="p-6 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm overflow-hidden">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Active Groups</h2>
+<button class="text-primary font-label-bold uppercase tracking-widest text-xs hover:underline">View All</button>
+</div>
+<div class="space-y-6">
+<!-- Group 1 -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">flight</span>
+</div>
+<div>
+<h3 class="font-body-md font-bold text-on-surface">EuroTrip 2024</h3>
+<p class="text-body-sm text-on-surface-variant">5 members</p>
+</div>
+</div>
+<span class="text-primary font-bold">$125.00</span>
+</div>
+<!-- Split-Indicator Component -->
+<div class="relative h-2 bg-surface-container-high rounded-full overflow-visible flex items-center">
+<div class="h-full bg-primary rounded-full" style="width: 65%;"></div>
+<div class="absolute left-0 transform -translate-y-1/2 top-1/2 ml-[10%]">
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-lowest bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a travel companion, modern aesthetic, soft natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKB_sBDIryYeiVc2EvlRsVdywCx6IifySlFRfLl6MMSAY3plvTZXrXwatZutyc19VXbL6JKd73Z4F5vDGHD-XVNgiriXEcB84_RQS6sO0IOClqv4NVKQeAjte48zBjvHgm2I3t8BK-Hs3dBFxv1cT0NK4DH1DN-wkx5mONrx7xEUd4SX5Aq6sOr4T6AnU-UN0DUi62OMUS9-tuPdkIOMDaOBrxOiBFR9bvS2QQ6VzYh1Wj3iFiqjF7_-B_IARt-4jOoheEVrwHnQM"/>
+</div>
+</div>
+<div class="absolute left-0 transform -translate-y-1/2 top-1/2 ml-[45%]">
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-lowest bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a male traveler, sunny outdoor lighting, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjQdnbgxoKObhX9-W3duYxdWAubdCzqRR66Kxa6MNWlEr8QlGZKQCXDeYmmeU4r6YL3SUhtPV4ZCFGj-gzeTRqXxDWXgO2VdyGZzgJQBozP88Yw7qEPaXVPDbDokGp6SDKeqMJNL18ZHUo6TYFQqVkOmcjuch4Fjfqsa9-Gx6dNuYJIb5LE_hsXoPoP1HCvVZMqi9Kgb9M06Lp70ncCbzzcoAjyeftF3g5z2ZrtreRsJLFt2STKOY42_BPS2wLJPpNi3y7VhLIHbg"/>
+</div>
+</div>
+<div class="absolute right-0 transform -translate-y-1/2 top-1/2">
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-lowest bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-on-primary">check</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group 2 -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">home</span>
+</div>
+<div>
+<h3 class="font-body-md font-bold text-on-surface">Greenwich Flat</h3>
+<p class="text-body-sm text-on-surface-variant">3 members</p>
+</div>
+</div>
+<span class="text-error font-bold">$450.00</span>
+</div>
+<div class="relative h-2 bg-surface-container-high rounded-full overflow-visible flex items-center">
+<div class="h-full bg-primary rounded-full" style="width: 30%;"></div>
+<div class="absolute left-0 transform -translate-y-1/2 top-1/2 ml-[25%]">
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-lowest bg-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait headshot of a roommate, soft interior lighting, clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgF7ur9ICn63MClKnLA1SaPUPTG-ADdw5InAe66HSPENAJQfpJb4hmZM0tUZEEsCY-Tr5tuSmqWjoDz3qHYbyH6WqLelqCwUYSQmxvEdNiJNEoLe_xcQeTJ4MNGOfXnlrSSfJQ7ds2JfBgUv5iI7wk_EU4zSOf_NKZNB3gQHGlBv0JgYeXZJovO9aT8pxWOCk5pl-jWj1Fsai5fJSdtZ9WfiAxVnshm374cjxB41b4-dIODp8IIwGvgDcoN73LqH6MDOgJbgxKsYE"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-[400px] z-50 flex items-center gap-3"><nav class="flex-1 flex justify-between items-center bg-white/70 backdrop-blur-2xl border border-white/20 rounded-full pl-4 pr-1.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"><div class="flex items-center gap-4 sm:gap-6"><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">home</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">group</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">chat_bubble</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">insights</span></a></div><a class="flex items-center gap-1.5 bg-on-surface/5 text-on-surface rounded-full pl-1.5 pr-3 py-1.5 active:scale-95 transition-transform" href="#"><div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant"><img alt="Me" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD10PxmBhPjeoSiTPBy68rBHxp19Vhwi08ZWXhP_TpIjBUCuRMep-MnksUVcZFbqafopkhnZHaNBaACCjfz9V0nP2NvZOE5khstwkjafjGCl5ciFLImEf9VmraDGN08dijkJOHJ8_yC83K1Mllb7OMAn-KeRD-kQ7-ol9-E9oRTbz2bX3dvdbya0aUW6omkWi3NcXV9v5xQSZOGAY_AQwV_JQ7BYvSIUkOqg9zf5zSlFBYJx-KLXy9LWwzYLYAoA_4bXIoogkKFbo0"/></div><span class="font-label-bold text-[13px]">Profile</span></a></nav><button class="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"><span class="material-symbols-outlined text-3xl">add</span></button></div>
+<script>
+        // Micro-interaction for balance cards
+        document.querySelectorAll('.active\\:scale-\\[0\\.98\\]').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

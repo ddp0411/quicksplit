@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit | Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e5",
+                    "primary-container": "#7fcdff",
+                    "on-primary-container": "#00577b",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dadadc",
+                    "surface-container-high": "#e8e8ea",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f6",
+                    "on-secondary-fixed": "#071e24",
+                    "outline": "#70787f",
+                    "inverse-surface": "#2f3133",
+                    "on-tertiary-fixed-variant": "#2b38aa",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed-dim": "#85cfff",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#bac0ff",
+                    "secondary": "#4c6269",
+                    "on-tertiary-container": "#3744b4",
+                    "tertiary-fixed": "#dfe0ff",
+                    "surface-tint": "#00658e",
+                    "secondary-fixed": "#cfe7ee",
+                    "primary-fixed": "#c7e7ff",
+                    "on-background": "#1a1c1e",
+                    "tertiary": "#4552c3",
+                    "primary": "#00658e",
+                    "on-surface": "#1a1c1e",
+                    "inverse-primary": "#85cfff",
+                    "on-primary-fixed": "#001e2e",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#bfc7cf",
+                    "on-primary-fixed-variant": "#004c6c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#50666d",
+                    "surface-container": "#eeeef0",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "on-secondary-fixed-variant": "#344a51",
+                    "secondary-container": "#cce4ec",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "inverse-on-surface": "#f0f0f3",
+                    "background": "#f9f9fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "container-max": "1200px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .gradient-bg {
+            background: radial-gradient(circle at 50% 50%, #c7e7ff 0%, #f9f9fc 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- Splash Screen Container -->
+<main class="relative h-screen w-full flex flex-col items-center justify-center gradient-bg">
+<!-- Subtle Atmospheric Background Detail -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary-container/20 blur-[120px]"></div>
+<div class="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-secondary-container/30 blur-[120px]"></div>
+</div>
+<!-- Logo Section -->
+<div class="relative z-10 flex flex-col items-center space-y-8 px-margin-mobile">
+<!-- Animated Brand Icon Container -->
+<div class="animate-float">
+<div class="w-24 h-24 md:w-32 md:h-32 rounded-[32%] bg-gradient-to-br from-primary to-primary-container flex items-center justify-center shadow-2xl shadow-primary/20 ring-1 ring-white/20">
+<span class="material-symbols-outlined text-on-primary text-[48px] md:text-[64px]" style="font-variation-settings: 'FILL' 1;">
+                        payments
+                    </span>
+</div>
+</div>
+<!-- Brand Typography -->
+<div class="text-center">
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tight md:text-[64px] md:leading-[1]">
+                    QuickSplit
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-4 max-w-xs mx-auto opacity-80">
+                    Effortless bill splitting powered by intelligent automation.
+                </p>
+</div>
+</div>
+<!-- Progress/Loading State -->
+<div class="absolute bottom-24 flex flex-col items-center w-full max-w-xs px-margin-mobile">
+<div class="w-full h-1 bg-surface-variant/30 rounded-full overflow-hidden relative">
+<div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-[3000ms] ease-out w-0" id="loader"></div>
+</div>
+<span class="font-label-bold text-label-bold text-outline mt-4 uppercase tracking-widest">Initialising AI Core</span>
+</div>
+<!-- Footer / Legal Anchor -->
+<div class="absolute bottom-8 text-center w-full px-margin-mobile">
+<p class="font-label-bold text-label-bold text-on-surface-variant opacity-60">
+                Securely managed by QuickSplit Financial Systems
+            </p>
+</div>
+</main>
+<!-- Interactive Layer / Micro-interaction JavaScript -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader');
+            
+            // Start progress bar animation
+            setTimeout(() => {
+                loader.style.width = '100%';
+            }, 100);
+
+            // Subtle mouse move effect for background
+            document.addEventListener('mousemove', (e) => {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                const moveX = (x - 0.5) * 20;
+                const moveY = (y - 0.5) * 20;
+                
+                document.querySelector('.gradient-bg').style.background = `radial-gradient(circle at ${50 + moveX}% ${50 + moveY}%, #c7e7ff 0%, #f9f9fc 100%)`;
+            });
+        });
+
+        // Suppression of Shared Components as per "Destination Rule" & "Transactional/Task-Focused" rule
+        // This is a Splash/Success screen, so TopAppBar and BottomNavBar are omitted.
+    </script>
+<!-- Visual Identity Check: 
+         - Soft blue gradient background (radial-gradient with surface-container-low and primary-fixed)
+         - Modern Minimalism (spacious layouts, focused typography)
+         - Material Symbol Transcription (payments)
+         - Tailwind Config Casing & Tokens applied
+    -->
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>QuickSplit - Friends</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9fc",
+                        "on-secondary-container": "#50666d",
+                        "surface-bright": "#f9f9fc",
+                        "primary-container": "#7fcdff",
+                        "tertiary-fixed-dim": "#bdc2ff",
+                        "secondary": "#4c6269",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#70787f",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#344a51",
+                        "inverse-primary": "#85cfff",
+                        "surface-variant": "#e2e2e5",
+                        "on-secondary-fixed": "#071e24",
+                        "tertiary-container": "#bac0ff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container": "#eeeef0",
+                        "surface-dim": "#dadadc",
+                        "on-primary-fixed-variant": "#004c6c",
+                        "primary-fixed": "#c7e7ff",
+                        "on-surface-variant": "#40484e",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1a1c1e",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#b3cad2",
+                        "secondary-fixed": "#cfe7ee",
+                        "surface-tint": "#00658e",
+                        "surface-container-low": "#f3f3f6",
+                        "outline-variant": "#bfc7cf",
+                        "inverse-surface": "#2f3133",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#00577b",
+                        "secondary-container": "#cce4ec",
+                        "on-tertiary-fixed": "#000965",
+                        "on-primary": "#ffffff",
+                        "background": "#f9f9fc",
+                        "surface-container-high": "#e8e8ea",
+                        "on-tertiary-container": "#3744b4",
+                        "on-surface": "#1a1c1e",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e2e2e5",
+                        "primary": "#00658e",
+                        "tertiary": "#4552c3",
+                        "tertiary-fixed": "#dfe0ff",
+                        "primary-fixed-dim": "#85cfff",
+                        "on-tertiary-fixed-variant": "#2b38aa",
+                        "on-primary-fixed": "#001e2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "unit": "4px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl shadow-sm h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a friendly tech entrepreneur in their 30s. The lighting is soft and natural, emphasizing a bright and approachable persona. The background is a clean, minimalist office space with subtle blue accents, aligning with the QuickSplit premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK0g7mmeceEt5Nal0SADz7m__EWu1QdXTv9v2M-MPiX2HZRO8QJFGYCDXJW1R6EBwcmnibMc0jCB5bu0BLMB00K1S5jaM7q7qG_nJGe7WnX67FGFca1iOGc9aACgL3p9jj8cj-uhXmQmQd9mVBwMUQxMD4FXuUrw_7BAqmyHWQuemD12mDcVr-R9WHniTA8uGGe3-OPJv_vPkN9UUKMNIRijea4A2M3WHz5vFVhEqJ4J0sVnsDOTXRv_H-Kao2n_S1_-Xyz15xMrI"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">QuickSplit</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-variant/50 transition-colors rounded-full active:scale-95 duration-200">notifications</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pt-20 pb-28 px-margin-mobile max-w-container-max mx-auto">
+<!-- Search Section -->
+<div class="relative mb-8">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 text-body-md focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant" placeholder="Search friends or contacts..." type="text"/>
+</div>
+<!-- Recent Contacts (Horizontal Carousel) -->
+<section class="mb-8">
+<h2 class="font-label-bold text-label-bold text-on-surface-variant mb-4 tracking-wider uppercase">Recent Contacts</h2>
+<div class="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+<!-- Recent Friend 1 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-primary-container group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover rounded-full" data-alt="Close-up portrait of a young woman with a warm smile, set against a soft bokeh city background. The image has a clean, airy feel with soft lighting and a palette of pastel blues and whites, echoing a premium financial app style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCytsQJ9rT56-iios6X68nkzJyLsk12Ks5X7Nfda6CdT6B4wAl-pGC95Vpr2I2N_Vxcut3k1aQzvdjH8P8_PdwZS1qTHdgyAmSYEdl3nphvz5t8lsVLqcVQ4j7FKDaI1RbpSivubSk3V2jtJjkoWqt3bSwH7n32slrzCIa4a1mtMchUe9j-3OB4eSyb6hEqH5VyhDO0twLxJ5zuMoBHWosjqv3-jgNK_fwkzS7BnqmcubYIk40tsdiqD1aPaPJYJeZz7h8eDTupjKs"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">Elena</span>
+</div>
+<!-- Recent Friend 2 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-primary-container group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of a young man wearing glasses and a navy sweater, looking directly at the camera with a confident expression. High-quality digital photography with a blurred professional studio background and soft lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoLjuLrMnY11ja2OcMmvthgYSIpTeej3C7giMuqVhKvXDoEgN36ecYJoxXj2aMMGZ-VRNmXryWfRrLphuv45BC2MZZyRvbhaHLpqYk_dNEaQ3TSPGXEJ3gpMO3n-9CrANhnhuGMONILuyreOvyxIm6dxKWb5e_TNdr3DkKyi35ImCDqTUA7TPs-tgI_SCePeZwCJ1vdvXXp2b4kwJqJZAoZMVNMZEyBvNpg7svENAAUKR8kbYkavt01z0BHDYTPr6RgLmDNbDiUu4"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">Marcus</span>
+</div>
+<!-- Recent Friend 3 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-primary-container group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover rounded-full" data-alt="A smiling woman with curly hair, wearing a white blazer. The shot is well-lit and professional, with a clean aesthetic and high-end feel. Colors are neutral with soft blue undertones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArFw4wUlZlLPPVGS2_gPLU7FDDn7xp-pxymGdYsI0CXkNn264uTIOtYrM756OEHjzeMJAKrrDNcY3WTt3HV3JbVhE7fmZvahEFJsHf7t3A-ofPwaaJKSEJec2yV2r2M8VQ7ID2Vaaqr2ctBV9WQ7yrkjeYiIcna58H7L2IeP_zUfE-odqHFlLVLXKHiH66a88CtabmWh3v8VSVoyoNbfAtSO67KvM2xdbTjQuR6GdtcHVVj5OQBuopzY1RxMUNT_ViSASF1UsC18o"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">Sofia</span>
+</div>
+<!-- Recent Friend 4 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-primary-container group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover rounded-full" data-alt="Casual headshot of a person with short dark hair and a friendly grin, dressed in a simple grey t-shirt. The environment is a bright, modern interior with natural light pouring in. Clean and professional appearance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArWd-aCwu8Dvr738RW0uFAxf4DV_Kx8Nf88fkBr56sjMs7fzeTqd8N3FMtDurl-Kijhr1iude5qgtCD_kFsB4x3csK3ROQSkrScdhCEMKZbbSri9bL7T6uXP28MNOJtqeX0H0DJX1v1-73JkTvHDQocD-n-kzaS-vJkfAOQwyo9uwWIvpdI381VaOBAppktULHVndWYGHHdscoB0MwdCZVIKnSnz11uWyVLlHoirXAesZDShxbDPVQmROgiSVTRbehDP7-Hwe-vpg"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">James</span>
+</div>
+<!-- Recent Friend 5 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-primary-container group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover rounded-full" data-alt="A professional woman in her late 20s, with a gentle expression. The background is a soft-focus office with modern lighting. The visual style is crisp, clean, and optimistic, matching a premium finance brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHM2SDkz4G_JXa_KrIyki3Dm12FcwZ0wX1mw9brVevwPAy3o0kLQxtnbnE9r5cXFEQHMUht_ltPLs_zVuIy_239i0tEkSrRFf7mi6AZVMzsqXAGvwHbe0p6kQDvVXEGNn9maCpsEWo8y5UT1mJFWUHUlUAr5iiGSdMF5PKGWaP5tpk5dMndPt_6DiH1Gg22xH5V1BKyvf2Dl2KDMrst6Z8AhnASoCg3UnnzYVD66OTWp3pCVHP8mJsvUeirAyolO7fXk7d4-uBIXc"/>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">Chloe</span>
+</div>
+</div>
+</section>
+<!-- All Friends List -->
+<section>
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-label-bold text-label-bold text-on-surface-variant tracking-wider uppercase">All Friends</h2>
+<span class="text-body-sm text-primary font-semibold">24 Friends</span>
+</div>
+<div class="space-y-1">
+<!-- Friend Row: A -->
+<div class="py-2 px-1 text-label-bold text-primary opacity-60">A</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-2">
+<!-- Row 1 -->
+<div class="flex items-center justify-between p-4 border-b border-surface-variant/30 hover:bg-surface-variant/20 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Professional avatar of a man with a beard, wearing a crisp blue shirt. The background is light grey and minimalist. The lighting is flattering and professional, fitting a high-end fintech app interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDF3RKUvfconTJ20XpfhBiAvMuwlmsgm_YQEEVEx2frd9oKKb4tDCWnCD20TH5sfREIuGaoG1h_1-ceTb7OB_1U6ZqxAjZVh1tMXqPrYDBPvF01WfbUbAEoWdcV-pk3qiBrNHJQ82Mb3ukH2wJh3l_uh-_OCYjTlZ3v-gGw4UrI-mVNpILDG1ZBdej99Ag_PDu7ktW3E_woKNvDsZGmfQmhd3MrUhECM09kr55CmMC9zmbRHJJOJIR_MnOuapFoja_CBEuyqMpe9k"/>
+</div>
+<div>
+<h3 class="font-body-md font-semibold text-on-surface">Aaron Miller</h3>
+<p class="font-body-sm text-on-surface-variant">aaron.m@email.com</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-sm text-error font-medium">You owe $15.50</p>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-variant/20 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A bright and vibrant portrait of a woman in her 20s with a cheerful smile. She is wearing a light-colored top. The image is clean, sharp, and uses high-key lighting for a premium feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMu5-jU4vyx-5ScxTVCbxAcbR-IPtBYiEBkQoyYTRUy8OVts9QmvXch6D8Eq7QpfU44xOQEJSnj1Fgn3JfN97j7nDHbsqSMcTuxw9Te7FTxa303sPSz4ZvcKjhLQgB-bBMiFtVP32uU1TGXIhWxJztlLBR8wafGkk71XPWPJdVu8T2LH4YNNtS-nSA0TOcZZrEqRC1EN7U_DnsdeFEguhP9yfSvmteALnefvp-4zIJF8uWj9O3T1Yi3CGETutcDX_Lh6v-cB1XTsQ"/>
+</div>
+<div>
+<h3 class="font-body-md font-semibold text-on-surface">Alice Chen</h3>
+<p class="font-body-sm text-on-surface-variant">alice.c@design.co</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-sm text-primary-fixed-dim bg-primary/10 px-2 py-0.5 rounded-full inline-block font-medium">Settle up</p>
+</div>
+</div>
+</div>
+<!-- Friend Row: B -->
+<div class="py-2 px-1 text-label-bold text-primary opacity-60">B</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-2">
+<div class="flex items-center justify-between p-4 hover:bg-surface-variant/20 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A portrait of a man in his 30s with a professional look, wearing a black t-shirt. The background is a minimalist studio setting with soft side lighting. The aesthetic is clean and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxgmsSuOm008smK-Z2wtJy0Ti4W-bp8lY8E0WhsBJilddcZLVxOOUCpahenZkrK5YBePK5aTGNkwC57EkzKFYLh7vrDbKMjOv8IfCDbL4AM0S4CeXIvwarQWkIhliUu1TStizyGg__xOQRPfoAUb1fOvqSn3eV9-3rRN3dbggQAUo8V-JYCfC_DqGb9O7cwz9PoI32sdCxcqmpcsEhVz671ilpF6NIKbc-CpwhswGa3D0qdH5_eBCr9ckmtlZaJ_sH9BuCKN8-NTc"/>
+</div>
+<div>
+<h3 class="font-body-md font-semibold text-on-surface">Benjamin Foster</h3>
+<p class="font-body-sm text-on-surface-variant">ben.foster@fintech.io</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-sm text-on-primary-container font-medium text-[#00658e]">Owes you $40.00</p>
+</div>
+</div>
+</div>
+<!-- Friend Row: C -->
+<div class="py-2 px-1 text-label-bold text-primary opacity-60">C</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden mb-2">
+<div class="flex items-center justify-between p-4 border-b border-surface-variant/30 hover:bg-surface-variant/20 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close-up of a smiling young person with curly hair, wearing a teal sweater. The photo has a bright, airy feeling with natural lighting and a high-resolution, professional quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBde0FFT9LMnaCQaMOphaE7_rDy5Tu65FJ5X4e_HXJSy_M128TkgTywsfciqDusKJKDoP1h5AOUqUvuegjbsHlP891CFOxEzritWsV7HrohkTcFlUoPVDYDseWQvgpwMfjld-pbc9-eEqE0vXJaUsyuHsonOBkLkF9tcsnc27F6lekVKzzeptgft5zUAqy2gSRcSfEQp8mk4zcOk9LAxSC3lFFlzi6s8W8FxehICyjnKyK8WMmhbrH2ZlNsW1bK0CMmXOQybFc8BYs"/>
+</div>
+<div>
+<h3 class="font-body-md font-semibold text-on-surface">Catherine Wells</h3>
+<p class="font-body-sm text-on-surface-variant">cat.wells@travel.com</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-sm text-on-surface-variant italic">No balance</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<!-- BottomNavBar -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-[400px] z-50 flex items-center gap-3">
+<nav class="flex-1 flex justify-between items-center bg-white/70 backdrop-blur-2xl border border-white/20 rounded-full pl-4 pr-1.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+<div class="flex items-center gap-4 sm:gap-6">
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">group</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">insights</span>
+</a>
+</div>
+<a class="flex items-center gap-1.5 bg-on-surface/5 text-on-surface rounded-full pl-1.5 pr-3 py-1.5 active:scale-95 transition-transform" href="#">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Me" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK0g7mmeceEt5Nal0SADz7m__EWu1QdXTv9v2M-MPiX2HZRO8QJFGYCDXJW1R6EBwcmnibMc0jCB5bu0BLMB00K1S5jaM7q7qG_nJGe7WnX67FGFca1iOGc9aACgL3p9jj8cj-uhXmQmQd9mVBwMUQxMD4FXuUrw_7BAqmyHWQuemD12mDcVr-R9WHniTA8uGGe3-OPJv_vPkN9UUKMNIRijea4A2M3WHz5vFVhEqJ4J0sVnsDOTXRv_H-Kao2n_S1_-Xyz15xMrI"/>
+</div>
+<span class="font-label-bold text-[13px]">Profile</span>
+</a>
+</nav>
+<button class="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<script>
+        // Simple micro-interaction for the search bar
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+
+        // Toggle Active State for Nav (Mock logic)
+        const navLinks = document.querySelectorAll('nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => {
+                    l.className = "flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-200";
+                });
+                link.className = "flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 duration-200";
+            });
+        });
+    </script>
+</body></html>

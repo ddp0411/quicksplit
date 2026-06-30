@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>QuickSplit | Security Verification</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e5",
+                    "primary-container": "#7fcdff",
+                    "on-primary-container": "#00577b",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dadadc",
+                    "surface-container-high": "#e8e8ea",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f3f3f6",
+                    "outline": "#70787f",
+                    "inverse-surface": "#2f3133",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed-dim": "#85cfff",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#bac0ff",
+                    "secondary": "#4c6269",
+                    "on-tertiary-container": "#3744b4",
+                    "tertiary-fixed": "#dfe0ff",
+                    "surface-tint": "#00658e",
+                    "secondary-fixed": "#cfe7ee",
+                    "primary-fixed": "#c7e7ff",
+                    "on-background": "#1a1c1e",
+                    "tertiary": "#4552c3",
+                    "primary": "#00658e",
+                    "on-surface": "#1a1c1e",
+                    "inverse-primary": "#85cfff",
+                    "on-primary-fixed": "#001e2e",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#bfc7cf",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#50666d",
+                    "surface-container": "#eeeef0",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "secondary-container": "#cce4ec",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "inverse-on-surface": "#f0f0f3",
+                    "background": "#f9f9fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "container-max": "1200px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #f9f9fc; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .otp-input:focus {
+            box-shadow: 0 0 0 2px #7fcdff;
+            border-color: #00658e;
+        }
+        /* Custom scroll and focus behaviors */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 101, 142, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopAppBar - Suppressed Navigation for Task-Focused Page -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl shadow-sm flex justify-between items-center px-margin-mobile h-16">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">QuickSplit</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">verified_user</span>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile py-24 relative overflow-hidden">
+<!-- Ambient Decorative Background -->
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-container/20 blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-tertiary-container/20 blur-[120px] pointer-events-none"></div>
+<!-- Identity Verification Section -->
+<section class="w-full max-w-md space-y-8 z-10">
+<div class="text-center space-y-4">
+<div class="inline-flex items-center justify-center w-20 h-20 bg-primary-container/30 rounded-3xl mb-4 rotate-3 shadow-xl">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Check your phone</h1>
+<p class="font-body-md text-on-surface-variant max-w-xs mx-auto">
+                    We've sent a 6-digit verification code to <span class="text-primary font-bold">•••• ••42</span>.
+                </p>
+</div>
+<!-- Verification Form -->
+<div class="glass-card p-8 rounded-3xl shadow-2xl space-y-8">
+<div class="flex justify-between gap-2" id="otp-container">
+<input autofocus="" class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+<input class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+<input class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+<input class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+<input class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+<input class="otp-input w-12 h-16 text-center text-2xl font-bold rounded-xl border-2 border-outline-variant bg-surface-container-lowest text-primary transition-all focus:outline-none" maxlength="1" type="number"/>
+</div>
+<div class="space-y-4">
+<button class="w-full h-14 bg-primary text-on-primary font-bold rounded-2xl shadow-lg hover:shadow-primary/30 active:scale-[0.98] transition-all duration-200">
+                        Verify Securely
+                    </button>
+<div class="flex flex-col items-center gap-2">
+<p class="font-body-sm text-on-surface-variant">Didn't receive the code?</p>
+<div class="flex items-center gap-2" id="resend-timer-wrapper">
+<span class="material-symbols-outlined text-outline text-lg">history</span>
+<span class="font-label-bold text-label-bold text-primary tabular-nums" id="timer">Resend in 00:59</span>
+</div>
+<button class="hidden font-label-bold text-label-bold text-primary underline underline-offset-4 active:text-on-primary-fixed-variant transition-colors" id="resend-btn">
+                            Resend New Code
+                        </button>
+</div>
+</div>
+</div>
+<!-- Security Assurance Card -->
+<div class="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-4 flex items-center gap-4">
+<div class="p-2 bg-on-primary-container/10 rounded-full">
+<span class="material-symbols-outlined text-on-primary-container text-xl">shield</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-bold text-label-bold text-on-surface">End-to-End Encrypted</h4>
+<p class="text-[11px] leading-tight text-on-surface-variant">This session is protected by QuickSplit secure architecture v2.0</p>
+</div>
+<span class="material-symbols-outlined text-on-primary-container opacity-40">info</span>
+</div>
+</section>
+<!-- Dynamic Contextual Visual (Mobile-Hidden Graphic) -->
+<div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-1/3 pr-margin-desktop">
+<div class="relative w-full aspect-square max-w-sm ml-auto">
+<div class="absolute inset-0 bg-primary/5 rounded-[48px] rotate-6 border border-primary/10"></div>
+<div class="absolute inset-0 bg-white shadow-2xl rounded-[48px] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional high-fidelity 3D render of a smartphone displaying a secure transaction checkmark, floating in a clean studio environment with soft blue and white lighting. The image emphasizes high-end fintech aesthetics with smooth gradients and glassmorphism elements, conveying trust, safety, and modern financial technology. Cinematic depth of field and premium materials like brushed aluminum and frosted glass are visible." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXrrx7d82o_OmdmcsDiIg35s5UaPZE37Mj1MEKGQJlTloKNAWFh8d9qTbkBQ-o8Ldr4MZk-HDMTwC01R3dEIG_eAIQ65SlRtLPnvP9b-IxuvW8MWYygWVbOqCXifki1ZdH48MEomG7r-iZMOmESKgF8zG0RgaelR6gulPjo4-LnaBYkOL80e-BKNALYcF2o7P_DUYk0zz-5XpSfL7LMfVLBzX9n7-0Nv-K88vBdF86tVBSjvC0aFVDZtza2grvJ5ndT3HbHOifGGk"/>
+</div>
+</div>
+</div>
+</main>
+<!-- Success Feedback Overlay (Hidden by Default) -->
+<div class="fixed inset-0 z-[100] bg-surface flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500" id="success-overlay">
+<div class="text-center space-y-6 transform scale-90 transition-transform duration-500" id="success-content">
+<div class="w-32 h-32 bg-primary-container rounded-full flex items-center justify-center mx-auto shadow-2xl">
+<span class="material-symbols-outlined text-on-primary-container text-6xl animate-bounce">check_circle</span>
+</div>
+<div class="space-y-2">
+<h2 class="font-headline-lg text-headline-lg text-primary">Identity Verified</h2>
+<p class="font-body-md text-on-surface-variant">Welcome back to QuickSplit AI.</p>
+</div>
+</div>
+</div>
+<!-- Scripts for Interaction -->
+<script>
+        // OTP Input Auto-focus & Control Logic
+        const inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Timer Logic
+        let seconds = 59;
+        const timerSpan = document.getElementById('timer');
+        const resendWrapper = document.getElementById('resend-timer-wrapper');
+        const resendBtn = document.getElementById('resend-btn');
+
+        const countdown = setInterval(() => {
+            seconds--;
+            timerSpan.textContent = `Resend in 00:${seconds < 10 ? '0' + seconds : seconds}`;
+            
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                resendWrapper.classList.add('hidden');
+                resendBtn.classList.remove('hidden');
+            }
+        }, 1000);
+
+        // Verification Simulation
+        const verifyBtn = document.querySelector('button.bg-primary');
+        const successOverlay = document.getElementById('success-overlay');
+        const successContent = document.getElementById('success-content');
+
+        verifyBtn.addEventListener('click', () => {
+            // Check if all fields are filled
+            const isFilled = Array.from(inputs).every(input => input.value.length === 1);
+            
+            if(isFilled) {
+                verifyBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Verifying...`;
+                verifyBtn.disabled = true;
+                
+                setTimeout(() => {
+                    successOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                    successContent.classList.remove('scale-90');
+                    successContent.classList.add('scale-100');
+                }, 1500);
+            } else {
+                // Shake effect for feedback
+                const form = document.querySelector('.glass-card');
+                form.classList.add('animate-[shake_0.4s_ease-in-out]');
+                setTimeout(() => form.classList.remove('animate-[shake_0.4s_ease-in-out]'), 400);
+            }
+        });
+
+        // Resend Button Click
+        resendBtn.addEventListener('click', () => {
+            alert('A new verification code has been dispatched.');
+            location.reload(); // Simple reset for demo
+        });
+    </script>
+<style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+    </style>
+</body></html>

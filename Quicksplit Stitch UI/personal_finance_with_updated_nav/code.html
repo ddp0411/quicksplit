@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit | Personal Dashboard</title>
+<!-- Google Fonts: Inter & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "surface": "#f9f9fc",
+                "on-secondary-container": "#50666d",
+                "surface-bright": "#f9f9fc",
+                "primary-container": "#7fcdff",
+                "tertiary-fixed-dim": "#bdc2ff",
+                "secondary": "#4c6269",
+                "surface-container-lowest": "#ffffff",
+                "outline": "#70787f",
+                "error-container": "#ffdad6",
+                "on-secondary-fixed-variant": "#344a51",
+                "inverse-primary": "#85cfff",
+                "surface-variant": "#e2e2e5",
+                "on-secondary-fixed": "#071e24",
+                "tertiary-container": "#bac0ff",
+                "inverse-on-surface": "#f0f0f3",
+                "surface-container": "#eeeef0",
+                "surface-dim": "#dadadc",
+                "on-primary-fixed-variant": "#004c6c",
+                "primary-fixed": "#c7e7ff",
+                "on-surface-variant": "#40484e",
+                "on-tertiary": "#ffffff",
+                "on-background": "#1a1c1e",
+                "error": "#ba1a1a",
+                "secondary-fixed-dim": "#b3cad2",
+                "secondary-fixed": "#cfe7ee",
+                "surface-tint": "#00658e",
+                "surface-container-low": "#f3f3f6",
+                "outline-variant": "#bfc7cf",
+                "inverse-surface": "#2f3133",
+                "on-secondary": "#ffffff",
+                "on-primary-container": "#00577b",
+                "secondary-container": "#cce4ec",
+                "on-tertiary-fixed": "#000965",
+                "on-primary": "#ffffff",
+                "background": "#f9f9fc",
+                "surface-container-high": "#e8e8ea",
+                "on-tertiary-container": "#3744b4",
+                "on-surface": "#1a1c1e",
+                "on-error-container": "#93000a",
+                "on-error": "#ffffff",
+                "surface-container-highest": "#e2e2e5",
+                "primary": "#00658e",
+                "tertiary": "#4552c3",
+                "tertiary-fixed": "#dfe0ff",
+                "primary-fixed-dim": "#85cfff",
+                "on-tertiary-fixed-variant": "#2b38aa",
+                "on-primary-fixed": "#001e2e"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "margin-desktop": "40px",
+                "unit": "4px",
+                "container-max": "1200px",
+                "gutter": "16px",
+                "margin-mobile": "20px"
+              },
+              "fontFamily": {
+                "label-bold": ["Inter"],
+                "body-md": ["Inter"],
+                "headline-lg-mobile": ["Inter"],
+                "headline-lg": ["Inter"],
+                "headline-xl": ["Inter"],
+                "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                "label-bold": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "600" }],
+                "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bfc7cf;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 dark:bg-surface-container/60 backdrop-blur-xl shadow-sm flex justify-between items-center px-margin-mobile h-16 md:px-margin-desktop">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean, professional headshot of a young professional woman in business casual attire. The lighting is soft and natural, with a neutral, slightly out-of-focus office background. The overall aesthetic is bright and high-key, matching a modern light-mode financial application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClg7IA7aufeOGMVHhqGVE2kZoScRzk6Elvkq6bSHz6rRMzLJLFkthbLk3zucEhg1pvYFXr-kvnFgKCNXqcKq-Xcyamahcp_7rjGpY2sSinVzWGnibwr5jXSkLkphhAzaIF44o_uZ47mjE3r1s6uLjZT6De5ErVRSWll81eLWCUk8XAvSZUsyC0rvSSqn3J2bU39Byx21BcQkNJuuHUl-AuoDPxgKrdLn7nU2YICg5i-32qb7fbiNXLLR8iFRlqUXqw4vXnxG7WVGw"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">QuickSplit</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-variant/50 transition-colors rounded-full active:scale-95 duration-200">notifications</button>
+</div>
+</header>
+<main class="pt-20 pb-24 px-margin-mobile max-w-container-max mx-auto md:px-margin-desktop">
+<!-- Hero Balance Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-8">
+<!-- Total Balance Card -->
+<div class="relative overflow-hidden p-6 rounded-xl bg-surface-container-lowest border border-outline-variant shadow-sm flex flex-col justify-between h-48 group" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s, transform 0.5s;">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-7xl text-primary">account_balance_wallet</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface-variant tracking-wider uppercase">Total Balance</p>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-2">$12,450.80</h2>
+</div>
+<div class="flex items-center gap-2 text-primary font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="">+2.4% from last month</span>
+</div>
+<!-- Subtle Gradient Header Overlay -->
+<div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-container to-transparent opacity-50"></div>
+</div>
+<!-- Monthly Spending Card -->
+<div class="p-6 rounded-xl bg-primary-container text-on-primary-container shadow-lg flex flex-col justify-between h-48" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.1s, transform 0.5s 0.1s;">
+<div>
+<p class="font-label-bold text-label-bold opacity-80 tracking-wider uppercase">Monthly Spending</p>
+<h2 class="font-headline-xl text-headline-xl mt-2">$3,240.15</h2>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center font-label-bold text-label-bold">
+<span class="">Budget Progress</span>
+<span class="">81%</span>
+</div>
+<div class="w-full bg-on-primary-container/20 h-2 rounded-full overflow-hidden">
+<div class="bg-on-primary-container h-full w-[81%]" style="transition: width 1s ease-out;"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Insights / Split Indicator Row -->
+<section class="mb-8 p-6 rounded-xl bg-surface-container-low border border-outline-variant">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4">Pending Splits</h3>
+<div class="flex flex-col gap-4" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.2s, transform 0.5s 0.2s;">
+<!-- Split Indicator Component -->
+<div class="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A focused headshot of a diverse group of young adults in a bright, modern cafe setting. The lighting is crisp and the background is slightly blurred with soft blue and white bokeh. Professional and inviting portrait for a collaborative financial app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkDbohRQelYIsmJI1_a5zUpXjGD-M57N5-tLhUrQALTHbKZo4MZ-ApI9FR8ocbNk5UrTKmNweEB6BWESihCiA-qJhR6WRoOVgkcQLMb7GZsk9DuByixyqqlHWFM4W7uR35SOy0xDCWSWu6MvxHbPU0RhWOTWIGMK_wVCG6E11GOVKX8pjYKhYOkA2XjRp0tO0qwM5T92emCL598FfX4vQG1J8euTkEBdCGK9rPsd8kB73O2M1iIfA_QfOBtw_w4NFVuYl-A5bgXyo"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest bg-primary flex items-center justify-center text-white text-xs font-bold">JD</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest bg-secondary flex items-center justify-center text-white text-xs font-bold">MK</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between text-body-sm font-label-bold mb-1">
+<span class="">Lunch at The Brasserie</span>
+<span class="text-primary">$45.00 of $135.00 paid</span>
+</div>
+<div class="relative w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="absolute h-full bg-primary rounded-full" style="width: 33%"></div>
+<!-- Avatar marker on split point -->
+<div class="absolute top-1/2 -translate-y-1/2 left-[33%] w-3 h-3 bg-white border-2 border-primary rounded-full shadow-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Spending by Category -->
+<section class="mb-8">
+<div class="flex justify-between items-end mb-4" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.3s, transform 0.5s 0.3s;">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Spending by Category</h3>
+<button class="text-primary font-label-bold text-label-bold hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.4s, transform 0.5s 0.4s;">
+<!-- Category Item 1 -->
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined p-2 bg-secondary-container text-on-secondary-container rounded-lg">home</span>
+<span class="font-label-bold text-on-surface">Housing</span>
+</div>
+<div class="text-headline-lg-mobile font-bold text-on-surface">$1,450.00</div>
+<div class="mt-2 h-1 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-secondary w-[45%] rounded-full"></div>
+</div>
+</div>
+<!-- Category Item 2 -->
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined p-2 bg-tertiary-container text-on-tertiary-container rounded-lg">restaurant</span>
+<span class="font-label-bold text-on-surface">Food</span>
+</div>
+<div class="text-headline-lg-mobile font-bold text-on-surface">$642.50</div>
+<div class="mt-2 h-1 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-tertiary w-[20%] rounded-full"></div>
+</div>
+</div>
+<!-- Category Item 3 -->
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined p-2 bg-primary-container text-on-primary-container rounded-lg">directions_bus</span>
+<span class="font-label-bold text-on-surface">Transport</span>
+</div>
+<div class="text-headline-lg-mobile font-bold text-on-surface">$280.00</div>
+<div class="mt-2 h-1 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-primary w-[10%] rounded-full"></div>
+</div>
+</div>
+<!-- Category Item 4 -->
+<div class="p-4 bg-surface-container-lowest border border-outline-variant rounded-xl hover:shadow-md transition-shadow">
+<div class="flex items-center gap-3 mb-3">
+<span class="material-symbols-outlined p-2 bg-surface-variant text-on-surface-variant rounded-lg">more_horiz</span>
+<span class="font-label-bold text-on-surface">Others</span>
+</div>
+<div class="text-headline-lg-mobile font-bold text-on-surface">$867.65</div>
+<div class="mt-2 h-1 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-on-surface-variant w-[25%] rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Transactions -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-4" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.5s, transform 0.5s 0.5s;">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Recent Transactions</h3>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container text-xs font-bold rounded-full">All</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant">Personal</span>
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-xs font-bold rounded-full cursor-pointer hover:bg-surface-variant">Split</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm" style="opacity: 1; transform: translateY(0px); transition: opacity 0.5s 0.6s, transform 0.5s 0.6s;">
+<div class="divide-y divide-outline-variant">
+<!-- Transaction 1 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<div>
+<h4 class="font-label-bold text-on-surface">Organic Groceries</h4>
+<p class="text-body-sm text-on-surface-variant">Today, 2:45 PM • <span class="text-secondary">Personal</span></p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-bold text-on-surface">-$112.40</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Completed</p>
+</div>
+</div>
+<!-- Transaction 2 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<h4 class="font-label-bold text-on-surface">Team Dinner Out</h4>
+<p class="text-body-sm text-on-surface-variant">Yesterday • <span class="text-primary">Split with 3 others</span></p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-bold text-primary">-$45.00</p>
+<p class="text-[10px] text-primary font-bold uppercase tracking-widest">Split Pending</p>
+</div>
+</div>
+<!-- Transaction 3 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<div>
+<h4 class="font-label-bold text-on-surface">Monthly Electricity Bill</h4>
+<p class="text-body-sm text-on-surface-variant">Oct 24 • <span class="text-secondary">Personal</span></p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-bold text-on-surface">-$185.20</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Auto-pay</p>
+</div>
+</div>
+<!-- Transaction 4 -->
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<h4 class="font-label-bold text-on-surface">Salary Deposit</h4>
+<p class="text-body-sm text-on-surface-variant">Oct 22 • <span class="text-primary font-bold">Income</span></p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-label-bold text-primary">+$4,200.00</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Cleared</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low text-center">
+<button class="text-primary font-label-bold text-label-bold">Show More Transactions</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Shell -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-[400px] z-50 flex items-center gap-3">
+<nav class="flex-1 flex justify-between items-center bg-white/70 backdrop-blur-2xl border border-white/20 rounded-full pl-4 pr-1.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+<div class="flex items-center gap-4 sm:gap-6">
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">group</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+</a>
+<a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-2xl">insights</span>
+</a>
+</div>
+<a class="flex items-center gap-1.5 bg-on-surface/5 text-on-surface rounded-full pl-1.5 pr-3 py-1.5 active:scale-95 transition-transform" href="#">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Me" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClg7IA7aufeOGMVHhqGVE2kZoScRzk6Elvkq6bSHz6rRMzLJLFkthbLk3zucEhg1pvYFXr-kvnFgKCNXqcKq-Xcyamahcp_7rjGpY2sSinVzWGnibwr5jXSkLkphhAzaIF44o_uZ47mjE3r1s6uLjZT6De5ErVRSWll81eLWCUk8XAvSZUsyC0rvSSqn3J2bU39Byx21BcQkNJuuHUl-AuoDPxgKrdLn7nU2YICg5i-32qb7fbiNXLLR8iFRlqUXqw4vXnxG7WVGw"/>
+</div>
+<span class="font-label-bold text-[13px]">Profile</span>
+</a>
+</nav>
+<button class="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Subtle entrance animation for cards
+            const cards = document.querySelectorAll('section > div, section > section');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 10);
+            });
+
+            // Smooth progress bar fill
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.bg-on-primary-container.h-full');
+                progressBars.forEach(bar => {
+                    bar.style.width = bar.dataset.width || bar.style.width;
+                });
+            }, 500);
+        });
+    </script>
+</body></html>

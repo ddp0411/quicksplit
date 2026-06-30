@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit | Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001e2e",
+                        "on-surface": "#1a1c1e",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-container": "#50666d",
+                        "on-tertiary-fixed": "#000965",
+                        "primary-container": "#7fcdff",
+                        "outline-variant": "#bfc7cf",
+                        "secondary": "#4c6269",
+                        "surface-container-low": "#f3f3f6",
+                        "surface-bright": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#2b38aa",
+                        "tertiary": "#4552c3",
+                        "surface-tint": "#00658e",
+                        "secondary-fixed-dim": "#b3cad2",
+                        "primary": "#00658e",
+                        "surface-dim": "#dadadc",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#cce4ec",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#00577b",
+                        "on-primary-fixed-variant": "#004c6c",
+                        "surface-container-high": "#e8e8ea",
+                        "surface": "#f9f9fc",
+                        "primary-fixed-dim": "#85cfff",
+                        "on-background": "#1a1c1e",
+                        "on-tertiary-container": "#3744b4",
+                        "surface-container-highest": "#e2e2e5",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#bdc2ff",
+                        "inverse-primary": "#85cfff",
+                        "tertiary-container": "#bac0ff",
+                        "primary-fixed": "#c7e7ff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "secondary-fixed": "#cfe7ee",
+                        "on-surface-variant": "#40484e",
+                        "inverse-surface": "#2f3133",
+                        "outline": "#70787f",
+                        "background": "#f9f9fc",
+                        "on-secondary-fixed": "#071e24",
+                        "on-secondary-fixed-variant": "#344a51",
+                        "tertiary-fixed": "#dfe0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-desktop": "40px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+            overflow-x: hidden;
+        }
+
+        .glass-nav {
+            background: rgba(249, 249, 252, 0.6);
+            backdrop-filter: blur(20px);
+        }
+
+        .gradient-bg {
+            background: radial-gradient(circle at 70% 20%, #c7e7ff 0%, #f9f9fc 60%);
+        }
+
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pulse-soft {
+            animation: pulse-soft 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.3s; }
+        .stagger-3 { animation-delay: 0.5s; }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="gradient-bg min-h-screen flex flex-col">
+<!-- Top Navigation Bar (Suppressed FAB/Drawer for Onboarding Focus) -->
+<header class="fixed top-0 w-full z-50 glass-nav shadow-sm h-16 flex items-center justify-between px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center gap-2">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">QuickSplit</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors hidden md:block">Log In</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-bold text-label-bold active:scale-95 transition-transform">Get Started</button>
+</div>
+</header>
+<!-- Main Hero Content -->
+<main class="flex-grow flex flex-col md:flex-row items-center justify-center max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-24 pb-12 w-full gap-12">
+<!-- Text Content Area -->
+<div class="flex-1 text-left z-10 space-y-6 animate-fadeIn">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full stagger-1">
+<span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+<span class="text-label-bold font-label-bold">AI-POWERED FINANCE</span>
+</div>
+<h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-on-surface tracking-tight stagger-1">
+                Split smarter. <br/>
+<span class="text-primary">Spend wiser.</span> <br/>
+                Pay instantly.
+            </h1>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-md stagger-2 leading-relaxed">
+                Experience the future of shared expenses. Our intelligent ledger automates calculations, manages balances, and settles debts with a single tap.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-4 stagger-3">
+<button class="bg-primary text-on-primary h-14 px-8 rounded-xl font-label-bold text-[16px] shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all flex items-center justify-center gap-2 group">
+                    Get Started Free
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="border-[1.5px] border-primary text-primary h-14 px-8 rounded-xl font-label-bold text-[16px] hover:bg-primary/5 active:scale-95 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">play_circle</span>
+                    How it works
+                </button>
+</div>
+<!-- Social Proof -->
+<div class="pt-8 flex items-center gap-4 stagger-3">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional woman with a friendly smile, clean studio lighting, soft corporate aesthetic, high-quality photography, light mode financial app style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnl8y2llvBxNHzfxNNtfWR_gmQJwH-hwHgdbj6Bn1tqusG6e9skawUNPlT7sJlWvPsleiobucBClcSz_BPfGLVzSBlOCgp8D9hBikWe8JqTqM8nCtKU2RA0yr0HpAKRbgNi9LARzN0AnR9MgYYx7CtluDjyEwZagslD5363SnAnbPJqGNKienYv7K0gpgMSDSqAlkCsb07qqnA30SFFmJf1QTLlZZ20bNrLX_CzqZPlBNErlsN730ArXwixs_CHLoV_iJYBsmLdmU"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a young male creative professional, neutral background, cinematic lighting, premium modern tech brand aesthetic, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq1QoyB3Wd1elZTqMIoju9b6YyIE_tX-BMAbnPJ9Ls6Y2bnr-Ty1n4c9XBrSby1iquXf4UQW5MvON9_GAQvoBEah34aURki_2NQ-k7vHLcy3v2kSqqpuiHzMUNbE_qoOCHyI-UM6-7tmc-U3LWWmVQf-oFQ5r8P3f-np9Nmb_fjb0qoggYRnKzabptvxQ9CFE7dBDaiEJ03l1yv3jq-jXYHME18V-a-JL4-fMVlmAdfpzO4KGN6W04UdlmbBD0dPOL6FEg-M9DTaI"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-background overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a diverse female professional, warm natural lighting, professional and approachable expression, high-end fintech visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhmkcq5r4PQCFe_Cg9OA_4gKaubIvjM4WPQXs2o71KvfOftk0Vmiyayz1kWPnldMvt0hSUP1jwnSWhsdCdnP01L9jpzOFGxucDXgukQtuJZQ45ymvgHkuXP7i3xY-dwRxc-Ma9Ms7yh5woTXcbotOoZ9gqA3ybp1Y0uNNJRi0Wz7PHTUGI0_LTXbvB_P2B_gMLNNozrt8mQPqlY0RVWKbT9EHzPI9oBYuf2qpBWLHDfGb-KLqPXqe5fgBbxtLp4acnBlyILRUQL5E"/>
+</div>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">15k+</span> active splitters today
+                </div>
+</div>
+</div>
+<!-- Visual Hero Area (Asymmetric Glass Bento) -->
+<div class="flex-1 relative w-full h-[400px] md:h-[600px] flex items-center justify-center">
+<!-- Background Decorative Blobs -->
+<div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-container/30 blur-[100px] rounded-full floating-element"></div>
+<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-tertiary-container/20 blur-[100px] rounded-full floating-element stagger-2"></div>
+<!-- Central Split-Indicator Mockup -->
+<div class="relative z-10 w-full max-w-[450px]">
+<!-- Main Card -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-[32px] p-6 shadow-2xl shadow-primary/10 space-y-6 floating-element">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-label-bold font-label-bold text-on-surface-variant">RECENT DINNER</p>
+<h3 class="text-headline-lg-mobile font-bold text-on-surface">$284.50</h3>
+</div>
+<div class="bg-primary/10 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+</div>
+<!-- Unique Split-Indicator Component -->
+<div class="space-y-4">
+<div class="flex justify-between text-body-sm font-label-bold">
+<span class="text-on-surface-variant">Splitting with 4 friends</span>
+<span class="text-primary">85% Paid</span>
+</div>
+<div class="relative h-4 bg-surface-container rounded-full overflow-visible">
+<div class="absolute top-0 left-0 h-full w-[85%] bg-primary rounded-full"></div>
+<!-- Avatars on Split Points -->
+<div class="absolute top-1/2 -translate-y-1/2 left-[20%] w-8 h-8 rounded-full border-2 border-on-primary shadow-sm bg-surface overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a smiling person, minimalist flat style, professional fintech color palette, soft lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxVKt4vy7txom1cAR36gknAjWUyvMiwoR908HXL6tIqQX6BBkIMRcrtI13-ck32b1olR7OsywYs-cMWyRUok5cOnZshCxdMt7rO2cjjoQeQqVBWcLvJxk_ndt2AdZoAamz8oWNWbxUtaO82aQ2aNpTwelOs_0MXtzAFqWcQSHOIEOUVBEi1OXBFkuJsyiiSx-iLj0Jz7eCI0W8x4Hu-dmEWeC1m3U7we6ZFTG8Sro09rqvNNTj66fzcSs9UsNTKk31X3acXtlgBEw"/>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[45%] w-8 h-8 rounded-full border-2 border-on-primary shadow-sm bg-surface overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a diverse individual, professional modern look, soft shadows, premium app design style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi0I2gRSI1kx_XyoM4Ym35nVPsPuCwvoEPsZE9g2_Aje4J7GTIOD_hNukkHUJxSsY4JAAPRxsOvxlzQSLZBhQfUDIahrUJ6TPQcYzvuN6s8jtC0XJQSeEunw7fkOar3cpISGEFOJfOFu9k0uF2yrjTq-snX2_vwJ59j8aWFuBbGh05dwwo87NZksCtCjm7X6HtJKdVvJQEUNTbJhIAp7hBJ0YsdZDVBAN0rBLbzV9kXfg8iSrD-zueGowNBHKocOyWrcj9qAUsbtE"/>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[70%] w-8 h-8 rounded-full border-2 border-on-primary shadow-sm bg-surface overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a confident young professional, clean background, soft aesthetic lighting, high-quality digital photo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxqucLM7Ec0i_V7EAaZpJb35UHqA5q8qZLqEGZhB_WyCPa-VEFv3_sz1FeemM7Iba6yht3S4RXnTXy8NYozTWYlUkyRUSoUsqVMgGyZZFZiZQuE2i3ZhvuncIkOIxlWwgy3pzHuUHhs5wpLRvnUhWgjzzWr0PF2V-MVkEB88pCosdRwzoR4F1ShJT-vrvpqsSEA3gD0gqYXfME_oJ3WVPJXVEx4sFwQ2yWiLw-BvOslBPiR4RqX1vN1a9fmbT23kClNjyXvZVd5V4"/>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 right-[0%] w-8 h-8 rounded-full border-2 border-on-primary shadow-sm bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">hourglass_empty</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3 pt-2">
+<div class="bg-surface-container-low p-4 rounded-2xl">
+<p class="text-[10px] font-label-bold text-on-surface-variant">YOUR SHARE</p>
+<p class="text-body-md font-bold text-on-surface">$71.12</p>
+</div>
+<div class="bg-primary-container p-4 rounded-2xl">
+<p class="text-[10px] font-label-bold text-on-primary-container">PENDING</p>
+<p class="text-body-md font-bold text-on-primary-container">$42.00</p>
+</div>
+</div>
+</div>
+<!-- Floating Interaction Tags -->
+<div class="absolute -top-6 -right-6 bg-white/80 backdrop-blur-md border border-white p-4 rounded-2xl shadow-xl floating-element stagger-2 hidden md:flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600">check_circle</span>
+</div>
+<div>
+<p class="text-label-bold font-bold text-on-surface">Alex paid you</p>
+<p class="text-[10px] text-on-surface-variant">Just now</p>
+</div>
+</div>
+<div class="absolute -bottom-10 -left-10 bg-white/80 backdrop-blur-md border border-white p-4 rounded-2xl shadow-xl floating-element stagger-3 hidden md:flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600">bolt</span>
+</div>
+<div>
+<p class="text-label-bold font-bold text-on-surface">AI Split applied</p>
+<p class="text-[10px] text-on-surface-variant">Tax &amp; Tip calculated</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Features Section (Minimalist Grid) -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-20 w-full">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="p-8 bg-surface-container-low rounded-[24px] border border-outline-variant/10 hover:border-primary/30 transition-all group">
+<div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+</div>
+<h4 class="font-headline-lg-mobile font-bold text-on-surface mb-3">Smart OCR</h4>
+<p class="text-body-sm text-on-surface-variant">Snap a photo and let our AI extract every item, tax, and tip automatically.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-[24px] border border-outline-variant/10 hover:border-primary/30 transition-all group">
+<div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<h4 class="font-headline-lg-mobile font-bold text-on-surface mb-3">Group Dynamics</h4>
+<p class="text-body-sm text-on-surface-variant">Create persistent groups for roommates or travel buddies to track long-term balances.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-[24px] border border-outline-variant/10 hover:border-primary/30 transition-all group">
+<div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<h4 class="font-headline-lg-mobile font-bold text-on-surface mb-3">Direct Pay</h4>
+<p class="text-body-sm text-on-surface-variant">Connect your accounts and settle up with one click using your favorite payment apps.</p>
+</div>
+</div>
+</section>
+<!-- Footer Space -->
+<footer class="mt-auto py-8 border-t border-outline-variant/20">
+<div class="max-w-container-max mx-auto px-margin-mobile flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-label-bold text-on-surface-variant">© 2024 QuickSplit. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<a class="text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            const floatingElements = document.querySelectorAll('.floating-element');
+            floatingElements.forEach((el, index) => {
+                const factor = (index + 1) * 0.5;
+                el.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+            });
+        });
+
+        // Entrance Animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fadeIn').forEach(el => {
+            el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
+        });
+    </script>
+</body></html>

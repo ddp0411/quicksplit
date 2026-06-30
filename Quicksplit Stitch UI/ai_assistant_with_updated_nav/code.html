@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>QuickSplit AI Chat</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .message-gradient {
+            background: linear-gradient(135deg, #7fcdff 0%, #00658e 100%);
+        }
+        .ai-bubble-gradient {
+            background: linear-gradient(180deg, #f9f9fc 0%, #cce4ec 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        /* Custom scrollbar for chat area */
+        .chat-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #bfc7cf;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001e2e",
+                        "on-surface": "#1a1c1e",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-container": "#50666d",
+                        "on-tertiary-fixed": "#000965",
+                        "primary-container": "#7fcdff",
+                        "outline-variant": "#bfc7cf",
+                        "secondary": "#4c6269",
+                        "surface-container-low": "#f3f3f6",
+                        "surface-bright": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#2b38aa",
+                        "tertiary": "#4552c3",
+                        "surface-tint": "#00658e",
+                        "secondary-fixed-dim": "#b3cad2",
+                        "primary": "#00658e",
+                        "surface-dim": "#dadadc",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#cce4ec",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#00577b",
+                        "on-primary-fixed-variant": "#004c6c",
+                        "surface-container-high": "#e8e8ea",
+                        "surface": "#f9f9fc",
+                        "primary-fixed-dim": "#85cfff",
+                        "on-background": "#1a1c1e",
+                        "on-tertiary-container": "#3744b4",
+                        "surface-container-highest": "#e2e2e5",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#bdc2ff",
+                        "inverse-primary": "#85cfff",
+                        "tertiary-container": "#bac0ff",
+                        "primary-fixed": "#c7e7ff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "secondary-fixed": "#cfe7ee",
+                        "on-surface-variant": "#40484e",
+                        "inverse-surface": "#2f3133",
+                        "outline": "#70787f",
+                        "background": "#f9f9fc",
+                        "on-secondary-fixed": "#071e24",
+                        "on-secondary-fixed-variant": "#344a51",
+                        "tertiary-fixed": "#dfe0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "container-max": "1200px",
+                        "gutter": "16px",
+                        "margin-desktop": "40px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-bold": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 dark:bg-surface-container/60 backdrop-blur-xl shadow-sm h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of Alex Morgan, a young professional woman with a friendly expression. She is in a bright, modern office with soft natural lighting and a clean, high-end minimalist background that matches a light-mode UI aesthetic. The color palette is neutral with soft blue hints." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Lbz7KQYEsVVLxeXsMMTwgDuHk_KTksaHSdoZpsB_uLYkWMVJvbdsxoQJZOsGmjrCgjv6b40ehRA8m4CIL-yWoShbAmOpkNFLssC4-QLw2as1bBdfaoIAXqZWwprFEcfZigkLrdFBYpUVnjLtP3Ku07ae8QiCZarKjUAdgSgBspLoH1xHpA91Y52_omaPV8qjnPsFfY5qfbozEXaf6SoMo4qNGFg9WZ8hcR3LGJOuafEik4U8xxDTdpQZzVabkLeyrF4EogvYrwQ"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">QuickSplit</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-16 overflow-hidden flex flex-col relative mb-24">
+<!-- Ambient Background Decoration -->
+<div class="absolute top-20 -right-20 w-64 h-64 bg-primary-container/20 rounded-full blur-[100px] -z-10"></div>
+<div class="absolute bottom-40 -left-20 w-80 h-80 bg-tertiary-container/20 rounded-full blur-[100px] -z-10"></div>
+<!-- Chat History -->
+<section class="flex-1 overflow-y-auto px-margin-mobile py-6 chat-scroll flex flex-col gap-6">
+<!-- System/Time Marker -->
+<div class="flex justify-center">
+<span class="font-label-bold text-label-bold text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- AI Welcome Message -->
+<div class="flex flex-col gap-1 items-start max-w-[85%]">
+<div class="ai-bubble-gradient p-4 rounded-2xl rounded-tl-none border border-outline-variant/30 shadow-sm" style="opacity: 1; transform: translateY(0px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+<p class="font-body-md text-body-md text-on-surface">Hi Alex! I'm your QuickSplit assistant. I can help you track spending, split bills, or analyze your monthly budget. What's on your mind?</p>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface-variant ml-1">AI Assistant • 09:41 AM</span>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-1 items-end self-end max-w-[80%]">
+<div class="bg-primary text-on-primary p-4 rounded-2xl rounded-tr-none shadow-md" style="opacity: 1; transform: translateY(0px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+<p class="font-body-md text-body-md">Where did I spend the most this month?</p>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface-variant mr-1">You • 09:42 AM</span>
+</div>
+<!-- AI Response with Breakdown -->
+<div class="flex flex-col gap-1 items-start max-w-[90%]">
+<div class="ai-bubble-gradient p-4 rounded-2xl rounded-tl-none border border-outline-variant/30 shadow-sm flex flex-col gap-4" style="opacity: 0; transform: translateY(10px);">
+<p class="font-body-md text-body-md text-on-surface">Based on your transactions, your highest spending category this month is <span class="font-bold text-primary">Dining &amp; Social</span>. Here is the breakdown:</p>
+<!-- Insights Component -->
+<div class="bg-surface/50 rounded-xl p-3 border border-primary/10 flex flex-col gap-3">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-bold text-label-bold text-on-surface-variant">Dining &amp; Social</span>
+<span class="font-label-bold text-label-bold text-primary">$482.50</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[65%]" style="opacity: 0; transform: translateY(10px);"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-bold text-label-bold text-on-surface-variant">Rent &amp; Utilities</span>
+<span class="font-label-bold text-label-bold text-secondary">$320.00</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full w-[40%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-bold text-label-bold text-on-surface-variant">Transport</span>
+<span class="font-label-bold text-label-bold text-tertiary">$145.20</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full w-[20%]"></div>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface">Would you like me to suggest some ways to optimize your dining budget?</p>
+</div>
+<span class="font-label-bold text-[10px] text-on-surface-variant ml-1">AI Assistant • 09:42 AM</span>
+</div>
+<!-- Quick Action Chips -->
+<div class="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 scroll-hide">
+<button class="whitespace-nowrap px-4 py-2 rounded-full border border-primary/30 bg-primary-container/10 text-primary font-label-bold text-label-bold hover:bg-primary-container/20 transition-colors">Optimize budget</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-variant/30 transition-colors">Split last meal</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-variant/30 transition-colors">Check rent status</button>
+</div>
+</section>
+<!-- Input Area (Sticky-ish above Nav) -->
+<div class="p-4 bg-surface/80 backdrop-blur-md border-t border-outline-variant/10">
+<div class="max-w-container-max mx-auto flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 shadow-inner focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md placeholder:text-outline py-2" placeholder="Ask AI" type="text"/>
+<button class="bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-lg" style="opacity: 0; transform: translateY(10px);">
+<span class="material-symbols-outlined">arrow_upward</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-[400px] z-50 flex items-center gap-3"><nav class="flex-1 flex justify-between items-center bg-white/70 backdrop-blur-2xl border border-white/20 rounded-full pl-4 pr-1.5 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"><div class="flex items-center gap-4 sm:gap-6"><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">home</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">group</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">chat_bubble</span></a><a class="flex items-center justify-center text-on-surface/40 hover:text-primary transition-colors active:scale-90" href="#"><span class="material-symbols-outlined text-2xl">insights</span></a></div><a class="flex items-center gap-1.5 bg-on-surface/5 text-on-surface rounded-full pl-1.5 pr-3 py-1.5 active:scale-95 transition-transform" href="#"><div class="w-6 h-6 rounded-full overflow-hidden border border-outline-variant"><img alt="Me" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Lbz7KQYEsVVLxeXsMMTwgDuHk_KTksaHSdoZpsB_uLYkWMVJvbdsxoQJZOsGmjrCgjv6b40ehRA8m4CIL-yWoShbAmOpkNFLssC4-QLw2as1bBdfaoIAXqZWwprFEcfZigkLrdFBYpUVnjLtP3Ku07ae8QiCZarKjUAdgSgBspLoH1xHpA91Y52_omaPV8qjnPsFfY5qfbozEXaf6SoMo4qNGFg9WZ8hcR3LGJOuafEik4U8xxDTdpQZzVabkLeyrF4EogvYrwQ"/></div><span class="font-label-bold text-[13px]">Profile</span></a></nav><button class="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"><span class="material-symbols-outlined text-3xl">add</span></button></div>
+<script>
+        // Simple micro-interaction for the chat bubbles
+        document.addEventListener('DOMContentLoaded', () => {
+            const bubbles = document.querySelectorAll('.ai-bubble-gradient, .bg-primary');
+            bubbles.forEach((bubble, index) => {
+                bubble.style.opacity = '0';
+                bubble.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    bubble.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    bubble.style.opacity = '1';
+                    bubble.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Auto-scroll to bottom
+            const scrollContainer = document.querySelector('.chat-scroll');
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        });
+
+        // Input focus effect
+        const input = document.querySelector('input');
+        const inputContainer = input.parentElement;
+        input.addEventListener('focus', () => {
+            inputContainer.classList.add('bg-surface-container-highest');
+        });
+        input.addEventListener('blur', () => {
+            inputContainer.classList.remove('bg-surface-container-highest');
+        });
+    </script>
+</body></html>

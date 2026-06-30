@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickSplit - OCR Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9fc",
+                    "on-secondary-container": "#50666d",
+                    "surface-bright": "#f9f9fc",
+                    "primary-container": "#7fcdff",
+                    "tertiary-fixed-dim": "#bdc2ff",
+                    "secondary": "#4c6269",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#70787f",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#344a51",
+                    "inverse-primary": "#85cfff",
+                    "surface-variant": "#e2e2e5",
+                    "on-secondary-fixed": "#071e24",
+                    "tertiary-container": "#bac0ff",
+                    "inverse-on-surface": "#f0f0f3",
+                    "surface-container": "#eeeef0",
+                    "surface-dim": "#dadadc",
+                    "on-primary-fixed-variant": "#004c6c",
+                    "primary-fixed": "#c7e7ff",
+                    "on-surface-variant": "#40484e",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#1a1c1e",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#b3cad2",
+                    "secondary-fixed": "#cfe7ee",
+                    "surface-tint": "#00658e",
+                    "surface-container-low": "#f3f3f6",
+                    "outline-variant": "#bfc7cf",
+                    "inverse-surface": "#2f3133",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#00577b",
+                    "secondary-container": "#cce4ec",
+                    "on-tertiary-fixed": "#000965",
+                    "on-primary": "#ffffff",
+                    "background": "#f9f9fc",
+                    "surface-container-high": "#e8e8ea",
+                    "on-tertiary-container": "#3744b4",
+                    "on-surface": "#1a1c1e",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary": "#00658e",
+                    "tertiary": "#4552c3",
+                    "tertiary-fixed": "#dfe0ff",
+                    "primary-fixed-dim": "#85cfff",
+                    "on-tertiary-fixed-variant": "#2b38aa",
+                    "on-primary-fixed": "#001e2e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "unit": "4px",
+                    "container-max": "1200px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "label-bold": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+        .glass-header {
+            background: rgba(249, 249, 252, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .receipt-card {
+            box-shadow: 0 4px 20px -2px rgba(0, 101, 142, 0.08);
+        }
+        /* Custom scrollbar for clean aesthetics */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2e2e5;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl shadow-sm h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Review Scan</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young tech professional with a friendly smile, clean lighting, high-end photography style, soft neutral background, wearing a modern minimalist outfit in shades of blue and gray." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwqk5FRwNfYI763XAQbvobc6gzfjHLSJMgMJd9te3FKKHMLaLlc1Tkp1ea9q9jZbfgUeo1tKaUbNcMg9JTBtk1dpw_Ij5tsZ89lBYxtPx4YQHDvXf5HVy4eIBBfAWHb0O3zAspWRs7TE3X-ZB2jK2GKNqVdqaizXK6CbA2BNXllHTAj6htG9gn9ZMAXa2zNUzMe32nrBof-2TCXRrYnIyG19QPkFQoswVZ3L6LRH5o2lNuklm-craLibRFXYY0d6iAgPJBp99nkAs"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile max-w-container-max mx-auto space-y-6">
+<!-- OCR Status Indicator -->
+<div class="flex items-center gap-2 px-4 py-2 bg-primary-container/20 rounded-full w-fit mx-auto animate-pulse">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="text-primary font-label-bold text-label-bold uppercase tracking-wider">AI Analysis Complete</span>
+</div>
+<!-- Receipt Digitalization Container -->
+<div class="grid lg:grid-cols-2 gap-8 items-start">
+<!-- Original Image Reference (Left Column Desktop) -->
+<div class="hidden lg:block sticky top-24">
+<div class="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant shadow-sm aspect-[3/4] relative">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A high-resolution, sharp macro photograph of a restaurant receipt held against a clean, modern marble tabletop. The receipt shows detailed line items and clear black text. The lighting is bright and even, highlighting the paper's texture and the precise typography of the printed numbers. Professional financial aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLxxMYyl7wK8mNIhowO1AzAcsmljTT2Td82IvK_n6tz0caZ7ZclPZVzxuqMkyCXAdC4NMfvw4Gk5mi8PrQ04RasNC_ufusyrD9FijJiGDmfLJFUPINo3EOTyp4rHNaN9RUOM0g8DYvKxVPNEC9RQBiHVlLeS8PkgREP_Sj7RWNppqCq1ASqKqio59-mtFm8T4WpSsC8tdgpJpQB3Yyxe_7RKlu2BfzcW3Iy5-N0IDbJuGu0RkWBpxgMZuRMIDH65ecXX50KRRfpMw"/>
+<div class="absolute inset-0 border-2 border-primary/30 pointer-events-none rounded-xl"></div>
+<div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">Original Scan</div>
+</div>
+</div>
+<!-- Extracted Data Review (Right Column Desktop / Main Mobile) -->
+<div class="space-y-6">
+<!-- Header Metadata Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant receipt-card space-y-4">
+<div class="space-y-1">
+<label class="text-on-surface-variant font-label-bold text-label-bold uppercase">Merchant Name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-0 border-b-2 border-primary px-0 py-2 font-headline-lg-mobile text-headline-lg-mobile text-primary focus:ring-0 focus:border-primary-container transition-colors" type="text" value="Blue Bottle Coffee"/>
+<span class="absolute right-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant/50 text-sm">edit</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2">
+<div class="space-y-1 flex-1">
+<label class="text-on-surface-variant font-label-bold text-label-bold uppercase">Date</label>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">calendar_today</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-body-md text-body-md focus:ring-0" type="date" value="2023-10-24"/>
+</div>
+</div>
+<div class="space-y-1 flex-1 text-right">
+<label class="text-on-surface-variant font-label-bold text-label-bold uppercase">Category</label>
+<div class="flex items-center justify-end gap-2">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">Dining</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Items List Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant receipt-card overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-label-bold text-label-bold uppercase text-on-surface-variant">Extracted Items</h2>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-sm">add_circle</span> Add Item
+                        </button>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Item Row 1 -->
+<div class="p-6 flex justify-between items-start group hover:bg-surface-container/30 transition-colors">
+<div class="space-y-1 flex-1">
+<input class="bg-transparent border-0 p-0 w-full font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="Single Origin Espresso"/>
+<p class="text-on-surface-variant text-body-sm font-body-sm">Qty: 2</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+<input class="bg-transparent border-0 p-0 pl-4 w-16 text-right font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="11.00"/>
+</div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-error">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+<!-- Item Row 2 -->
+<div class="p-6 flex justify-between items-start group hover:bg-surface-container/30 transition-colors">
+<div class="space-y-1 flex-1">
+<input class="bg-transparent border-0 p-0 w-full font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="Avocado Toast (Extra Egg)"/>
+<p class="text-on-surface-variant text-body-sm font-body-sm">Qty: 1</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+<input class="bg-transparent border-0 p-0 pl-4 w-16 text-right font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="16.50"/>
+</div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-error">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+<!-- Item Row 3 -->
+<div class="p-6 flex justify-between items-start group hover:bg-surface-container/30 transition-colors">
+<div class="space-y-1 flex-1">
+<input class="bg-transparent border-0 p-0 w-full font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="Oat Milk Latte"/>
+<p class="text-on-surface-variant text-body-sm font-body-sm">Qty: 1</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">$</span>
+<input class="bg-transparent border-0 p-0 pl-4 w-16 text-right font-body-md text-body-md text-on-surface focus:ring-0" type="text" value="6.75"/>
+</div>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-error">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Totals Section -->
+<div class="p-6 bg-surface-container-low space-y-3">
+<div class="flex justify-between items-center text-on-surface-variant font-body-md">
+<span>Subtotal</span>
+<span>$34.25</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant font-body-md">
+<div class="flex items-center gap-1">
+<span>Tax (8.5%)</span>
+<span class="material-symbols-outlined text-xs">edit</span>
+</div>
+<span>$2.91</span>
+</div>
+<div class="pt-3 border-t border-outline-variant flex justify-between items-center">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">Total</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">$37.16</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar (Fixed) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/60 backdrop-blur-xl px-4 py-4 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
+<div class="max-w-container-max mx-auto grid grid-cols-2 gap-4">
+<!-- Split Bill Button -->
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl py-3 hover:bg-secondary-container/80 transition-all active:scale-95" onclick="handleSplit()">
+<div class="flex items-center gap-2 font-label-bold text-label-bold uppercase">
+<span class="material-symbols-outlined text-sm">group</span>
+                    Split this Bill
+                </div>
+<span class="text-[10px] opacity-70">Assign items to friends</span>
+</button>
+<!-- Confirm Button -->
+<button class="flex flex-col items-center justify-center bg-primary text-white rounded-xl py-3 hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20" onclick="handleConfirm()">
+<div class="flex items-center gap-2 font-label-bold text-label-bold uppercase">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Confirm Data
+                </div>
+<span class="text-[10px] opacity-70">Save to history</span>
+</button>
+</div>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        function handleConfirm() {
+            const btn = event.currentTarget;
+            btn.innerHTML = `
+                <div class="flex items-center gap-2 font-label-bold text-label-bold uppercase">
+                    <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                </div>
+            `;
+            setTimeout(() => {
+                alert("Receipt confirmed and saved successfully!");
+                location.reload();
+            }, 1200);
+        }
+
+        function handleSplit() {
+            alert("Redirecting to itemized split view...");
+        }
+
+        // Simple feedback on input change
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                input.parentElement.classList.add('animate-pulse');
+                setTimeout(() => input.parentElement.classList.remove('animate-pulse'), 500);
+            });
+        });
+    </script>
+</body></html>

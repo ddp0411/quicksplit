@@ -54,6 +54,9 @@ logs/
 Thumbs.db
 
 # Image assets that MUST be tracked (override the blanket *.png/*.jpg/*.jpeg rules above):
-# app icons/splash for EAS builds, and the landing page's logo/favicon.
+# app icons/splash for EAS builds, the landing page's logo/favicon, and design references.
 !mobile/assets/**
 !landing/assets/**
+!Quicksplit Stitch UI/**
+# ...but never track OS junk, even inside allowlisted dirs.
+Quicksplit Stitch UI/**/.DS_Store
