@@ -1542,7 +1542,9 @@ export const ReviewScreen: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
       queryClient.invalidateQueries({ queryKey: ['balances'] });
       toast('Expense created from receipt!', 'success');
-      navigation.navigate('HomeTab');
+      // 'Home' is the tab; target its root screen so the Scan→Split→Review flow is
+      // dismissed and we land on the dashboard (works from any tab's stack).
+      navigation.navigate('Home', { screen: 'HomeMain' });
     },
     onError: () => toast('Failed to create expense', 'error'),
   });

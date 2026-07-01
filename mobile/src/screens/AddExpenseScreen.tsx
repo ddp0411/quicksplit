@@ -593,12 +593,13 @@ export const AddExpenseScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Scan Receipt */}
+          {/* Scan Receipt — opens the OCR flow, which creates its own expense from the
+              receipt (it does not pre-fill this form). */}
           <TouchableOpacity
             style={s.scanBtn}
             onPress={() => navigation.navigate('Scan')}
           >
-            <Text style={s.scanBtnText}>📷 Scan Receipt to Pre-fill Amount</Text>
+            <Text style={s.scanBtnText}>📷 Scan a receipt to add an expense</Text>
           </TouchableOpacity>
 
           {/* Date */}
