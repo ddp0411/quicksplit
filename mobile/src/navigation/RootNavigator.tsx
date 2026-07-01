@@ -32,6 +32,7 @@ import {
   PermissionSetupScreen,
 } from '../screens/stubs';
 import { MonthlyExpensesScreen } from '../screens/MonthlyExpensesScreen';
+import { NewGroupScreen } from '../screens/NewGroupScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -244,6 +245,10 @@ function FriendsStack() {
       <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
       <Stack.Screen name="SettleUp" component={SettleUpScreen} />
       <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
+      {/* OCR flow so "Scan Receipt" from AddExpense works in this tab too. */}
+      <Stack.Screen name="Scan" component={ScanScreen} />
+      <Stack.Screen name="Split" component={SplitScreen} />
+      <Stack.Screen name="Review" component={ReviewScreen} />
     </Stack.Navigator>
   );
 }
@@ -253,6 +258,7 @@ function GroupsStack() {
     <Stack.Navigator screenOptions={STACK_OPTIONS}>
       <Stack.Screen name="GroupsMain" component={GroupsScreen} />
       <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
+      <Stack.Screen name="NewGroup" component={NewGroupScreen} />
       <Stack.Screen name="CreateGroup" component={CreateGroupScreen} />
       <Stack.Screen name="GroupInsights" component={GroupInsightsScreen} />
       <Stack.Screen name="ImportGroup" component={ImportGroupScreen} />
@@ -260,6 +266,10 @@ function GroupsStack() {
       <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
       <Stack.Screen name="SettleUp" component={SettleUpScreen} />
       <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
+      {/* OCR flow so "Scan Receipt" from AddExpense works in this tab too. */}
+      <Stack.Screen name="Scan" component={ScanScreen} />
+      <Stack.Screen name="Split" component={SplitScreen} />
+      <Stack.Screen name="Review" component={ReviewScreen} />
     </Stack.Navigator>
   );
 }

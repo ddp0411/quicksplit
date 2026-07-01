@@ -42,6 +42,15 @@ const SPLIT_TYPES = [
 
 type SplitType = 'equal' | 'exact' | 'percentage' | 'shares';
 
+// An expense is one of three kinds. Personal = just you (no "owe"); Friends = split with
+// friends (no group); Group = split within a group. The kind drives which fields are shown.
+type ExpenseMode = 'personal' | 'friends' | 'group';
+const EXPENSE_MODES: { value: ExpenseMode; label: string; emoji: string }[] = [
+  { value: 'personal', label: 'Personal', emoji: '👤' },
+  { value: 'friends', label: 'Friends', emoji: '👥' },
+  { value: 'group', label: 'Group', emoji: '🏷️' },
+];
+
 const RECURRING_OPTIONS = [
   { value: 'weekly', label: 'Weekly' },
   { value: 'monthly', label: 'Monthly' },
@@ -239,6 +248,11 @@ export const AddExpenseScreen: React.FC = () => {
   const preselectedUserId: string | undefined = params?.userId; // from a friend's "Add" action
   const today = new Date().toISOString().split('T')[0];
 
+  // Open in the mode implied by where "Add" was tapped: from a group → Group, from a
+  // friend → Friends, otherwise (generic center "+") → Personal so nothing auto-involves friends.
+  const initialMode: ExpenseMode = preselectedGroupId ? 'group' : preselectedUserId ? 'friends' : 'personal';
+
+  const [mode, setMode] = useState<ExpenseMode>(initialMode);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<ExpenseCategory>('other');
@@ -252,15 +266,36 @@ export const AddExpenseScreen: React.FC = () => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFreq, setRecurringFreq] = useState('monthly');
 
-  const [paidBy, setPaidBy] = useState<UserMini>({
+  const self: UserMini = {
     id: user!.id, name: user!.name, email: user!.email,
     avatar_color: user!.avatar_color ?? '#00658E',
-  });
+  };
+  const [paidBy, setPaidBy] = useState<UserMini>(self);
   const [participants, setParticipants] = useState<string[]>(
     preselectedUserId && preselectedUserId !== user!.id
       ? [user!.id, preselectedUserId]
       : [user!.id]
   );
+
+  // Switching the expense kind resets the split so the two never get mixed: Personal locks
+  // to just you, Friends clears any group, Group starts fresh until a group is chosen.
+  const changeMode = (next: ExpenseMode) => {
+    setMode(next);
+    setPaidBy(self);
+    setSplitType('equal');
+    if (next === 'personal') {
+      setGroupId('');
+      setParticipants([user!.id]);
+    } else if (next === 'friends') {
+      setGroupId('');
+      setParticipants(
+        preselectedUserId && preselectedUserId !== user!.id ? [user!.id, preselectedUserId] : [user!.id]
+      );
+    } else {
+      setGroupId(preselectedGroupId ?? '');
+      setParticipants([user!.id]);
+    }
+  };
   const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({});
   const [percentages, setPercentages] = useState<Record<string, string>>({});
   const [shares, setShares] = useState<Record<string, string>>({});
@@ -346,7 +381,8 @@ export const AddExpenseScreen: React.FC = () => {
     if (!description.trim()) { Alert.alert('Missing description', 'Please enter a description.'); return; }
     const amt = parseFloat(amount);
     if (isNaN(amt) || amt <= 0) { Alert.alert('Invalid amount', 'Enter a valid amount.'); return; }
-    if (participants.length === 0) { Alert.alert('No participants', 'Add at least one participant.'); return; }
+    if (mode === 'group' && !groupId) { Alert.alert('Select a group', 'Choose which group this expense belongs to.'); return; }
+    if (mode !== 'personal' && participants.length === 0) { Alert.alert('No participants', 'Add at least one participant.'); return; }
     mutation.mutate();
   };
 
@@ -368,6 +404,28 @@ export const AddExpenseScreen: React.FC = () => {
         </View>
 
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+          {/* Expense kind: Personal / Friends / Group */}
+          <View style={s.modeRow}>
+            {EXPENSE_MODES.map((m) => (
+              <TouchableOpacity
+                key={m.value}
+                style={[s.modeOption, mode === m.value && s.modeOptionActive]}
+                onPress={() => changeMode(m.value)}
+                activeOpacity={0.85}
+              >
+                <Text style={s.modeEmoji}>{m.emoji}</Text>
+                <Text style={[s.modeLabel, mode === m.value && s.modeLabelActive]}>{m.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={s.modeHint}>
+            {mode === 'personal'
+              ? 'Just for you — tracked in your spending, nobody owes anything.'
+              : mode === 'friends'
+                ? 'Split with friends. Balances update for everyone involved.'
+                : 'Split within a group. Balances update for the group.'}
+          </Text>
+
           {/* Amount */}
           <View style={s.amountCard}>
             <Text style={s.currencySymbol}>₹</Text>
@@ -420,88 +478,97 @@ export const AddExpenseScreen: React.FC = () => {
             )}
           </View>
 
-          {/* Group */}
-          <View style={s.field}>
-            <Text style={s.fieldLabel}>Group (optional)</Text>
-            <TouchableOpacity style={s.selector} onPress={() => setShowGroups((v) => !v)}>
-              <Text style={s.selectorText}>{selectedGroup ? selectedGroup.name : 'No group (personal)'}</Text>
-              <Text style={s.selectorArrow}>{showGroups ? '▲' : '▼'}</Text>
-            </TouchableOpacity>
-            {showGroups && (
-              <View style={s.dropdown}>
-                <TouchableOpacity
-                  style={[s.dropItem, !groupId && s.dropItemActive]}
-                  onPress={() => { setGroupId(''); setShowGroups(false); }}
-                >
-                  <Text style={s.dropItemText}>No group</Text>
+          {/* Group (Group mode only) */}
+          {mode === 'group' && (
+            <View style={s.field}>
+              <Text style={s.fieldLabel}>Group</Text>
+              <TouchableOpacity style={s.selector} onPress={() => setShowGroups((v) => !v)}>
+                <Text style={[s.selectorText, !selectedGroup && { color: colors.textMuted }]}>
+                  {selectedGroup ? selectedGroup.name : 'Select a group'}
+                </Text>
+                <Text style={s.selectorArrow}>{showGroups ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {showGroups && (
+                <View style={s.dropdown}>
+                  {(groups as any[]).length === 0 && (
+                    <View style={s.dropItem}>
+                      <Text style={[s.dropItemText, { color: colors.textMuted }]}>No groups yet — create one first.</Text>
+                    </View>
+                  )}
+                  {(groups as any[]).map((g) => (
+                    <TouchableOpacity
+                      key={g.id}
+                      style={[s.dropItem, groupId === g.id && s.dropItemActive]}
+                      onPress={() => { setGroupId(g.id); setShowGroups(false); setParticipants([user!.id]); }}
+                    >
+                      <Text style={s.dropItemText}>{g.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Paid By — only when splitting */}
+          {mode !== 'personal' && (
+            <View style={s.field}>
+              <Text style={s.fieldLabel}>Paid by</Text>
+              <TouchableOpacity
+                style={s.selector}
+                onPress={() => setShowPaidByPicker(true)}
+                disabled={availableUsers.length <= 1}
+              >
+                <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#00658E' }]}>
+                  <Text style={s.miniAvatarText}>{avatarInitials(paidBy.name)}</Text>
+                </View>
+                <Text style={[s.selectorText, { flex: 1, marginLeft: 8 }]}>{paidBy.name}</Text>
+                {availableUsers.length > 1 && <Text style={s.selectorArrow}>▼</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Participants — only when splitting */}
+          {mode !== 'personal' && (
+            <View style={s.field}>
+              <Text style={s.fieldLabel}>Split with</Text>
+              <View style={s.chipsWrap}>
+                {participantUsers.map((u) => (
+                  <View key={u.id} style={s.chip}>
+                    <Text style={s.chipText}>{u.name.split(' ')[0]}</Text>
+                    <TouchableOpacity onPress={() => setParticipants((prev) => prev.filter((id) => id !== u.id))}>
+                      <Text style={s.chipX}> ×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                <TouchableOpacity style={s.addChip} onPress={() => setShowParticipantPicker(true)}>
+                  <Text style={s.addChipText}>+ Add</Text>
                 </TouchableOpacity>
-                {(groups as any[]).map((g) => (
+              </View>
+            </View>
+          )}
+
+          {/* Split type — only when splitting */}
+          {mode !== 'personal' && (
+            <View style={s.field}>
+              <Text style={s.fieldLabel}>Split type</Text>
+              <View style={s.splitRow}>
+                {SPLIT_TYPES.map((t) => (
                   <TouchableOpacity
-                    key={g.id}
-                    style={[s.dropItem, groupId === g.id && s.dropItemActive]}
-                    onPress={() => { setGroupId(g.id); setShowGroups(false); setParticipants([user!.id]); }}
+                    key={t.value}
+                    style={[s.splitOption, splitType === t.value && s.splitOptionActive]}
+                    onPress={() => setSplitType(t.value)}
                   >
-                    <Text style={s.dropItemText}>{g.name}</Text>
+                    <Text style={[s.splitOptionText, splitType === t.value && s.splitOptionTextActive]}>
+                      {t.label}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
-            )}
-          </View>
-
-          {/* Paid By */}
-          <View style={s.field}>
-            <Text style={s.fieldLabel}>Paid by</Text>
-            <TouchableOpacity
-              style={s.selector}
-              onPress={() => setShowPaidByPicker(true)}
-              disabled={availableUsers.length <= 1}
-            >
-              <View style={[s.miniAvatar, { backgroundColor: paidBy.avatar_color || '#00658E' }]}>
-                <Text style={s.miniAvatarText}>{avatarInitials(paidBy.name)}</Text>
-              </View>
-              <Text style={[s.selectorText, { flex: 1, marginLeft: 8 }]}>{paidBy.name}</Text>
-              {availableUsers.length > 1 && <Text style={s.selectorArrow}>▼</Text>}
-            </TouchableOpacity>
-          </View>
-
-          {/* Participants */}
-          <View style={s.field}>
-            <Text style={s.fieldLabel}>Split with</Text>
-            <View style={s.chipsWrap}>
-              {participantUsers.map((u) => (
-                <View key={u.id} style={s.chip}>
-                  <Text style={s.chipText}>{u.name.split(' ')[0]}</Text>
-                  <TouchableOpacity onPress={() => setParticipants((prev) => prev.filter((id) => id !== u.id))}>
-                    <Text style={s.chipX}> ×</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity style={s.addChip} onPress={() => setShowParticipantPicker(true)}>
-                <Text style={s.addChipText}>+ Add</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-
-          {/* Split type */}
-          <View style={s.field}>
-            <Text style={s.fieldLabel}>Split type</Text>
-            <View style={s.splitRow}>
-              {SPLIT_TYPES.map((t) => (
-                <TouchableOpacity
-                  key={t.value}
-                  style={[s.splitOption, splitType === t.value && s.splitOptionActive]}
-                  onPress={() => setSplitType(t.value)}
-                >
-                  <Text style={[s.splitOptionText, splitType === t.value && s.splitOptionTextActive]}>
-                    {t.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+          )}
 
           {/* Per-participant value inputs */}
-          {(splitType !== 'equal') && participantUsers.length > 0 && (
+          {mode !== 'personal' && (splitType !== 'equal') && participantUsers.length > 0 && (
             <View style={s.field}>
               <Text style={s.fieldLabel}>
                 {splitType === 'exact' ? 'Exact amounts (₹)' : splitType === 'percentage' ? 'Percentages (%)' : 'Shares (units)'}
@@ -627,6 +694,13 @@ function createStyles(c: C) {
     saveBtn: { backgroundColor: '#00658E', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 8 },
     saveBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
     scroll: { paddingHorizontal: 20, paddingBottom: 120 },
+    modeRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+    modeOption: { flex: 1, backgroundColor: c.pillBg, borderRadius: 14, paddingVertical: 12, alignItems: 'center', gap: 4, borderWidth: 1.5, borderColor: 'transparent' },
+    modeOptionActive: { backgroundColor: '#E8F3FA', borderColor: '#00658E' },
+    modeEmoji: { fontSize: 20 },
+    modeLabel: { fontSize: 13, fontWeight: '700', color: c.textSub },
+    modeLabelActive: { color: '#00658E' },
+    modeHint: { fontSize: 12, color: c.textMuted, marginBottom: 14, lineHeight: 17 },
     amountCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#00658E', borderRadius: 20, padding: 24, marginBottom: 6 },
     currencySymbol: { fontSize: 32, fontWeight: '700', color: 'rgba(255,255,255,0.6)', marginRight: 4 },
     amountInput: { fontSize: 48, fontWeight: '800', color: '#FFFFFF', minWidth: 120, textAlign: 'center' },

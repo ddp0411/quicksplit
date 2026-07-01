@@ -880,6 +880,7 @@ class GroupImportView(APIView):
                         amount=cost,
                         category=mapped_cat,
                         paid_by=request.user,
+                        created_by=request.user,
                         date=expense_date,
                         split_type='equal',
                     )

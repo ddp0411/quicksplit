@@ -99,7 +99,7 @@ export const GroupsScreen: React.FC = () => {
       <View style={s.topBar}>
         <View style={s.topBarSide} />
         <Text style={s.title}>Groups</Text>
-        <TouchableOpacity style={s.iconBtn} onPress={() => navigation.navigate('CreateGroup')}>
+        <TouchableOpacity style={s.iconBtn} onPress={() => navigation.navigate('NewGroup')}>
           <Text style={s.iconBtnText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -158,7 +158,7 @@ export const GroupsScreen: React.FC = () => {
                 title={search || filter !== 'all' || categoryFilter !== 'all' ? 'No results' : 'No groups yet'}
                 subtitle="Create a group to start splitting with friends"
                 actionLabel={!search && filter === 'all' && categoryFilter === 'all' ? 'Create group' : undefined}
-                onAction={!search && filter === 'all' && categoryFilter === 'all' ? () => navigation.navigate('CreateGroup') : undefined}
+                onAction={!search && filter === 'all' && categoryFilter === 'all' ? () => navigation.navigate('NewGroup') : undefined}
               />
             ) : null
           }

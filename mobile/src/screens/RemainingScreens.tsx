@@ -393,11 +393,29 @@ export const SpendingInsightsScreen: React.FC = () => {
   const { colors } = useTheme();
   const s = createSiStyles(colors);
   const [filter, setFilter] = useState('this_month');
+  const [subsMonthly, setSubsMonthly] = useState(0);
+  const [budgets, setBudgets] = useState<{ count: number; over: number }>({ count: 0, over: 0 });
 
   const { data: expenses = [] } = useQuery({
     queryKey: ['expenses'],
     queryFn: () => expensesAPI.getExpenses(),
   });
+
+  // Subscriptions + budgets are stored locally (same AsyncStorage keys as the tools screens).
+  useEffect(() => {
+    (async () => {
+      try {
+        const [subsRaw, budgetsRaw] = await Promise.all([
+          AsyncStorage.getItem('qs-subscriptions'),
+          AsyncStorage.getItem('qs-budgets'),
+        ]);
+        const subs: any[] = subsRaw ? JSON.parse(subsRaw) : [];
+        setSubsMonthly(subs.reduce((sum, sub) => sum + (sub.cycle === 'yearly' ? sub.amount / 12 : sub.amount), 0));
+        const b: any[] = budgetsRaw ? JSON.parse(budgetsRaw) : [];
+        setBudgets({ count: b.length, over: b.filter((x) => x.limit > 0 && x.spent >= x.limit).length });
+      } catch { /* ignore local read errors */ }
+    })();
+  }, []);
 
   const filtered = (expenses as any[]).filter((e) => {
     const d = new Date(e.date);
@@ -412,11 +430,15 @@ export const SpendingInsightsScreen: React.FC = () => {
     return true;
   });
 
-  const totalSpend = filtered.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  // Use the user's own share (what they actually spent), not the full expense amount.
+  const share = (e: any) => e.your_share ?? 0;
+  const totalSpend = filtered.reduce((sum, e) => sum + share(e), 0);
+  const personalSpend = filtered.filter((e) => !e.group).reduce((sum, e) => sum + share(e), 0);
+  const groupSpend = filtered.filter((e) => e.group).reduce((sum, e) => sum + share(e), 0);
 
   const byCategory: Record<string, number> = {};
   filtered.forEach((e) => {
-    byCategory[e.category] = (byCategory[e.category] ?? 0) + parseFloat(e.amount);
+    byCategory[e.category] = (byCategory[e.category] ?? 0) + share(e);
   });
   const sorted = Object.entries(byCategory)
     .map(([cat, amount]) => ({ cat, amount }))
@@ -427,7 +449,7 @@ export const SpendingInsightsScreen: React.FC = () => {
       <ScreenHeader title="Spending Insights" />
       <ScrollView contentContainerStyle={s.scroll}>
         <View style={s.hero}>
-          <Text style={s.heroLabel}>Total Spent</Text>
+          <Text style={s.heroLabel}>Your Spending</Text>
           <Text style={s.heroAmount}>{formatCurrency(totalSpend)}</Text>
         </View>
 
@@ -443,6 +465,34 @@ export const SpendingInsightsScreen: React.FC = () => {
           ))}
         </View>
 
+        {/* Personal vs Group (for the selected period) */}
+        <View style={s.splitCard}>
+          <View style={s.splitCol}>
+            <Text style={s.splitVal}>{formatCurrency(personalSpend)}</Text>
+            <Text style={s.splitLbl}>Personal</Text>
+          </View>
+          <View style={s.splitSep} />
+          <View style={s.splitCol}>
+            <Text style={s.splitVal}>{formatCurrency(groupSpend)}</Text>
+            <Text style={s.splitLbl}>Groups</Text>
+          </View>
+        </View>
+
+        {/* Subscriptions & budgets (current, not period-filtered) */}
+        <View style={s.metaCard}>
+          <View style={s.metaRow}>
+            <Text style={s.metaLabel}>📺 Subscriptions</Text>
+            <Text style={s.metaValue}>{formatCurrency(subsMonthly)}/mo</Text>
+          </View>
+          <View style={[s.metaRow, s.metaRowBorder]}>
+            <Text style={s.metaLabel}>🎯 Budgets</Text>
+            <Text style={[s.metaValue, budgets.over > 0 && { color: '#DC2626' }]}>
+              {budgets.count === 0 ? 'None set' : budgets.over > 0 ? `${budgets.over} over limit` : `${budgets.count} on track`}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={s.sectionTitle}>By category</Text>
         {sorted.length === 0 ? (
           <View style={s.empty}>
             <Text style={s.emptyText}>No expenses for this period</Text>
@@ -480,11 +530,22 @@ function createSiStyles(c: C) {
     hero: { backgroundColor: '#00658E', borderRadius: 20, padding: 24, alignItems: 'center', marginBottom: 20 },
     heroLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
     heroAmount: { fontSize: 36, fontWeight: '800', color: '#FFFFFF' },
-    filterRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+    filterRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
     filterChip: { flex: 1, backgroundColor: c.pillBg, borderRadius: 20, paddingVertical: 8, alignItems: 'center', borderWidth: 1, borderColor: 'transparent' },
     filterChipActive: { backgroundColor: c.successBg, borderColor: '#00658E' },
     filterChipText: { fontSize: 12, fontWeight: '600', color: c.textSub },
     filterChipTextActive: { color: '#00658E' },
+    splitCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, paddingVertical: 16, marginBottom: 12 },
+    splitCol: { flex: 1, alignItems: 'center' },
+    splitVal: { fontSize: 18, fontWeight: '800', color: c.text },
+    splitLbl: { fontSize: 12, color: c.textMuted, marginTop: 2 },
+    splitSep: { width: StyleSheet.hairlineWidth, height: 34, backgroundColor: c.cardBorder },
+    metaCard: { backgroundColor: c.card, borderRadius: 16, borderWidth: 1, borderColor: c.cardBorder, paddingHorizontal: 14, marginBottom: 20 },
+    metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 13 },
+    metaRowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
+    metaLabel: { fontSize: 14, fontWeight: '600', color: c.sectionLabel },
+    metaValue: { fontSize: 14, fontWeight: '700', color: c.text },
+    sectionTitle: { fontSize: 13, fontWeight: '700', color: c.textSub, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 },
     empty: { alignItems: 'center', paddingTop: 40 },
     emptyText: { fontSize: 15, color: c.textMuted },
     row: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, backgroundColor: c.card, borderRadius: 14, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 8 },
@@ -1077,7 +1138,7 @@ function createRfStyles(c: C) {
 // Import Splitwise
 // ─────────────────────────────────────────────────────────────────────────────
 export const ImportSplitwiseScreen: React.FC = () => {
-  const { toast } = useToastStore();
+  const navigation = useNavigation<any>();
   const { colors } = useTheme();
   const s = createImStyles(colors);
   const steps = [
@@ -1087,15 +1148,9 @@ export const ImportSplitwiseScreen: React.FC = () => {
     { n: '4', text: 'Tap "Upload CSV" below to import' },
   ];
 
-  const handleUpload = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All });
-      if (!result.canceled) {
-        toast('CSV import coming soon — processing pipeline in progress', 'info');
-      }
-    } catch {
-      toast('Could not open file picker', 'error');
-    }
+  // Reuse the real CSV importer that lives in the Groups stack (POST /groups/import/).
+  const handleUpload = () => {
+    navigation.navigate('Groups', { screen: 'ImportGroup' });
   };
 
   return (

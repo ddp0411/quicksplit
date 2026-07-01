@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../theme/useTheme';
 
 type C = ReturnType<typeof useTheme>['colors'];
@@ -72,6 +73,10 @@ export const HomeScreen: React.FC = () => {
 
   const todayInsight = useMemo(() => AI_INSIGHTS[new Date().getDate() % AI_INSIGHTS.length], []);
 
+  // Local-only finance data (subscriptions + budgets) for the Spending Insights card.
+  const [subsMonthly, setSubsMonthly] = useState(0);
+  const [budgetInfo, setBudgetInfo] = useState<{ count: number; over: number }>({ count: 0, over: 0 });
+
   // NOTE: balance uses the shared ['balances'] key so writes elsewhere (AddExpense /
   // SettleUp) that invalidate ['balances'] also refresh Home.
   const { data: balance, isLoading: balanceLoading, refetch: refetchBalance } = useQuery({
@@ -106,20 +111,40 @@ export const HomeScreen: React.FC = () => {
       refetchFriends();
       refetchActivity();
       refetchMyExpenses();
+      // Subscriptions + budgets live only in AsyncStorage (same keys the Personal tools write).
+      (async () => {
+        try {
+          const [subsRaw, budgetsRaw] = await Promise.all([
+            AsyncStorage.getItem('qs-subscriptions'),
+            AsyncStorage.getItem('qs-budgets'),
+          ]);
+          const subs: any[] = subsRaw ? JSON.parse(subsRaw) : [];
+          setSubsMonthly(subs.reduce((sum, sub) => sum + (sub.cycle === 'yearly' ? sub.amount / 12 : sub.amount), 0));
+          const budgets: any[] = budgetsRaw ? JSON.parse(budgetsRaw) : [];
+          setBudgetInfo({
+            count: budgets.length,
+            over: budgets.filter((b) => b.limit > 0 && b.spent >= b.limit).length,
+          });
+        } catch { /* ignore local read errors */ }
+      })();
     }, [refetchBalance, refetchGroups, refetchFriends, refetchActivity, refetchMyExpenses])
   );
 
-  // Current-month personal spend (sum of the user's share), for the insights card.
-  const monthSpend = useMemo(() => {
+  // Current-month spend (sum of the user's share) split into personal (non-group) vs group.
+  const { monthSpend, personalSpend, groupSpend } = useMemo(() => {
     const now = new Date();
     const y = now.getFullYear();
     const m = now.getMonth();
-    return (myExpenses as any[])
-      .filter((e: any) => {
-        const d = new Date(e.date + 'T00:00:00');
-        return d.getFullYear() === y && d.getMonth() === m;
-      })
-      .reduce((sum: number, e: any) => sum + (e.your_share ?? 0), 0);
+    let personal = 0;
+    let group = 0;
+    for (const e of myExpenses as any[]) {
+      const d = new Date(e.date + 'T00:00:00');
+      if (d.getFullYear() !== y || d.getMonth() !== m) continue;
+      const share = e.your_share ?? 0;
+      if (e.group) group += share;
+      else personal += share;
+    }
+    return { monthSpend: personal + group, personalSpend: personal, groupSpend: group };
   }, [myExpenses]);
 
   const topGroups = useMemo(
@@ -264,24 +289,49 @@ export const HomeScreen: React.FC = () => {
           <Text style={s.insightCta}>Chat →</Text>
         </TouchableOpacity>
 
-        {/* This month's spending → Personal spending view */}
+        {/* Spending Insights → full insights view (expenses + subscriptions + budgets) */}
         <TouchableOpacity
-          style={s.spendCard}
-          onPress={() => navigation.navigate('Personal')}
+          style={s.insightsCard}
+          onPress={() => navigation.navigate('Personal', { screen: 'SpendingInsights' })}
           activeOpacity={0.85}
         >
-          <View style={s.spendLeft}>
-            <View style={[s.iconTile, { backgroundColor: colors.tertiaryContainer }]}>
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path d="M4 19 V5 M4 19 H20 M7 14.5 L11 10 L14 13 L19 7" stroke={colors.tertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </Svg>
+          <View style={s.insightsHeader}>
+            <View style={s.spendLeft}>
+              <View style={[s.iconTile, { backgroundColor: colors.tertiaryContainer }]}>
+                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                  <Path d="M4 19 V5 M4 19 H20 M7 14.5 L11 10 L14 13 L19 7" stroke={colors.tertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </Svg>
+              </View>
+              <View>
+                <Text style={s.spendLabel}>SPENDING INSIGHTS</Text>
+                <Text style={s.spendAmount}>
+                  {formatCurrency(monthSpend)}<Text style={s.spendPeriod}> this month</Text>
+                </Text>
+              </View>
             </View>
-            <View>
-              <Text style={s.spendLabel}>THIS MONTH'S SPENDING</Text>
-              <Text style={s.spendAmount}>{formatCurrency(monthSpend)}</Text>
+            <Text style={s.spendCta}>View →</Text>
+          </View>
+          <View style={s.insightsStats}>
+            <View style={s.statItem}>
+              <Text style={s.statValue}>{formatCurrency(personalSpend)}</Text>
+              <Text style={s.statLabel}>Personal</Text>
+            </View>
+            <View style={s.statDivider} />
+            <View style={s.statItem}>
+              <Text style={s.statValue}>{formatCurrency(groupSpend)}</Text>
+              <Text style={s.statLabel}>Groups</Text>
+            </View>
+            <View style={s.statDivider} />
+            <View style={s.statItem}>
+              <Text style={s.statValue}>{formatCurrency(subsMonthly)}</Text>
+              <Text style={s.statLabel}>Subs/mo</Text>
+            </View>
+            <View style={s.statDivider} />
+            <View style={s.statItem}>
+              <Text style={[s.statValue, budgetInfo.over > 0 && { color: colors.errorText }]}>{budgetInfo.count}</Text>
+              <Text style={s.statLabel}>{budgetInfo.over > 0 ? `${budgetInfo.over} over` : 'Budgets'}</Text>
             </View>
           </View>
-          <Text style={s.spendCta}>Insights →</Text>
         </TouchableOpacity>
 
         {/* Active Groups */}
@@ -299,7 +349,7 @@ export const HomeScreen: React.FC = () => {
           ) : topGroups.length === 0 ? (
             <View style={s.emptyCard}>
               <Text style={s.emptyText}>No groups yet</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Groups', { screen: 'CreateGroup' })}>
+              <TouchableOpacity onPress={() => navigation.navigate('Groups', { screen: 'NewGroup' })}>
                 <Text style={s.seeAll}>+ CREATE</Text>
               </TouchableOpacity>
             </View>
@@ -470,14 +520,20 @@ function createStyles(c: C) {
     insightText: { fontSize: 13, color: c.textSub, lineHeight: 18, fontFamily: 'Inter_400Regular' },
     insightCta: { fontSize: 13, fontWeight: '700', color: c.primary, marginLeft: 4, fontFamily: 'Inter_700Bold' },
 
-    spendCard: {
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    insightsCard: {
       backgroundColor: c.card, borderRadius: 18, borderWidth: 1, borderColor: c.cardBorder, padding: 14, marginBottom: 18,
     },
+    insightsHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     spendLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
     spendLabel: { fontSize: 10, fontWeight: '700', color: c.textMuted, letterSpacing: 1, marginBottom: 3, fontFamily: 'Inter_700Bold' },
     spendAmount: { fontSize: 20, fontWeight: '700', color: c.text, fontFamily: 'Inter_700Bold' },
+    spendPeriod: { fontSize: 12, fontWeight: '500', color: c.textMuted, fontFamily: 'Inter_400Regular' },
     spendCta: { fontSize: 13, fontWeight: '700', color: c.primary, marginLeft: 8, fontFamily: 'Inter_700Bold' },
+    insightsStats: { flexDirection: 'row', alignItems: 'center', marginTop: 14, paddingTop: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.cardBorder },
+    statItem: { flex: 1, alignItems: 'center' },
+    statValue: { fontSize: 14, fontWeight: '700', color: c.text, fontFamily: 'Inter_700Bold' },
+    statLabel: { fontSize: 10, color: c.textMuted, marginTop: 2, fontFamily: 'Inter_400Regular' },
+    statDivider: { width: StyleSheet.hairlineWidth, height: 26, backgroundColor: c.cardBorder },
 
     section: { marginBottom: 18 },
     sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
